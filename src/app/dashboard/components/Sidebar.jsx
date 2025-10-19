@@ -6,13 +6,25 @@ import {
   LayoutDashboard, 
   Users, 
   Package, 
-  X 
+  X,
+  Wrench,
+  Calendar,
+  Megaphone,
+  BarChart3,
+  Smartphone,
+  Headphones,
+  Settings
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Repair Services', href: '/dashboard/repair-services', icon: Wrench },
   { name: 'Products', href: '/dashboard/products', icon: Package },
+  { name: 'Bookings', href: '/dashboard/bookings', icon: Calendar },
+  { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Content', href: '/dashboard/content', icon: Megaphone },
+  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
