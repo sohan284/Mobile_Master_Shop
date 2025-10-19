@@ -8,6 +8,7 @@ export default function page() {
       <Header />
       <main>
         {/* Main content goes here */}
+        <div>Main Content</div>
       </main>
       <Footer />
     </div>
