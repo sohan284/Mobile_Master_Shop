@@ -3,7 +3,7 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="bg-[#0f4c81] text-gray-300 py-10 px-6 md:px-20">
+        <footer className="bg-[#6B7E8D] text-gray-300 py-10 px-6 md:px-20">
             {/* Top grid with 4 sections */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
                 {/* Repair Section */}

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
+import PageTransition from '@/components/animations/PageTransition';
 
 // Phone models data (same as in parent page)
 const phoneModels = [
@@ -104,9 +105,9 @@ export default function PhoneModelPage({ params }) {
     ];
 
     return (
+        <PageTransition>
         <div className="min-h-screen ">
-            <Header />
-            <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Breadcrumb */}
                     <div className="mb-6">
@@ -196,7 +197,7 @@ export default function PhoneModelPage({ params }) {
                     </div>
                 </div>
             </div>
-            <Footer />
-        </div>
+         </div>
+        </PageTransition>
     );
 }

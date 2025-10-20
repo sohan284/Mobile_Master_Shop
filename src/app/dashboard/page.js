@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   Star
 } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Dashboard() {
   const stats = [
@@ -47,11 +48,12 @@ export default function Dashboard() {
   ];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome back! Here's what's happening with your business.</p>
+        <p className="text-gray-600">Welcome back! Heres whats happening with your business.</p>
       </div>
 
       {/* Stats grid */}
@@ -132,5 +134,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

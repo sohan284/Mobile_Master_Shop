@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Megaphone, Video, Gift, Settings, Eye } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Content() {
   const [activeTab, setActiveTab] = useState('offers');
@@ -88,6 +89,7 @@ export default function Content() {
   ];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -284,5 +286,6 @@ export default function Content() {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 }

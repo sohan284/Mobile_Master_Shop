@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import PageTransition from '@/components/animations/PageTransition';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
@@ -408,6 +409,7 @@ export default function BrandRepairPage({ params }) {
     }
 
     return (
+        <PageTransition>
         <div className="min-h-screen ">
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
@@ -527,5 +529,6 @@ export default function BrandRepairPage({ params }) {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 }

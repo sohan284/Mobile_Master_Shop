@@ -14,6 +14,7 @@ import {
   Globe,
   Save
 } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('business');
@@ -59,6 +60,7 @@ export default function Settings() {
   };
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -334,5 +336,6 @@ export default function Settings() {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 }

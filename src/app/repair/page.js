@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import PageTransition from "@/components/animations/PageTransition";
 
 export default function RepairPage() {
   const phoneBrands = [
@@ -50,7 +51,8 @@ export default function RepairPage() {
   );
     
   return (
-    <div className="min-h-screen max-w-[1200px] mx-auto">
+  <PageTransition>
+      <div className="min-h-screen max-w-[1200px] mx-auto">
       <div className="container mx-auto px-4 py-8">
         <div className="">
        <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
@@ -228,5 +230,6 @@ export default function RepairPage() {
         </div>
       </div>
     </div>
+  </PageTransition>
   );
 }

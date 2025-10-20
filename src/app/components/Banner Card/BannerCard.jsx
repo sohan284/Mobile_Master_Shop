@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { CustomButton } from '@/components/ui/button';
 import Link from 'next/link';
+import MotionFade from '@/components/animations/MotionFade';
 
 export default function BannerCard() {
     const cardsData = [
@@ -30,33 +31,43 @@ export default function BannerCard() {
 
     return (
         <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 gap-6 py-20 max-w-[1200px] mx-auto">
-            {cardsData.map((card) => (
-                <Card key={card.id} className="shadow-lg overflow-visible w-80 md:w-96">
-                    <CardContent className="px-6">
-                        {/* Image (absolute positioned - overlapping top) */}
-                        <div className='flex'>
-                            <img
-                                src={card.image}
-                                alt={card.heading}
-                                className="w-14 obeject-contain -mt-16 mb-2 ml-8"
-                            />
+            {cardsData.map((card, idx) => (
+                <MotionFade key={card.id} delay={idx * 0.05}>
+              <Card className="group relative shadow-xl overflow-visible w-64 md:w-80 transition-all duration-300 ease-out hover:shadow-2xl hover:-translate-y-1 bg-white border-2 border-slate-200 hover:border-blue-400">
+    <CardContent className="px-5 pb-5 pt-16">
+        {/* Floating Image Container */}
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-600 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl">
+            <div className="w-full h-full bg-white rounded-xl p-2.5 flex items-center justify-center">
+                <img
+                    src={card.image}
+                    alt={card.heading}
+                    className="w-full h-full object-contain"
+                />
+            </div>
+        </div>
 
-                            {/* Heading */}
-                            <h2 className="text-2xl font-bold text-blue-900 ml-6 mb-4">
-                                {card.heading}
-                            </h2>
-                        </div>
+        {/* Decorative accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-cyan-500"></div>
 
-                        {/* Button */}
-                        <Link href={card.link}>
-                            <Button
-                                className="w-full cursor-pointer text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-6"
-                            >
-                                {card.buttonText}
-                            </Button>
-                        </Link>
-                    </CardContent>
-                </Card>
+        {/* Content Section */}
+        <div className="text-center space-y-4">
+            {/* Heading */}
+            <h2 className="text-xl md:text-2xl font-bold text-blue-900 leading-tight transition-all duration-300 group-hover:scale-105">
+                {card.heading}
+            </h2>
+
+            {/* Decorative divider */}
+            <div className="h-1 w-16 mx-auto bg-cyan-500 rounded-full"></div>
+
+            {/* Button */}
+            <Link href={card.link} className="block mt-5 group rounded-none">
+                <CustomButton className="w-full text-base  bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 rounded-none">
+                    {card.buttonText}
+                </CustomButton>
+            </Link>
+        </div>
+    </CardContent>
+</Card></MotionFade>
             ))}
         </div>
     );

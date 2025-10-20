@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,6 +60,7 @@ export default function Users() {
   );
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -199,5 +201,6 @@ export default function Users() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

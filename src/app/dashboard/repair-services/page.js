@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Smartphone, Wrench, DollarSign } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function RepairServices() {
   const [activeTab, setActiveTab] = useState('models');
@@ -32,6 +33,7 @@ export default function RepairServices() {
   ];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -196,5 +198,6 @@ export default function RepairServices() {
         </div>
       )}
     </div>
+    </PageTransition>
   );
 }
