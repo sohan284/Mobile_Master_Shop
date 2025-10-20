@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function BannerCard() {
     const cardsData = [
@@ -9,18 +10,21 @@ export default function BannerCard() {
             image: '/1.png',
             heading: 'Repair',
             buttonText: 'Make a quote',
+            link: '/repair',
         },
         {
             id: 2,
             image: '/2.png',
-            heading: 'Refurbished',
-            buttonText: 'See the Refurbished Ones',
+            heading: 'Phone',
+            buttonText: 'See the Phones Ones',
+            link: '/phones',
         },
         {
             id: 3,
             image: '/3.png',
             heading: 'Accessories',
             buttonText: 'See the range',
+            link: '/accessories',
         },
     ];
 
@@ -44,11 +48,13 @@ export default function BannerCard() {
                         </div>
 
                         {/* Button */}
-                        <Button
-                            className="w-full text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-6"
-                        >
-                            {card.buttonText}
-                        </Button>
+                        <Link href={card.link}>
+                            <Button
+                                className="w-full cursor-pointer text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-6"
+                            >
+                                {card.buttonText}
+                            </Button>
+                        </Link>
                     </CardContent>
                 </Card>
             ))}

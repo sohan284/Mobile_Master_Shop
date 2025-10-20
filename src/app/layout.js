@@ -1,5 +1,7 @@
 import { Roboto, Nunito } from "next/font/google";
 import "./globals.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -22,7 +24,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
-        {children}
+        <Header />
+        <main>
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
