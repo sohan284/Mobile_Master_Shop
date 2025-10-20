@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { CustomButton } from '@/components/ui/button';
+import MotionFade from '@/components/animations/MotionFade';
 
 export default function Repair() {
     const brandLogo = [
@@ -26,12 +27,12 @@ export default function Repair() {
                 <img src="/1.png" alt="Phone" className="w-16 sm:w-20" />
 
                 {/* Title */}
-                <h2 className="font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#0f4c81] text-center">
+                <h2 className="font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#6B7E8D] text-center">
                     Repairs
                 </h2>
 
                 {/* Keep this second div's UI exactly the same */}
-                <div className="p-4 bg-[#0f4c81] shadow-[10px_10px_0px_#a8c2d9]">
+                <div className="p-4 bg-[#6B7E8D] shadow-[10px_10px_0px_#a8c2d9]">
                     <p className="text-center text-lg max-w-3xl font-bold text-white">
                         Repairs to all brands, 12-month warranty
                     </p>
@@ -45,35 +46,39 @@ export default function Repair() {
 
                 {/* Brand logos */}
                 <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 pt-4">
-                    {brandLogo.map((item) => (
-                        <div key={item.id} className="w-12 sm:w-14 md:w-16 flex items-center justify-center">
-                            <img
-                                src={item.src}
-                                alt={item.alt}
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
+                    {brandLogo.map((item, idx) => (
+                        <MotionFade key={item.id} delay={idx * 0.04}>
+                            <div className="w-12 sm:w-14 md:w-16 flex items-center justify-center transition-transform duration-200 ease-out hover:scale-110">
+                                <img
+                                    src={item.src}
+                                    alt={item.alt}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
+                        </MotionFade>
                     ))}
                 </div>
 
                 {/* Repair categories grid */}
                 <div className='grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 mt-4 mr-2 md:m-0'>
-                    {imagePath.map((item) => (
-                        <div key={item.id} className="mb-6 flex items-center">
-                            <img
-                                src={item.src}
-                                alt={item.alt}
-                                className="w-16 object-contain"
-                            />
-                            <h3 className="text-2xl w-32 font-bold text-center bg-white p-6 rounded-r-lg">{item.alt}</h3>
-                        </div>
+                    {imagePath.map((item, idx) => (
+                        <MotionFade key={item.id} delay={idx * 0.05}>
+                            <div className="mb-6 flex items-center transition-all duration-200 ease-out hover:-translate-y-0.5">
+                                <img
+                                    src={item.src}
+                                    alt={item.alt}
+                                    className="w-16 object-contain transition-transform duration-200 ease-out group-hover:scale-110"
+                                />
+                                <h3 className="text-2xl w-32 font-bold text-center bg-white p-6 rounded-r-lg">{item.alt}</h3>
+                            </div>
+                        </MotionFade>
                     ))}
                 </div>
 
                 {/* CTA Button */}
-                <Button className="text-base sm:text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 sm:py-6 px-8 sm:px-10 rounded-xl mt-4">
+                <CustomButton className="group text-base sm:text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 sm:py-6 px-8 sm:px-10 rounded-xl mt-4">
                     Get the price of my repair
-                </Button>
+                </CustomButton>
             </div>
         </div>
     );

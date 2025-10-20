@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X, Search, User, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
-
+import Image from 'next/image';
+import logo from "@/assets/mlkLogo.png"
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [mobileSearch, setMobileSearch] = useState(false);
@@ -13,7 +14,7 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-[#0f4c81] text-white py-6 sticky top-0 w-full z-50">
+        <header className="bg-[#6B7E8D] text-white py-6 sticky top-0 w-full z-50">
             <div className="max-w-5xl mx-auto px-4 flex items-center justify-between lg:justify-center relative">
 
                 {/* Mobile: Hamburger - Logo - User */}
@@ -39,7 +40,11 @@ export default function Header() {
                     </div>
 
                     {/* Center Logo */}
-                    <div className="text-2xl font-bold text-center">LOGO</div>
+                    <div className="text-2xl font-bold text-center">
+                        <Link href="/">
+                            <Image src={logo} alt="Logo" width={40} height={40} />
+                        </Link>
+                    </div>
 
                     {/* Right Nav */}
                     <div className="flex items-center space-x-4 text-lg">
@@ -62,7 +67,7 @@ export default function Header() {
             {isOpen && (
                 <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" onClick={toggleSidebar}>
                     <div
-                        className="fixed top-0 left-0 w-full h-full bg-[#0f4c81] text-white p-6 z-50"
+                        className="fixed top-0 left-0 w-full h-full bg-[#6B7E8D] text-white p-6 z-50"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center mb-6">

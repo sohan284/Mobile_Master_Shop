@@ -8,12 +8,12 @@ export default function Refurbished() {
                 <img src="/2.png" alt="Phone" className="w-16 sm:w-20" />
 
                 {/* Title */}
-                <h2 className="font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#0f4c81] text-center">
+                <h2 className="font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#6B7E8D] text-center">
                     Save Refurbished
                 </h2>
 
                 {/* Keep this second div's UI exactly the same */}
-                <div className="p-4 bg-[#0f4c81] shadow-[10px_10px_0px_#a8c2d9]">
+                <div className="p-4 bg-[#6B7E8D] shadow-[10px_10px_0px_#a8c2d9]">
                     <p className="text-center text-lg max-w-3xl font-bold text-white">
                         Refurbished smartphones guaranteed for 24 months
                     </p>

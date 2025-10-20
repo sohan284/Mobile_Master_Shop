@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
+import PageTransition from '@/components/animations/PageTransition';
 
 // Phone models data (same as in parent page)
 const phoneModels = [
@@ -104,9 +105,9 @@ export default function PhoneModelPage({ params }) {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
-            <div className="container mx-auto px-4 py-8">
+        <PageTransition>
+        <div className="min-h-screen ">
+          <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Breadcrumb */}
                     <div className="mb-6">
@@ -139,6 +140,16 @@ export default function PhoneModelPage({ params }) {
                                 Storage: {phone.storage} • Starting from {phone.price}
                             </div>
                         </div>
+                    </div>
+                    
+                    {/* Step System */}
+                    <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
+                        <div className="bg-[#134B81] text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
+                            3
+                        </div>
+                        <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+                            Choose your repair service
+                        </h2>
                     </div>
                     
                     {/* Services Grid */}
@@ -186,7 +197,7 @@ export default function PhoneModelPage({ params }) {
                     </div>
                 </div>
             </div>
-            <Footer />
-        </div>
+         </div>
+        </PageTransition>
     );
 }

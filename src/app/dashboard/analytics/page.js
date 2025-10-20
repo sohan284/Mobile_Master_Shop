@@ -14,6 +14,7 @@ import {
   BarChart3,
   PieChart
 } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Analytics() {
   const [activePeriod, setActivePeriod] = useState('30d');
@@ -86,6 +87,7 @@ export default function Analytics() {
   ];
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -313,5 +315,6 @@ export default function Analytics() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

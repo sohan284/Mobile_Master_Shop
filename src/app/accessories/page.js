@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function AccessoriesPage() {
     const accessories = [
@@ -34,6 +35,7 @@ export default function AccessoriesPage() {
     ];
 
     return (
+        <PageTransition>
         <div className="min-h-screen bg-gray-50">
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
@@ -99,5 +101,6 @@ export default function AccessoriesPage() {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Calendar, Clock, MapPin, Mail, Phone, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import PageTransition from '@/components/animations/PageTransition';
 
 export default function Bookings() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -108,6 +109,7 @@ export default function Bookings() {
   };
 
   return (
+    <PageTransition>
     <div className="space-y-6">
       {/* Page header */}
       <div className="flex justify-between items-center">
@@ -245,5 +247,6 @@ export default function Bookings() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

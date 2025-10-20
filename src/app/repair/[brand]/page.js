@@ -1,6 +1,8 @@
-import React from 'react';
+"use client"
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import PageTransition from '@/components/animations/PageTransition';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 
@@ -381,14 +383,20 @@ const brandData = {
 export default function BrandRepairPage({ params }) {
     const { brand } = params;
     const brandInfo = brandData[brand];
+    const [searchTerm, setSearchTerm] = useState('');
     
     // Filter phone models by brand
     const brandPhones = phoneModels.filter(phone => phone.brand === brand);
+    
+    // Filter phones based on search term
+    const filteredPhones = brandPhones.filter(phone =>
+        phone.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // If brand not found, show 404
     if (!brandInfo) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-800 mb-4">Brand Not Found</h1>
                     <p className="text-gray-600 mb-6">The requested brand repair service is not available.</p>
@@ -401,7 +409,8 @@ export default function BrandRepairPage({ params }) {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <PageTransition>
+        <div className="min-h-screen ">
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
                     {/* Breadcrumb */}
@@ -430,39 +439,81 @@ export default function BrandRepairPage({ params }) {
                         </div>
                     </div>
                     
-                
-                    {/* Phone Models Section */}
-                    <div className="mb-12">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {brandPhones.map((phone) => (
-                                <Link key={phone.id} href={`/repair/${brand}/${phone.id}`}>
-                                    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                                        <div className="flex items-center mb-3">
-                                            <Image
-                                                src={phone.image}
-                                                alt={phone.name}
-                                                width={32}
-                                                height={32}
-                                                className="object-contain mr-3"
-                                            />
-                                            <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-                                                {phone.name}
-                                            </h3>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <div className="text-xs text-gray-500">
-                                                Storage: {phone.storage}
-                                            </div>
-                                            <div className="text-sm font-bold text-blue-600">
-                                                {phone.price}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                    {/* Step System */}
+                    <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
+                        <div className="bg-[#134B81] text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
+                            2
                         </div>
+                        <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+                            Choose your phone model
+                        </h2>
+                        
+                        {/* Search Bar */}
+                        <div className="mb-6">
+                            <div className="relative mx-auto">
+                                <input
+                                    type="text"
+                                    placeholder={`Search ${brandInfo.name} phones...`}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 pr-4 text-gray-700 bg-transparent border-0 border-b-2 border-gray-300 rounded-none focus:outline-none focus:border-blue-500"
+                                />
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                          {/* Phone Models Section */}
+                    <div className="mb-12">
+                        {filteredPhones.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {filteredPhones.map((phone) => (
+                                    <Link key={phone.id} href={`/repair/${brand}/${phone.id}`}>
+                                        <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                                            <div className="flex items-center mb-3">
+                                                <Image
+                                                    src={phone.image}
+                                                    alt={phone.name}
+                                                    width={32}
+                                                    height={32}
+                                                    className="object-contain mr-3"
+                                                />
+                                                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
+                                                    {phone.name}
+                                                </h3>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="text-xs text-gray-500">
+                                                    Storage: {phone.storage}
+                                                </div>
+                                                <div className="text-sm font-bold text-blue-600">
+                                                    {phone.price}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-12">
+                                <div className="text-gray-500 text-lg mb-4">
+                                    No phones found matching &quot;{searchTerm}&quot;
+                                </div>
+                                <button
+                                    onClick={() => setSearchTerm('')}
+                                    className="text-blue-600 hover:text-blue-800 underline"
+                                >
+                                    Clear search
+                                </button>
+                            </div>
+                        )}
                     </div>
                     
+                    </div>
+                
+                  
                     {/* Why Choose Us */}
                     <div className="bg-white p-8 rounded-lg shadow-md">
                         <h2 className="text-2xl font-bold text-gray-800 mb-4">Why Choose Our {brandInfo.name} Repair Services?</h2>
@@ -478,5 +529,6 @@ export default function BrandRepairPage({ params }) {
                 </div>
             </div>
         </div>
+        </PageTransition>
     );
 }
