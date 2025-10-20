@@ -4,6 +4,7 @@ import Footer from '@/app/components/Footer';
 import Banner from '@/app/components/Banner';
 import Repair from '@/app/components/Repair';
 import Refurbished from '@/app/components/Refurbished';
+import Accessories from '@/app/components/Accessories';
 
 export default function page() {
   return (
@@ -14,6 +15,7 @@ export default function page() {
         <Banner />
         <Repair />
         <Refurbished />
+        <Accessories />
       </main>
       <Footer />
     </div>

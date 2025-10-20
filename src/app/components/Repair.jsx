@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Repair() {
     const brandLogo = [
@@ -71,9 +72,9 @@ export default function Repair() {
                 </div>
 
                 {/* CTA Button */}
-                <Button className="text-base sm:text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 sm:py-6 px-8 sm:px-10 rounded-xl mt-4">
+                <Link href='#' className="text-base sm:text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 sm:py-6 px-8 sm:px-10 rounded-xl mt-4">
                     Get the price of my repair
-                </Button>
+                </Link>
             </div>
         </div>
     );
