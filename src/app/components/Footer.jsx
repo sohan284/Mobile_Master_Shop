@@ -10,10 +10,10 @@ export default function Footer() {
                 <div>
                     <h3 className="text-white text-lg font-semibold mb-4">Repair</h3>
                     <ul className="space-y-2">
-                        <li><Link href="#" className="hover:text-white transition">Smartphone repair</Link></li>
                         <li><Link href="#" className="hover:text-white transition">APPLE</Link></li>
                         <li><Link href="#" className="hover:text-white transition">SAMSUNG</Link></li>
                         <li><Link href="#" className="hover:text-white transition">XIAOMI</Link></li>
+                        <li><Link href="#" className="hover:text-white transition">HUAWEI</Link></li>
                     </ul>
                 </div>
 
@@ -35,8 +35,8 @@ export default function Footer() {
                     <h3 className="text-white text-lg font-semibold mb-4">Our Stores</h3>
                     <ul className="space-y-2">
                         <li><Link href="#" className="hover:text-white transition">Repair Paris</Link></li>
-                        <li><Link href="#" className="hover:text-white transition">Repair Marseille</Link></li>
-                        <li><Link href="#" className="hover:text-white transition">Lyon Repair</Link></li>
+                        {/* <li><Link href="#" className="hover:text-white transition">Repair Marseille</Link></li>
+                        <li><Link href="#" className="hover:text-white transition">Lyon Repair</Link></li> */}
                     </ul>
                 </div>
 
