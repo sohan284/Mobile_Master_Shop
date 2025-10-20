@@ -42,7 +42,7 @@ export default function Header() {
                     {/* Center Logo */}
                     <div className="text-2xl font-bold text-center">
                         <Link href="/">
-                            <Image src={logo} alt="Logo" width={100} height={100} />
+                            <Image src={logo} alt="Logo" width={40} height={40} />
                         </Link>
                     </div>
 
