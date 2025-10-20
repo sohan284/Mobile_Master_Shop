@@ -2,6 +2,8 @@ import React from 'react';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import Banner from '@/app/components/Banner';
+import Repair from '@/app/components/Repair';
+import Refurbished from '@/app/components/Refurbished';
 
 export default function page() {
   return (
@@ -10,9 +12,8 @@ export default function page() {
       <main>
         {/* Main content goes here */}
         <Banner />
-        <div>
-          Another components can be added here.
-        </div>
+        <Repair />
+        <Refurbished />
       </main>
       <Footer />
     </div>
