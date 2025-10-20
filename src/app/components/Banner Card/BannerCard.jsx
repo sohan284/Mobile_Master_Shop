@@ -29,7 +29,7 @@ export default function BannerCard() {
     ];
 
     return (
-        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 gap-6 py-20">
+        <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 gap-6 py-20 max-w-[1200px] mx-auto">
             {cardsData.map((card) => (
                 <Card key={card.id} className="shadow-lg overflow-visible w-80 md:w-96">
                     <CardContent className="px-6">

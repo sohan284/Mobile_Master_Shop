@@ -7,8 +7,11 @@ export default function page() {
   return (
     <div>
     <Banner />
+    <div className='max-w-[1200px] mx-auto'>
+
         <Repair />
         <Refurbished />
+    </div>
     </div>
   )
 }

@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
         <Header />
-        <main>
+        <main className="">
           {children}
         </main>
         <Footer />
