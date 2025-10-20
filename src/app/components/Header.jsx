@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, Search, User, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,13 +13,13 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-[#0f4c81] text-white py-4 fixed w-full z-50">
+        <header className="bg-[#0f4c81] text-white py-6 sticky top-0 w-full z-50">
             <div className="max-w-5xl mx-auto px-4 flex items-center justify-between lg:justify-center relative">
 
                 {/* Mobile: Hamburger - Logo - User */}
                 <div className="lg:hidden flex justify-between items-center w-full">
                     <button onClick={toggleSidebar} className="text-white focus:outline-none">
-                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                        <Menu size={30} />
                     </button>
 
                     <div className="text-xl font-bold">LOGO</div>
@@ -32,26 +32,28 @@ export default function Header() {
                 {/* Desktop */}
                 <div className="hidden lg:flex items-center w-full justify-between">
                     {/* Left Nav */}
-                    <div className="flex space-x-4">
-                        <Link href="#" className="hover:underline">Home</Link>
-                        <Link href="#" className="hover:underline">About</Link>
-                        <Link href="#" className="hover:underline">Services</Link>
+                    <div className="flex space-x-4 text-lg">
+                        <Link href="#" className="hover:underline">Repair</Link>
+                        <Link href="#" className="hover:underline">Refurbished</Link>
+                        <Link href="#" className="hover:underline">Stores</Link>
                     </div>
 
                     {/* Center Logo */}
                     <div className="text-2xl font-bold text-center">LOGO</div>
 
                     {/* Right Nav */}
-                    <div className="flex items-center space-x-4">
-                        <Link href="#" className="hover:underline">Portfolio</Link>
+                    <div className="flex items-center space-x-4 text-lg">
+                        <Link href="#" className="hover:underline">Our Services</Link>
                         <Link href="#" className="hover:underline">Blog</Link>
-                        <Link href="#" className="hover:underline">Contact</Link>
-                        <button className="hover:text-gray-300" title="Search">
-                            <Search size={20} />
-                        </button>
-                        <button className="hover:text-gray-300" title="User">
-                            <User size={20} />
-                        </button>
+                        <Link href="#" className="hover:underline">About</Link>
+                        <div className="flex items-center space-x-3 ml-4">
+                            <button className="hover:text-gray-300" title="Search">
+                                <Search size={25} />
+                            </button>
+                            <button className="hover:text-gray-300" title="User">
+                                <User size={25} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -63,41 +65,52 @@ export default function Header() {
                         className="fixed top-0 left-0 w-full h-full bg-[#0f4c81] text-white p-6 z-50"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-bold">Menu</h2>
+                        <div className="flex items-center mb-6">
                             <button onClick={toggleSidebar}>
-                                <X size={24} />
+                                <X size={30} />
                             </button>
                         </div>
 
-                        {/* Search Icon or Input */}
-                        <div className="mb-4">
-                            {mobileSearch ? (
+                        {/* Mobile Search */}
+                        <div className="mb-6">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
                                 <input
                                     type="text"
-                                    placeholder="Search..."
-                                    className="w-full px-3 py-2 text-black rounded"
+                                    placeholder="Search the site..."
+                                    className="w-full pl-10 pr-3 py-2 text-black bg-white rounded-2xl focus:outline-none focus:ring-0"
                                     autoFocus
                                 />
-                            ) : (
-                                <button
-                                    className="flex items-center space-x-2 hover:underline"
-                                    onClick={() => setMobileSearch(true)}
-                                >
-                                    <Search size={20} />
-                                    <span>Search</span>
-                                </button>
-                            )}
+                            </div>
                         </div>
 
-                        <nav className="flex flex-col space-y-4">
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Home</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Services</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Portfolio</Link>
+                        {/* Mobile Nav */}
+                        <nav className="flex flex-col space-y-4 p-6 border-4 border-[#0d416e] border-x-0 text-xl text-[#85a4bf] font-bold">
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Repair</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Refurbished</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Stores</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Our Services</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Blog</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Contact</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>
                         </nav>
+                        <div className='p-6 text-[#85a4bf] font-bold text-xl'>
+                            <LogIn size={30} className="inline mr-2" />
+                            <span className="font-bold">Login</span>
+                        </div>
+                        {/* Social icons */}
+                        <div className="max-w-7xl mx-auto flex flex-col mt-72 p-6">
+                            <div className="flex space-x-6">
+                                <Link href="#" aria-label="Instagram" className="hover:text-white transition">
+                                    <Instagram className="w-6 h-6" />
+                                </Link>
+                                <Link href="#" aria-label="LinkedIn" className="hover:text-white transition">
+                                    <Linkedin className="w-6 h-6" />
+                                </Link>
+                                <Link href="#" aria-label="Facebook" className="hover:text-white transition">
+                                    <Facebook className="w-6 h-6" />
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
