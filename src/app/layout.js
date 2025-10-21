@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PageTransition from "@/components/animations/PageTransition";
+import QueryProvider from "@/providers/QueryProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -25,11 +26,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
-        <Header />
-        <main className="">
-            {children}
-        </main>
-        <Footer />
+        <QueryProvider>
+          <Header />
+          <main className="">
+              {children}
+          </main>
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   );

@@ -56,7 +56,7 @@ export default function Repair() {
     ];
 
     return (
-        <div className="py-16">
+        <div className="pt-16">
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
                 
                 {/* Hero Section */}
@@ -132,7 +132,7 @@ export default function Repair() {
                 <MotionFade delay={0.2}>
                     <div className="mb-16">
                         <h3 className="text-3xl font-bold text-center text-[#6B7E8D] mb-12">Our Repair Services</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                             {repairServices.map((service, idx) => (
                                 <MotionFade key={service.id} delay={0.5 + idx * 0.1}>
                                     <div className="group bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500  border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">

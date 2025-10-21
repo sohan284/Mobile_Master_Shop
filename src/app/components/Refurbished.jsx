@@ -16,7 +16,6 @@ const swiperStyles = `
     padding: 20px 0 40px 0;
   }
   .swiper-pagination-custom .swiper-pagination-bullet {
-    background: #6B7E8D;
     opacity: 0.3;
     width: 12px;
     height: 12px;
@@ -96,8 +95,8 @@ export default function Refurbished() {
                 </div>
 
                 {/* Products Swiper */}
-                <MotionFade delay={0.1}>
-                    <div className="mb-12">
+                <MotionFade delay={0.1} className="relative">
+                    <div className="mb-4">
                         <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
                         spaceBetween={24}
@@ -162,7 +161,7 @@ export default function Refurbished() {
                                         </div>
                                         
                                         <div className="flex-grow flex flex-col justify-between">
-                                            <h3 className="font-bold text-lg text-[#6B7E8D] mb-4 line-clamp-2 group-hover:text-[#00bfb2] transition-colors duration-300">
+                                            <h3 className="font-bold text-lg text-[#6B7E8D] line-clamp-2 group-hover:text-[#00bfb2] transition-colors duration-300">
                                                 {name.replace('.png', '').replace(/[-_]/g, ' ')}
                                             </h3>
                                             
@@ -184,8 +183,8 @@ export default function Refurbished() {
                     </Swiper>
 
                     {/* Custom Navigation */}
-                    <div className="flex justify-center items-center mt-2 gap-6">
-                        <button className="swiper-button-prev-custom bg-[#6B7E8D] hover:bg-[#00bfb2] text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 shadow-xl hover:shadow-2xl group">
+                    <div className="absolute flex -top-12 right-0 justify-center items-center mt-2 ">
+                        <button className="swiper-button-prev-custom cursor-pointer bg-transparent text-primary w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                             </svg>
@@ -193,7 +192,7 @@ export default function Refurbished() {
                         
                         <div className="swiper-pagination-custom flex gap-3"></div>
                         
-                        <button className="swiper-button-next-custom bg-[#6B7E8D] hover:bg-[#00bfb2] text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 shadow-xl hover:shadow-2xl group">
+                        <button className="swiper-button-next-custom cursor-pointer bg-transparent text-primary w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                             </svg>
