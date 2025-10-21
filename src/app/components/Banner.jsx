@@ -52,6 +52,7 @@ export default function Banner() {
             }}
         >
             <div className='max-w-[1200px] mx-auto px-4 py-12 md:py-10 md:pt-4'>
+               
                 <div className='grid grid-cols-1 md:grid-cols-2 items-center gap-8'>
                     {/* Left: Title + CTA updates per slide */}
                     <div className='text-secondary'>
@@ -81,16 +82,16 @@ export default function Banner() {
                     <div className='relative'>
                         <div className='aspect-[4/3] md:aspect-[5/4] rounded-2xl flex items-center justify-center overflow-hidden'>
                             <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={slides[index].id + '-img'}
-                                    src={slides[index].image}
-                                    alt={slides[index].title}
-                                    className='w-40 md:w-56 object-contain drop-shadow-xl'
-                                    initial={{ opacity: 0, x: 24 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -24 }}
-                                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                                />
+                                <Link href={slides[index].ctaHref} className='inline-block group'>
+                                <motion.div className='inline-block group'>
+                                    <img
+                                        src={slides[index].image}
+                                        alt={slides[index].title}
+                                        className='w-full object-bottom'
+                                    />
+                                </motion.div>
+                                </Link>
+                               
                             </AnimatePresence>
                         </div>
 
