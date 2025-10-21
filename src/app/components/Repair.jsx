@@ -1,6 +1,7 @@
 import React from 'react';
 import { CustomButton } from '@/components/ui/button';
 import MotionFade from '@/components/animations/MotionFade';
+import Link from 'next/link';
 
 export default function Repair() {
     const brandLogo = [
@@ -181,14 +182,17 @@ export default function Repair() {
                 </MotionFade>
 
                 {/* CTA Section */}
-                <MotionFade delay={0.3}>
+                <MotionFade delay={0.55}>
                     <div className="text-center">
                         <div className="bg-gradient-to-r from-[#6B7E8D] to-[#00bfb2] rounded-3xl p-8 shadow-2xl">
                             <h3 className="text-2xl font-bold text-white mb-4">Ready to Get Your Device Fixed?</h3>
                             <p className="text-white/90 mb-6">Get an instant quote and book your repair today</p>
-                            <CustomButton className="bg-white text-[#6B7E8D] hover:bg-white/90 text-lg px-8 py-4 font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                          <Link href="/repair">
+                          <CustomButton className="bg-white text-[#6B7E8D] hover:bg-white/90 text-lg px-8 py-4 font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                                 Get Instant Quote
                             </CustomButton>
+                          </Link>
+                        
                         </div>
                     </div>
                 </MotionFade>

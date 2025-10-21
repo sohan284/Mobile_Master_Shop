@@ -206,7 +206,7 @@ export default function Refurbished() {
                 <MotionFade delay={0.2}>
                     <div className="text-center">
                     <Link 
-                        href='#' 
+                        href='/phones' 
                         className=""
                     >
                         <CustomButton className="bg-primary text-secondary hover:bg-primary/90">

@@ -97,7 +97,7 @@ export default function Banner() {
 
                         {/* Controls */}
                         <div className='mt-4 flex items-center justify-between'>
-                            <button onClick={prev} className='text-white/80 hover:text-white transition-colors'>
+                            <button onClick={prev} className='text-white/80 hover:text-white transition-colors cursor-pointer'>
                                 ‹
                             </button>
                             <div className='flex items-center gap-2'>
@@ -110,7 +110,7 @@ export default function Banner() {
                                     />
                                 ))}
                             </div>
-                            <button onClick={next} className='text-white/80 hover:text-white transition-colors'>
+                            <button onClick={next} className='text-white/80 hover:text-white transition-colors cursor-pointer'>
                                 ›
                             </button>
                         </div>
