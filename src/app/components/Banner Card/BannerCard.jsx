@@ -47,21 +47,21 @@ export default function BannerCard() {
         </div>
 
         {/* Decorative accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-cyan-500"></div>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-primary"></div>
 
         {/* Content Section */}
         <div className="text-center space-y-4">
             {/* Heading */}
-            <h2 className="text-xl md:text-2xl font-bold text-blue-900 leading-tight transition-all duration-300 group-hover:scale-105">
+            <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight transition-all duration-300 group-hover:scale-105">
                 {card.heading}
             </h2>
 
             {/* Decorative divider */}
-            <div className="h-1 w-16 mx-auto bg-cyan-500 rounded-full"></div>
+            <div className="h-1 w-16 mx-auto bg-primary rounded-full"></div>
 
             {/* Button */}
             <Link href={card.link} className="block mt-5 group rounded-none">
-                <CustomButton className="w-full text-base  bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 rounded-none">
+                <CustomButton>
                     {card.buttonText}
                 </CustomButton>
             </Link>

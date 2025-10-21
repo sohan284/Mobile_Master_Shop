@@ -64,12 +64,12 @@ export default function Dashboard() {
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.name}</p>
                 <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className={`text-sm ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-sm ${stat.changeType === 'positive' ? 'text-primary' : 'text-red-600'}`}>
                   {stat.change} from last month
                 </p>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg">
-                <stat.icon className="h-6 w-6 text-blue-600" />
+                <stat.icon className="h-6 w-6 text-primary" />
               </div>
             </div>
           </div>

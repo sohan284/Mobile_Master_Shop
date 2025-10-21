@@ -3,12 +3,12 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
     return (
-        <footer className="bg-[#6B7E8D] text-gray-300 py-10 px-6 md:px-20">
+        <footer className="bg-primary text-secondary py-10 px-6 md:px-20">
             {/* Top grid with 4 sections */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
                 {/* Repair Section */}
                 <div>
-                    <h3 className="text-white text-lg font-semibold mb-4">Repair</h3>
+                    <h3 className="text-secondary text-lg font-semibold mb-4">Repair</h3>
                     <ul className="space-y-2">
                         <li><Link href="#" className="hover:text-white transition">APPLE</Link></li>
                         <li><Link href="#" className="hover:text-white transition">SAMSUNG</Link></li>
@@ -19,7 +19,7 @@ export default function Footer() {
 
                 {/* Services Section */}
                 <div>
-                    <h3 className="text-white text-lg font-semibold mb-4">Services</h3>
+                    <h3 className="text-secondary text-lg font-semibold mb-4">Services</h3>
                     <ul className="space-y-2">
                         <li><Link href="#" className="hover:text-white transition">Accessories</Link></li>
                         <li><Link href="#" className="hover:text-white transition">Refurbished smartphones</Link></li>
@@ -32,7 +32,7 @@ export default function Footer() {
 
                 {/* Our Stores Section */}
                 <div>
-                    <h3 className="text-white text-lg font-semibold mb-4">Our Stores</h3>
+                    <h3 className="text-secondary text-lg font-semibold mb-4">Our Stores</h3>
                     <ul className="space-y-2">
                         <li><Link href="#" className="hover:text-white transition">Repair Paris</Link></li>
                         {/* <li><Link href="#" className="hover:text-white transition">Repair Marseille</Link></li>
@@ -42,7 +42,7 @@ export default function Footer() {
 
                 {/* Useful Links Section */}
                 <div>
-                    <h3 className="text-white text-lg font-semibold mb-4">Useful Links</h3>
+                    <h3 className="text-secondary text-lg font-semibold mb-4">Useful Links</h3>
                     <ul className="space-y-2">
                         <li><Link href="#" className="hover:text-white transition">Terms and Conditions</Link></li>
                         <li><Link href="#" className="hover:text-white transition">Legal notices</Link></li>
@@ -53,7 +53,7 @@ export default function Footer() {
 
             {/* Social icons */}
             <div className="max-w-7xl mx-auto mt-10 flex flex-col items-center">
-                <h3 className="text-white text-lg font-semibold mb-4">Follow Us</h3>
+                <h3 className="text-secondary text-lg font-semibold mb-4">Follow Us</h3>
                 <div className="flex space-x-6">
                     <Link href="#" aria-label="Instagram" className="hover:text-white transition">
                         <Instagram className="w-6 h-6" />
@@ -69,7 +69,7 @@ export default function Footer() {
 
             {/* Copyright Section */}
             <div className="mt-10 pt-6 text-center text-sm text-gray-500">
-                © {new Date().getFullYear()} Repair Company. All rights reserved.
+                © {new Date().getFullYear()} MLK. All rights reserved.
             </div>
         </footer>
     );

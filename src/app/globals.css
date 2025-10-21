@@ -59,9 +59,9 @@ h1, h2, h3 {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --primary: oklch(0.6 0.118 184.704);
+  --primary-foreground: oklch(0.6 0.118 184.704)lch(0.985 0 0);
+  --secondary: #FEFACD;
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
@@ -126,6 +126,20 @@ h1, h2, h3 {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Title Styles */
+  .title {
+    @apply  text-2xl font-bold leading-tight text-gray-900;
+  }
+  
+  .subtitle {
+    @apply text-xl font-semibold leading-relaxed text-gray-600;
+  }
+  .paragraph {
+    @apply text-sm text-gray-600;
   }
 }
 

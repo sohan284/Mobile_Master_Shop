@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Search, User, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
 import Image from 'next/image';
@@ -7,14 +7,53 @@ import logo from "@/assets/mlkLogo.png"
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [mobileSearch, setMobileSearch] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
         setMobileSearch(false); // Reset search when sidebar toggles
     };
 
+    // Scroll detection logic with throttling for smoother performance
+    useEffect(() => {
+        let ticking = false;
+        
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+                    const scrollDifference = Math.abs(currentScrollY - lastScrollY);
+                    
+                    // Only trigger if scroll difference is significant (reduces jitter)
+                    if (scrollDifference > 5) {
+                        // Show header when at top
+                        if (currentScrollY < 10) {
+                            setIsVisible(true);
+                        }
+                        // Hide header when scrolling down, show when scrolling up
+                        else if (currentScrollY > lastScrollY && currentScrollY > 80) {
+                            setIsVisible(false);
+                        } else if (currentScrollY < lastScrollY) {
+                            setIsVisible(true);
+                        }
+                        
+                        setLastScrollY(currentScrollY);
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
+
     return (
-        <header className="bg-[#6B7E8D] text-white py-6 sticky top-0 w-full z-50">
+        <header className={`bg-primary shadow text-secondary py-6 sticky top-0 w-full z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            isVisible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+        }`}>
             <div className="max-w-5xl mx-auto px-4 flex items-center justify-between lg:justify-center relative">
 
                 {/* Mobile: Hamburger - Logo - User */}
@@ -34,15 +73,15 @@ export default function Header() {
                 <div className="hidden lg:flex items-center w-full justify-between">
                     {/* Left Nav */}
                     <div className="flex space-x-4 text-lg">
-                        <Link href="#" className="hover:underline">Repair</Link>
-                        <Link href="#" className="hover:underline">Refurbished</Link>
-                        <Link href="#" className="hover:underline">Stores</Link>
+                        <Link href="/repair" className="hover:underline">Repair</Link>
+                        <Link href="/phones" className="hover:underline">Phones</Link>
+                        <Link href="/accessories" className="hover:underline">Accessories</Link>
                     </div>
 
                     {/* Center Logo */}
                     <div className="text-2xl font-bold text-center">
                         <Link href="/">
-                            <Image src={logo} alt="Logo" width={40} height={40} />
+                            <Image className='rounded-full' src={logo} alt="Logo" width={40} height={40} />
                         </Link>
                     </div>
 
@@ -93,7 +132,7 @@ export default function Header() {
                         <nav className="flex flex-col space-y-4 p-6 border-4 border-[#0d416e] border-x-0 text-xl text-[#85a4bf] font-bold">
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Repair</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Refurbished</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Stores</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Accessories</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Our Services</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Blog</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>

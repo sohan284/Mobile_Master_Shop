@@ -41,7 +41,7 @@ export default function Analytics() {
       change: '+8.2%',
       changeType: 'positive',
       icon: Wrench,
-      color: 'text-blue-600'
+      color: 'text-primary'
     },
     {
       name: 'Product Sales',
@@ -289,7 +289,7 @@ export default function Analytics() {
               <div className="flex items-center space-x-4">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <Calendar className="h-5 w-5 text-primary" />
                   </div>
                 </div>
                 <div>

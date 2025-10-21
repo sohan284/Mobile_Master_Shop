@@ -56,12 +56,15 @@ export default function RepairPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="">
        <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
-        <div className="bg-[#134B81] text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
+        <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
             1
         </div>
-       <h1 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+       <h1 className="title text-primary mb-8 text-center">
             Choose the brand of your phone
           </h1>
+          <p className="subtitle text-center mb-8">
+            Select your phone brand to get started with professional repair services
+          </p>
       {/* Search Bar */}
       <div className="mb-6">
                             <div className="relative mx-auto">
@@ -81,7 +84,7 @@ export default function RepairPage() {
                         </div>
                     
           {/* Phone Brands Section */}
-          <div className="mb-12">
+          <div className="mb-12"></div>
             {filteredBrands.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                 {filteredBrands.map((brand) => (
@@ -96,7 +99,7 @@ export default function RepairPage() {
                           className="object-contain"
                         />
                       </div>
-                      <h3 className="text-sm font-semibold text-gray-800">
+                      <h3 className="subtitle text-center">
                         {brand.name}
                       </h3>
                     </div>
@@ -105,12 +108,12 @@ export default function RepairPage() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="text-gray-500 text-lg mb-4">
+                <div className="subtitle text-gray-500 mb-4">
                   No brands found matching &quot;{searchTerm}&quot;
                 </div>
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-primary hover:text-blue-800 underline"
                 >
                   Clear search
                 </button>
@@ -120,10 +123,10 @@ export default function RepairPage() {
 
        </div>
           <div className="">
-          <ul className="space-y-2 text-gray-600 text-xs">
-              <li>
-                SMARTPHONE REPAIR NEAR YOU WITH SAVE <br /> For smartphone repairs in
-                Nantes, Paris, Lyon, or Marseille, with Save, you can access one
+          <ul className="space-y-4">
+              <li className="paragraph">
+                <span className="subtitle block mb-2">SMARTPHONE REPAIR NEAR YOU WITH SAVE</span>
+                For smartphone repairs in Nantes, Paris, Lyon, or Marseille, with Save, you can access one
                 of our 150 stores located throughout France. Always closer to
                 you, we repair your devices while respecting both industry and
                 manufacturer requirements.
@@ -229,7 +232,7 @@ export default function RepairPage() {
           </div>
         </div>
       </div>
-    </div>
+    
   </PageTransition>
   );
 }
