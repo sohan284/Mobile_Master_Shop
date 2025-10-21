@@ -18,11 +18,11 @@ export default function PhonesPage() {
            <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
                     <h1 className="text-4xl font-bold text-primary mb-8 text-center">
-                        Refurbished Phones
+                            New Phones
                     </h1>
                     
                     <p className="text-center text-gray-600 mb-12 text-lg">
-                        High-quality refurbished phones with warranty and excellent condition
+                        High-quality new phones with warranty
                     </p>
                     
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

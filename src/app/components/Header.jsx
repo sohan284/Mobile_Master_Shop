@@ -73,9 +73,9 @@ export default function Header() {
                 <div className="hidden lg:flex items-center w-full justify-between">
                     {/* Left Nav */}
                     <div className="flex space-x-4 text-lg">
-                        <Link href="#" className="hover:underline">Repair</Link>
-                        <Link href="#" className="hover:underline">Refurbished</Link>
-                        <Link href="#" className="hover:underline">Stores</Link>
+                        <Link href="/repair" className="hover:underline">Repair</Link>
+                        <Link href="/phones" className="hover:underline">Phones</Link>
+                        <Link href="/accessories" className="hover:underline">Accessories</Link>
                     </div>
 
                     {/* Center Logo */}
@@ -132,7 +132,7 @@ export default function Header() {
                         <nav className="flex flex-col space-y-4 p-6 border-4 border-[#0d416e] border-x-0 text-xl text-[#85a4bf] font-bold">
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Repair</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Refurbished</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Stores</Link>
+                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Accessories</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Our Services</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Blog</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>

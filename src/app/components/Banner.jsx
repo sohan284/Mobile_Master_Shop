@@ -15,7 +15,7 @@ export default function Banner() {
         },
         {
             id: 2,
-            title: 'Shop refurbished phones',
+            title: 'Shop New Phones',
             ctaText: 'Browse phones',
             ctaHref: '/phones',
             image: '/2.png',
