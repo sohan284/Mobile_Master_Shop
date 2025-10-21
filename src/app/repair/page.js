@@ -3,9 +3,20 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PageTransition from "@/components/animations/PageTransition";
+import { useApiGet } from "@/hooks/useApi";
+import { apiFetcher } from "@/lib/api";
 
 export default function RepairPage() {
-  const phoneBrands = [
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Fetch brands from API using direct useApiGet
+  const { data: brandsResponse, isLoading, error } = useApiGet(
+    ['brands'],
+    () => apiFetcher.get('/brands/')
+  );
+  
+  // Fallback brands if API fails
+  const fallbackBrands = [
     {
       id: 1,
       name: "Apple",
@@ -43,13 +54,15 @@ export default function RepairPage() {
       route: "/repair/honor",
     },
   ];
-  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Use API data or fallback
+  const phoneBrands = brandsResponse?.data || fallbackBrands;
   
   // Filter brands based on search term
   const filteredBrands = phoneBrands.filter(brand =>
     brand.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-    
+  console.log(filteredBrands);
   return (
   <PageTransition>
       <div className="min-h-screen max-w-[1200px] mx-auto">
@@ -85,40 +98,62 @@ export default function RepairPage() {
                     
           {/* Phone Brands Section */}
           <div className="mb-12"></div>
-            {filteredBrands.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-                {filteredBrands.map((brand) => (
-                  <Link key={brand.id} href={brand.route}>
-                    <div className="bg-white h-30 w-30 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer text-center flex flex-col items-center justify-center">
-                      <div className="flex justify-center  mb-3">
-                        <Image
-                          src={brand.logo}
-                          alt={brand.name}
-                          width={48}
-                          height={48}
-                          className="object-contain"
-                        />
-                      </div>
-                      <h3 className="subtitle text-center">
-                        {brand.name}
-                      </h3>
+          
+          {/* Loading State */}
+          {isLoading && (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <p className="mt-4 text-gray-600">Loading brands...</p>
+            </div>
+          )}
+          
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="text-red-500 mb-4">
+                Failed to load brands. Using fallback data.
+              </div>
+            </div>
+          )}
+          
+          {/* Brands Grid */}
+          {!isLoading && filteredBrands.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+              {filteredBrands.map((brand) => (
+                <Link key={brand.id} href={brand.route || `/repair/${brand.name.toLowerCase()}`}>
+                  <div className="bg-white h-30 w-30 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer text-center flex flex-col items-center justify-center">
+                    <div className="flex justify-center mb-3">
+                      <Image
+                        src={brand.logo || `/Apple.png`}
+                        alt={brand.name}
+                        width={48}
+                        height={48}
+                        className="object-contain"
+                      />
                     </div>
-                  </Link>
-                ))}
+                    <h3 className="subtitle text-center">
+                      {brand.name}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          
+          {/* No Results */}
+          {!isLoading && filteredBrands.length === 0 && (
+            <div className="text-center py-12">
+              <div className="subtitle text-gray-500 mb-4">
+                No brands found matching &quot;{searchTerm}&quot;
               </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="subtitle text-gray-500 mb-4">
-                  No brands found matching &quot;{searchTerm}&quot;
-                </div>
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="text-primary hover:text-blue-800 underline"
-                >
-                  Clear search
-                </button>
-              </div>
-            )}
+              <button
+                onClick={() => setSearchTerm('')}
+                className="text-primary hover:text-blue-800 underline"
+              >
+                Clear search
+              </button>
+            </div>
+          )}
           </div>
 
        </div>

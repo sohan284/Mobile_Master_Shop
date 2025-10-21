@@ -7,7 +7,7 @@ import logo from "@/assets/mlkLogo.png"
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [mobileSearch, setMobileSearch] = useState(false);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isVisible, setIsVisible] = useState(true);   
     const [lastScrollY, setLastScrollY] = useState(0);
 
     const toggleSidebar = () => {

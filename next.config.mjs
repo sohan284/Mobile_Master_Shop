@@ -1,4 +1,15 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'save-co.lumivancelabs.com',
+        port: '',
+        pathname: '/media/**',
+      },
+    ],
+  },
+};
 
 export default nextConfig;
