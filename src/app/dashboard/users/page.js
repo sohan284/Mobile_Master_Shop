@@ -161,7 +161,7 @@ export default function Users() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
+                      <button className="text-primary hover:text-primary">
                         <Eye className="h-4 w-4" />
                       </button>
                       <button className="text-green-600 hover:text-green-900">

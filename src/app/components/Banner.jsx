@@ -45,16 +45,16 @@ export default function Banner() {
 
     return (
         <div
-            className=' bg-[#6B7E8D]'
+            className=' bg-primary'
             style={{
                 clipPath: 'ellipse(100% 55% at 48% 44%)',
                 WebkitClipPath: 'ellipse(100% 55% at 48% 44%)',
             }}
         >
-            <div className='max-w-[1200px] mx-auto px-4 py-12 md:py-10 md:pt-0'>
+            <div className='max-w-[1200px] mx-auto px-4 py-12 md:py-10 md:pt-4'>
                 <div className='grid grid-cols-1 md:grid-cols-2 items-center gap-8'>
                     {/* Left: Title + CTA updates per slide */}
-                    <div className='text-white'>
+                    <div className='text-secondary'>
                         <AnimatePresence mode="wait">
                             <motion.div
                                 key={slides[index].id + '-text'}
@@ -68,7 +68,7 @@ export default function Banner() {
                                 </h2>
                                 <div className='mt-6'>
                                     <Link href={slides[index].ctaHref} className='inline-block group'>
-                                        <CustomButton className='bg-[#00bfb2] hover:bg-[#00ada2] text-[#083451] font-semibold px-6 py-3 rounded-none'>
+                                        <CustomButton>
                                             {slides[index].ctaText}
                                         </CustomButton>
                                     </Link>

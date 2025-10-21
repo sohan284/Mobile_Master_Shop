@@ -85,7 +85,7 @@ export default function Bookings() {
       case 'Pending':
         return <AlertCircle className="h-5 w-5 text-yellow-600" />;
       case 'Completed':
-        return <CheckCircle className="h-5 w-5 text-blue-600" />;
+        return <CheckCircle className="h-5 w-5 text-primary" />;
       case 'Cancelled':
         return <XCircle className="h-5 w-5 text-red-600" />;
       default:
@@ -213,7 +213,7 @@ export default function Bookings() {
               </div>
 
               <div className="flex items-center space-x-2 ml-4">
-                <button className="bg-blue-50 text-blue-600 px-3 py-2 rounded-md hover:bg-blue-100 text-sm">
+                <button className="bg-blue-50 text-primary px-3 py-2 rounded-md hover:bg-blue-100 text-sm">
                   View Details
                 </button>
                 <button className="bg-green-50 text-green-600 px-3 py-2 rounded-md hover:bg-green-100 text-sm">

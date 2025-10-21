@@ -112,7 +112,7 @@ export default function Content() {
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-blue-500 text-primary'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
@@ -168,7 +168,7 @@ export default function Content() {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <button className="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-md hover:bg-blue-100 flex items-center justify-center space-x-1">
+                  <button className="flex-1 bg-blue-50 text-primary px-3 py-2 rounded-md hover:bg-blue-100 flex items-center justify-center space-x-1">
                     <Edit className="h-4 w-4" />
                     <span>Edit</span>
                   </button>
@@ -239,7 +239,7 @@ export default function Content() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button className="text-primary hover:text-primary">
                           <Edit className="h-4 w-4" />
                         </button>
                         <button className="text-green-600 hover:text-green-900">

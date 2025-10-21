@@ -76,7 +76,7 @@ export default function Repair() {
                 </div>
 
                 {/* CTA Button */}
-                <CustomButton className="group text-base sm:text-lg bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 sm:py-6 px-8 sm:px-10 rounded-xl mt-4">
+                <CustomButton className='bg-primary text-secondary hover:bg-primary/90' >
                     Get the price of my repair
                 </CustomButton>
             </div>

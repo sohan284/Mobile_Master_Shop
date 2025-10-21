@@ -400,7 +400,7 @@ export default function BrandRepairPage({ params }) {
                 <div className="text-center">
                     <h1 className="text-4xl font-bold text-gray-800 mb-4">Brand Not Found</h1>
                     <p className="text-gray-600 mb-6">The requested brand repair service is not available.</p>
-                    <Link href="/repair" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                    <Link href="/repair" className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90">
                         Back to Repair Services
                     </Link>
                 </div>
@@ -415,7 +415,7 @@ export default function BrandRepairPage({ params }) {
                 <div className="max-w-6xl mx-auto">
                     {/* Breadcrumb */}
                     <div className="mb-6">
-                        <Link href="/repair" className="text-blue-600 hover:text-blue-800">
+                        <Link href="/repair" className="text-primary hover:text-primary/90">
                             ← Back to Repair Services
                         </Link>
                     </div>
@@ -430,7 +430,7 @@ export default function BrandRepairPage({ params }) {
                             className="mr-4"
                         />
                         <div>
-                            <h1 className="text-4xl font-bold text-blue-900">
+                            <h1 className="text-4xl font-bold text-primary">
                                 {brandInfo.fullName} Repair Services
                             </h1>
                             <p className="text-gray-600 text-lg">
@@ -441,10 +441,10 @@ export default function BrandRepairPage({ params }) {
                     
                     {/* Step System */}
                     <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
-                        <div className="bg-[#134B81] text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
+                        <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
                             2
                         </div>
-                        <h2 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+                        <h2 className="text-2xl font-bold text-primary mb-8 text-center">
                             Choose your phone model
                         </h2>
                         
@@ -488,7 +488,7 @@ export default function BrandRepairPage({ params }) {
                                                 <div className="text-xs text-gray-500">
                                                     Storage: {phone.storage}
                                                 </div>
-                                                <div className="text-sm font-bold text-blue-600">
+                                                <div className="text-sm font-bold text-primary">
                                                     {phone.price}
                                                 </div>
                                             </div>
@@ -503,7 +503,7 @@ export default function BrandRepairPage({ params }) {
                                 </div>
                                 <button
                                     onClick={() => setSearchTerm('')}
-                                    className="text-blue-600 hover:text-blue-800 underline"
+                                    className="text-primary hover:text-primary/90 underline"
                                 >
                                     Clear search
                                 </button>

@@ -17,7 +17,7 @@ export default function PhonesPage() {
         <div className="min-h-screen bg-gray-50">
            <div className="container mx-auto px-4 py-8">
                 <div className="max-w-6xl mx-auto">
-                    <h1 className="text-4xl font-bold text-blue-900 mb-8 text-center">
+                    <h1 className="text-4xl font-bold text-primary mb-8 text-center">
                         Refurbished Phones
                     </h1>
                     
@@ -41,7 +41,7 @@ export default function PhonesPage() {
                                 
                                 <div className="space-y-2 mb-4">
                                     {brand.models.map((model, modelIndex) => (
-                                        <div key={modelIndex} className="text-gray-600 hover:text-blue-600 cursor-pointer">
+                                        <div key={modelIndex} className="text-gray-600 hover:text-primary cursor-pointer">
                                             {model}
                                         </div>
                                     ))}

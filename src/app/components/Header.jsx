@@ -14,7 +14,7 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-[#6B7E8D] text-white py-6 sticky top-0 w-full z-50">
+        <header className="bg-primary shadow text-secondary py-6 sticky top-0 w-full z-50">
             <div className="max-w-5xl mx-auto px-4 flex items-center justify-between lg:justify-center relative">
 
                 {/* Mobile: Hamburger - Logo - User */}
@@ -42,7 +42,7 @@ export default function Header() {
                     {/* Center Logo */}
                     <div className="text-2xl font-bold text-center">
                         <Link href="/">
-                            <Image src={logo} alt="Logo" width={40} height={40} />
+                            <Image className='rounded-full' src={logo} alt="Logo" width={40} height={40} />
                         </Link>
                     </div>
 

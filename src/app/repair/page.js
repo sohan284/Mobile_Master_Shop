@@ -56,10 +56,10 @@ export default function RepairPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="">
        <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
-        <div className="bg-[#134B81] text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
+        <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
             1
         </div>
-       <h1 className="text-2xl font-bold text-blue-900 mb-8 text-center">
+       <h1 className="text-2xl font-bold text-primary mb-8 text-center">
             Choose the brand of your phone
           </h1>
       {/* Search Bar */}
@@ -110,7 +110,7 @@ export default function RepairPage() {
                 </div>
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-primary hover:text-blue-800 underline"
                 >
                   Clear search
                 </button>
