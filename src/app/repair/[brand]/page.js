@@ -430,12 +430,9 @@ export default function BrandRepairPage({ params }) {
                             className="mr-4"
                         />
                         <div>
-                            <h1 className="text-4xl font-bold text-primary">
+                            <h1 className="title text-primary">
                                 {brandInfo.fullName} Repair Services
                             </h1>
-                            <p className="text-gray-600 text-lg">
-                                {brandInfo.description}
-                            </p>
                         </div>
                     </div>
                     
@@ -444,7 +441,7 @@ export default function BrandRepairPage({ params }) {
                         <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
                             2
                         </div>
-                        <h2 className="text-2xl font-bold text-primary mb-8 text-center">
+                        <h2 className="title text-primary mb-8 text-center">
                             Choose your phone model
                         </h2>
                         
@@ -516,11 +513,11 @@ export default function BrandRepairPage({ params }) {
                   
                     {/* Why Choose Us */}
                     <div className="bg-white p-8 rounded-lg shadow-md">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Why Choose Our {brandInfo.name} Repair Services?</h2>
+                        <h2 className="title text-gray-800 mb-4">Why Choose Our {brandInfo.name} Repair Services?</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {brandInfo.features.map((feature, index) => (
                                 <div key={index}>
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">{feature.title}</h3>
+                                    <h3 className="subtitle text-gray-800 mb-2">{feature.title}</h3>
                                     <p className="text-gray-600">{feature.description}</p>
                                 </div>
                             ))}

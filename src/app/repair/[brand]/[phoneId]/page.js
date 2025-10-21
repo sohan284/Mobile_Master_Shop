@@ -62,7 +62,7 @@ export default function PhoneModelPage({ params }) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">Phone Model Not Found</h1>
+                    <h1 className="text-xl font-bold text-gray-800 mb-4">Phone Model Not Found</h1>
                     <p className="text-gray-600 mb-6">The requested phone model is not available.</p>
                     <Link href={`/repair/${brand}`} className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
                         Back to {brand.charAt(0).toUpperCase() + brand.slice(1)} Repair
@@ -182,13 +182,13 @@ export default function PhoneModelPage({ params }) {
                             className="mr-4"
                         />
                         <div>
-                            <h1 className="text-4xl font-bold text-primary">
+                            <h1 className="title text-primary">
                                 {phone.name} Repair Services
                             </h1>
-                            <p className="text-gray-600 text-lg">
+                            <p className="subtitle">
                                 Professional repair services for {phone.name}
                             </p>
-                            <div className="mt-2 text-sm text-gray-500">
+                            <div className="mt-2 paragraph">
                                 Storage: {phone.storage} • Starting from {phone.price}
                             </div>
                         </div>
@@ -199,7 +199,7 @@ export default function PhoneModelPage({ params }) {
                         <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
                             3
                         </div>
-                        <h2 className="text-2xl font-bold text-primary mb-8 text-center">
+                        <h2 className="title text-primary mb-8 text-center">
                             Choose your repair service
                         </h2>
                              {/* Services Grid */}
@@ -211,7 +211,7 @@ export default function PhoneModelPage({ params }) {
                                 <div 
                                     key={service.id} 
                                     onClick={() => handleServiceSelect(service.id)}
-                                    className={`p-6 rounded-xl shadow transition-all duration-300 border-2 cursor-pointer ${
+                                    className={` p-3 pb-1 rounded-xl shadow transition-all duration-300 border-2 cursor-pointer ${
                                         isSelected 
                                             ? ' border-primary shadow-primary' 
                                             : isDisabled
@@ -220,8 +220,8 @@ export default function PhoneModelPage({ params }) {
                                     }`}
                                 >
                                     <div className="flex items-center mb-4">
-                                        <div className="text-3xl mr-3">{service.icon}</div>
-                                        <h3 className={`text-xl font-bold ${
+                                        <div className="text-xl mr-3">{service.icon}</div>
+                                        <h3 className={`subtitle ${
                                             isSelected ? 'text-primary' : 'text-gray-800'
                                         }`}>
                                             {service.service}
@@ -234,7 +234,7 @@ export default function PhoneModelPage({ params }) {
                                             </div>
                                         )}
                                     </div>
-                                    <p className={`mb-4 text-sm leading-relaxed ${
+                                    <p className={`mb-4 paragraph ${
                                         isSelected ? 'text-primary' : isDisabled ? 'text-gray-400' : 'text-gray-600'
                                     }`}>
                                         {service.description}
@@ -276,19 +276,19 @@ export default function PhoneModelPage({ params }) {
                     
                     {/* Phone Specifications */}
                     <div className="bg-white p-8 rounded-lg shadow-md mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Phone Specifications</h2>
+                        <h2 className="title text-gray-800 mb-4">Phone Specifications</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Model Information</h3>
-                                <p className="text-gray-600">Brand: {phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</p>
-                                <p className="text-gray-600">Model: {phone.name}</p>
-                                <p className="text-gray-600">Storage Options: {phone.storage}</p>
+                                <h3 className="subtitle text-gray-800 mb-2">Model Information</h3>
+                                <p className="paragraph">Brand: {phone.brand.charAt(0).toUpperCase() + phone.brand.slice(1)}</p>
+                                <p className="paragraph">Model: {phone.name}</p>
+                                <p className="paragraph">Storage Options: {phone.storage}</p>
                             </div>
                             <div>
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Repair Information</h3>
-                                <p className="text-gray-600">Repair Price Range: {phone.price}</p>
-                                <p className="text-gray-600">Warranty: 90 days on all repairs</p>
-                                <p className="text-gray-600">Turnaround: Same day available</p>
+                                <h3 className="subtitle text-gray-800 mb-2">Repair Information</h3>
+                                <p className="paragraph">Repair Price Range: {phone.price}</p>
+                                <p className="paragraph">Warranty: 90 days on all repairs</p>
+                                <p className="paragraph">Turnaround: Same day available</p>
                             </div>
                         </div>
                     </div>
