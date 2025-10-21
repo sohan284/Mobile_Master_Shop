@@ -3,8 +3,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'save-co-e6wj.vercel.app',
+        protocol: 'http',
+        hostname: 'save-co.lumivancelabs.com',
         port: '',
         pathname: '/media/**',
       },

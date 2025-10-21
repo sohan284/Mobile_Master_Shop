@@ -62,6 +62,7 @@ export default function RepairPage() {
   const filteredBrands = phoneBrands.filter(brand =>
     brand.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(filteredBrands);
   return (
   <PageTransition>
       <div className="min-h-screen max-w-[1200px] mx-auto">
@@ -123,7 +124,7 @@ export default function RepairPage() {
                   <div className="bg-white h-30 w-30 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer text-center flex flex-col items-center justify-center">
                     <div className="flex justify-center mb-3">
                       <Image
-                        src={brand?.logo || `/Apple.png`}
+                        src={brand.logo || `/Apple.png`}
                         alt={brand.name}
                         width={48}
                         height={48}

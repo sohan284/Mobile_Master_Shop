@@ -5,6 +5,8 @@ import Link from 'next/link';
 import PageTransition from '@/components/animations/PageTransition';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
+import { apiFetcher } from '@/lib/api';
+import { useApiGet } from '@/hooks/useApi';
 
 // Phone models data with brand property
 const phoneModels = [
@@ -55,6 +57,7 @@ const phoneModels = [
 // Brand configuration data
 const brandData = {
     apple: {
+        id: 1,
         name: 'Apple',
         logo: '/Apple.png',
         fullName: 'Apple iPhone',
@@ -109,6 +112,7 @@ const brandData = {
         ]
     },
     samsung: {
+        id: 2,
         name: 'Samsung',
         logo: '/Samsung.png',
         fullName: 'Samsung Galaxy',
@@ -163,6 +167,7 @@ const brandData = {
         ]
     },
     huawei: {
+        id: 3,
         name: 'Huawei',
         logo: '/Huawei.png',
         fullName: 'Huawei',
@@ -217,6 +222,7 @@ const brandData = {
         ]
     },
     xiaomi: {
+        id: 4,
         name: 'Xiaomi',
         logo: '/Xiaomi.png',
         fullName: 'Xiaomi',
@@ -271,6 +277,7 @@ const brandData = {
         ]
     },
     oppo: {
+        id: 5,
         name: 'Oppo',
         logo: '/Oppo.png',
         fullName: 'Oppo',
@@ -325,7 +332,8 @@ const brandData = {
         ]
     },
     honor: {
-        name: 'Honor',
+        id: 6,
+            name: 'Honor',
         logo: '/Honor.png',
         fullName: 'Honor',
         description: 'Professional repair services for all Honor models',
@@ -384,17 +392,22 @@ export default function BrandRepairPage({ params }) {
     const { brand } = params;
     const brandInfo = brandData[brand];
     const [searchTerm, setSearchTerm] = useState('');
-    
+    const { data: phoneModelsResponse, isLoading, error } = useApiGet(
+        ['phoneModels', brand],
+        () => apiFetcher.get(`/models/?brand=${brand}`)
+      );
+      console.log(phoneModelsResponse);
+      
     // Filter phone models by brand
-    const brandPhones = phoneModels.filter(phone => phone.brand === brand);
+    const brandPhones = phoneModelsResponse || [];
     
     // Filter phones based on search term
     const filteredPhones = brandPhones.filter(phone =>
         phone.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+console.log(brandPhones);
     // If brand not found, show 404
-    if (!brandInfo) {
+    if (brandPhones.length === 0) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -423,15 +436,15 @@ export default function BrandRepairPage({ params }) {
                     {/* Header */}
                     <div className="flex items-center mb-8">
                         <Image
-                            src={brandInfo.logo}
-                            alt={brandInfo.name}
+                            src={brandInfo?.logo}
+                            alt={brandInfo?.name}
                             width={64}
                             height={64}
                             className="mr-4"
                         />
                         <div>
                             <h1 className="title text-primary">
-                                {brandInfo.fullName} Repair Services
+                                {brandInfo?.fullName} Repair Services
                             </h1>
                         </div>
                     </div>
@@ -450,7 +463,7 @@ export default function BrandRepairPage({ params }) {
                             <div className="relative mx-auto">
                                 <input
                                     type="text"
-                                    placeholder={`Search ${brandInfo.name} phones...`}
+                                    placeholder={`Search ${brandInfo?.name} phones...`}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full px-4 py-3 pl-10 pr-4 text-gray-700 bg-transparent border-0 border-b-2 border-gray-300 rounded-none focus:outline-none focus:border-blue-500"
@@ -471,22 +484,22 @@ export default function BrandRepairPage({ params }) {
                                         <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
                                             <div className="flex items-center mb-3">
                                                 <Image
-                                                    src={phone.image}
-                                                    alt={phone.name}
+                                                    src={phone?.image}
+                                                    alt={phone?.name}
                                                     width={32}
                                                     height={32}
                                                     className="object-contain mr-3"
                                                 />
                                                 <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-                                                    {phone.name}
+                                                    {phone?.name}
                                                 </h3>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="text-xs text-gray-500">
-                                                    Storage: {phone.storage}
+                                                    Storage: {phone?.storage}
                                                 </div>
                                                 <div className="text-sm font-bold text-primary">
-                                                    {phone.price}
+                                                    {phone?.price}
                                                 </div>
                                             </div>
                                         </div>
@@ -513,9 +526,9 @@ export default function BrandRepairPage({ params }) {
                   
                     {/* Why Choose Us */}
                     <div className="bg-white p-8 rounded-lg shadow-md">
-                        <h2 className="title text-gray-800 mb-4">Why Choose Our {brandInfo.name} Repair Services?</h2>
+                        <h2 className="title text-gray-800 mb-4">Why Choose Our {brandInfo?.name} Repair Services?</h2>
                         <div className="grid md:grid-cols-2 gap-6">
-                            {brandInfo.features.map((feature, index) => (
+                            {brandInfo?.features.map((feature, index) => (
                                 <div key={index}>
                                     <h3 className="subtitle text-gray-800 mb-2">{feature.title}</h3>
                                     <p className="text-gray-600">{feature.description}</p>

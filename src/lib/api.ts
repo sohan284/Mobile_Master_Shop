@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const BASE_URL = 'https://save-co-e6wj.vercel.app/api';
+const BASE_URL = 'http://save-co.lumivancelabs.com/api';
 
 // Create axios instance
 const apiClient = axios.create({
