@@ -205,11 +205,17 @@ export default function ModelDetailsPage() {
             <div className="space-y-2">
               <div>
                 <label className="text-sm font-medium text-gray-500">Brand</label>
-                <p className="text-lg font-semibold">{model?.brand?.name || 'N/A'}</p>
+                <p className="text-lg font-semibold">{model?.brand_name || 'N/A'}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Category</label>
-                <p className="text-lg">{model?.category || 'N/A'}</p>
+                <label className="text-sm font-medium text-gray-500">Brand Logo</label>
+                <Image 
+                src={model?.brand_logo || '/Apple.png'} 
+                alt={model?.name}
+                className="h-12 w-12 object-contain"
+                width={24}
+                height={24}
+              />
               </div>
             </div>
 

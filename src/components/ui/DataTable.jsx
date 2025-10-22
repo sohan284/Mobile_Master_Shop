@@ -43,13 +43,16 @@ export default function DataTable({
   className = "",
   loading = false
 }) {
+  // Ensure data is always an array
+  const safeData = Array.isArray(data) ? data : [];
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
 
   // Filter data based on search term
-  const filteredData = data.filter(item => {
+  const filteredData = safeData.filter(item => {
     if (!searchTerm) return true;
     return columns.some(column => {
       const value = column.accessor ? item[column.accessor] : '';

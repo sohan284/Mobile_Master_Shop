@@ -36,7 +36,7 @@ const navigation = [
     submenu: [
       { name: 'Brands', href: '/dashboard/repair-services/brands', icon: Tag },
       { name: 'Models', href: '/dashboard/repair-services/models', icon: PhoneIcon },
-      { name: 'Service List', href: '/dashboard/repair-services/services', icon: List },
+      { name: 'Problems', href: '/dashboard/repair-services/problems', icon: List },
     ]
   },
   { name: 'Products', href: '/dashboard/products', icon: Package },
@@ -124,19 +124,39 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                             <item.icon className="mr-3 h-5 w-5" />
                             {item.name}
                           </div>
-                          {isExpanded ? (
-                            <ChevronDown className="h-4 w-4" />
-                          ) : (
-                            <ChevronRight className="h-4 w-4" />
-                          )}
+                          <div className="transition-transform duration-200">
+                            {isExpanded ? (
+                              <ChevronDown className="h-4 w-4" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4" />
+                            )}
+                          </div>
                         </button>
                         
-                        {isExpanded && (
+                        {/* Submenu with smooth animation */}
+                        <div
+                          className={`
+                            overflow-hidden transition-all duration-300 ease-in-out
+                            ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+                          `}
+                        >
                           <ul className="ml-6 mt-2 space-y-1">
-                            {item.submenu.map((subItem) => {
+                            {item.submenu.map((subItem, index) => {
                               const isSubActive = pathname === subItem.href;
                               return (
-                                <li key={subItem.name}>
+                                <li 
+                                  key={subItem.name}
+                                  className={`
+                                    transition-all duration-300 ease-in-out
+                                    ${isExpanded 
+                                      ? 'translate-x-0 opacity-100' 
+                                      : '-translate-x-4 opacity-0'
+                                    }
+                                  `}
+                                  style={{ 
+                                    transitionDelay: isExpanded ? `${index * 50}ms` : '0ms' 
+                                  }}
+                                >
                                   <Link
                                     href={subItem.href}
                                     className={`
@@ -155,7 +175,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                               );
                             })}
                           </ul>
-                        )}
+                        </div>
                       </div>
                     ) : (
                       <Link
@@ -163,7 +183,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         className={`
                           flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
                           ${isActive 
-                            ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700' 
+                            ? 'bg-blue-50 text-primary border-r-2 border-primary' 
                             : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                           }
                         `}
@@ -177,19 +197,16 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 );
               })}
             </ul>
-            <div className="p-4 border-t  border-gray-200">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </button>
-          </div>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"
+              >
+                <LogOut className="mr-3 h-5 w-5" />
+                Logout
+              </button>
+            </div>
           </nav>
-          
-          {/* Logout Button */}
-        
         </div>
       </div>
     </>

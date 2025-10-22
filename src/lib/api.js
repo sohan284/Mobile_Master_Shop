@@ -117,13 +117,19 @@ export const getModelById = (id) => apiFetcher.get(`/api/repair/models/${id}/`);
 export const createModel = (data) => apiFetcher.post('/api/repair/models/', data);
 export const updateModel = (id, data) => apiFetcher.patch(`/api/repair/models/${id}/`, data);
 export const deleteModel = (id) => apiFetcher.delete(`/api/repair/models/${id}/`);
-
 // Service API functions
 export const getServices = (modelId) => apiFetcher.get(`/api/repair/services/?model=${modelId}`);
 export const getServiceById = (id) => apiFetcher.get(`/api/repair/services/${id}/`);
 export const createService = (data) => apiFetcher.post('/api/repair/services/', data);
 export const updateService = (id, data) => apiFetcher.patch(`/api/repair/services/${id}/`, data);
 export const deleteService = (id) => apiFetcher.delete(`/api/repair/services/${id}/`);
+
+// Problem API functions
+export const getProblems = (modelId) => apiFetcher.get(`/api/repair/problems/?model=${modelId}`);
+export const getProblemById = (id) => apiFetcher.get(`/api/repair/problems/${id}/`);
+export const createProblem = (data) => apiFetcher.post('/api/repair/problems/', data);
+export const updateProblem = (id, data) => apiFetcher.patch(`/api/repair/problems/${id}/`, data);
+export const deleteProblem = (id) => apiFetcher.delete(`/api/repair/problems/${id}/`);
 
 // Export the axios instance for custom requests
 export { apiClient };

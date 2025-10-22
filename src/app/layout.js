@@ -1,12 +1,9 @@
-'use client';
 import { Roboto, Nunito } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import QueryProvider from "@/providers/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { usePathname } from "next/navigation";
 import { Toaster } from 'react-hot-toast';
+import ClientLayout from "./components/ClientLayout";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -24,8 +21,6 @@ const nunito = Nunito({
 // };
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const isDashboard = pathname.includes("/dashboard") || pathname.includes("/login") || pathname.includes("/signup");
   return (
     <html lang="en">
       <body
@@ -33,11 +28,9 @@ export default function RootLayout({ children }) {
       >
         <QueryProvider>
           <AuthProvider>
-            {!isDashboard && <Header />}
-            <main className="">
-                {children}
-            </main>
-            {!isDashboard && <Footer />}
+            <ClientLayout>
+              {children}
+            </ClientLayout>
             <Toaster
               position="top-right"
               toastOptions={{
