@@ -6,12 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
-import { apiFetcher } from '@/lib/api';
+import { apiFetcher, deleteBrand } from '@/lib/api';
 import Image from 'next/image';
 import AddBrandModal from './components/AddBrandModal';
+import EditBrandModal from './components/EditBrandModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function BrandsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { data: brandsResponse, isLoading, error, refetch } = useApiGet(
     ['brands'],
     () => apiFetcher.get('/api/repair/brands/')
@@ -68,19 +74,50 @@ export default function BrandsPage() {
     setIsModalOpen(false);
   };
 
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedBrand(null);
+  };
+
   const handleModalSuccess = () => {
     refetch(); // Refresh the data after successful creation
   };
 
+  const handleEditModalSuccess = () => {
+    refetch(); // Refresh the data after successful update
+  };
+
   const handleEdit = (brand) => {
-    toast.success(`Edit brand: ${brand.name}`);
+    setSelectedBrand(brand);
+    setIsEditModalOpen(true);
   };
 
   const handleDelete = (brand) => {
-    if (confirm(`Are you sure you want to delete ${brand.name}?`)) {
-      setBrands(prev => prev.filter(b => b.id !== brand.id));
-      toast.success(`${brand.name} deleted successfully`);
+    setSelectedBrand(brand);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedBrand) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteBrand(selectedBrand.id);
+      toast.success(`${selectedBrand.name} deleted successfully`);
+      refetch(); // Refresh the data after successful deletion
+      setIsDeleteDialogOpen(false);
+      setSelectedBrand(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to delete brand');
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteDialogOpen(false);
+    setSelectedBrand(null);
+    setIsDeleting(false);
   };
 
   const handleView = (brand) => {
@@ -115,6 +152,27 @@ export default function BrandsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* Edit Brand Modal */}
+      <EditBrandModal
+        isOpen={isEditModalOpen}
+        onClose={handleEditModalClose}
+        onSuccess={handleEditModalSuccess}
+        brand={selectedBrand}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Brand"
+        message={`Are you sure you want to delete "${selectedBrand?.name}"? This action cannot be undone.`}
+        confirmText="Yes, delete it!"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={isDeleting}
       />
     </div>
   );

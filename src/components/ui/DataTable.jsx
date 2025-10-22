@@ -202,16 +202,7 @@ export default function DataTable({
                   ))}
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      {onView && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onView(item)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      )}
+                     
                       {onEdit && (
                         <Button
                           variant="ghost"
