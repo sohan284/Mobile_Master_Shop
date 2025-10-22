@@ -1,14 +1,16 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Search, User, LogIn, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Menu, X, Search, User, LogIn, Facebook, Instagram, Linkedin, LogOut } from 'lucide-react';
 import Image from 'next/image';
-import logo from "@/assets/mlkLogo.png"
+import logo from "@/assets/mlkLogo.png";
+import { useAuth } from '@/contexts/AuthContext';
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const [mobileSearch, setMobileSearch] = useState(false);
     const [isVisible, setIsVisible] = useState(true);   
     const [lastScrollY, setLastScrollY] = useState(0);
+    const { user, logout, isAuthenticated } = useAuth();
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
@@ -64,9 +66,22 @@ export default function Header() {
 
                     <div className="text-xl font-bold">LOGO</div>
 
-                    <button className="text-white focus:outline-none">
-                        <User size={24} />
-                    </button>
+                    {isAuthenticated() ? (
+                        <div className="flex items-center space-x-2">
+                            <span className="text-white text-sm">{user?.name}</span>
+                            <button 
+                                onClick={logout}
+                                className="text-white focus:outline-none hover:text-gray-300"
+                                title="Logout"
+                            >
+                                <LogOut size={24} />
+                            </button>
+                        </div>
+                    ) : (
+                        <Link href="/login" className="text-white focus:outline-none hover:text-gray-300">
+                            <User size={24} />
+                        </Link>
+                    )}
                 </div>
 
                 {/* Desktop */}
@@ -94,9 +109,29 @@ export default function Header() {
                             <button className="hover:text-gray-300" title="Search">
                                 <Search size={25} />
                             </button>
-                            <button className="hover:text-gray-300" title="User">
-                                <User size={25} />
-                            </button>
+                            {isAuthenticated() ? (
+                                <div className="flex items-center space-x-3">
+                                    <Link 
+                                        href="/dashboard" 
+                                        className="hover:text-gray-300 flex items-center space-x-2"
+                                        title="Dashboard"
+                                    >
+                                        <User size={25} />
+                                        <span className="text-sm">{user?.name}</span>
+                                    </Link>
+                                    <button 
+                                        onClick={logout}
+                                        className="hover:text-gray-300"
+                                        title="Logout"
+                                    >
+                                        <LogOut size={25} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <Link href="/login" className="hover:text-gray-300" title="Login">
+                                    <User size={25} />
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -137,10 +172,34 @@ export default function Header() {
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Blog</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>
                         </nav>
-                        <div className='p-6 text-[#85a4bf] font-bold text-xl'>
-                            <LogIn size={30} className="inline mr-2" />
-                            <span className="font-bold">Login</span>
-                        </div>
+                        {isAuthenticated() ? (
+                            <div className='p-6 text-[#85a4bf] font-bold text-xl'>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center">
+                                        <User size={30} className="inline mr-2" />
+                                        <span className="font-bold">{user?.name}</span>
+                                    </div>
+                                    <button 
+                                        onClick={logout}
+                                        className="text-[#85a4bf] hover:text-white transition"
+                                    >
+                                        <LogOut size={30} />
+                                    </button>
+                                </div>
+                                <Link 
+                                    href="/dashboard" 
+                                    className="block mt-2 text-lg hover:text-white transition"
+                                    onClick={toggleSidebar}
+                                >
+                                    Dashboard
+                                </Link>
+                            </div>
+                        ) : (
+                            <Link href="/login" className='p-6 text-[#85a4bf] font-bold text-xl hover:text-white transition' onClick={toggleSidebar}>
+                                <LogIn size={30} className="inline mr-2" />
+                                <span className="font-bold">Login</span>
+                            </Link>
+                        )}
                         {/* Social icons */}
                         <div className="max-w-7xl mx-auto flex flex-col mt-72 p-6">
                             <div className="flex space-x-6">

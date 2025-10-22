@@ -60,7 +60,7 @@ export function CustomButton({ className, children, ...props }) {
   return (
     <Button
       className={cn(
-        "relative overflow-hidden group rounded-none bg-secondary text-primary cursor-pointer hover:bg-secondary/90",
+        "relative overflow-hidden group rounded-none bg-primary text-primary-foreground hover:bg-primary/90",
         className
       )}
       {...props}

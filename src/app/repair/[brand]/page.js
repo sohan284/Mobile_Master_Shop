@@ -396,8 +396,7 @@ export default function BrandRepairPage({ params }) {
         ['phoneModels', brand],
         () => apiFetcher.get(`/models/?brand=${brand}`)
       );
-      console.log(phoneModelsResponse);
-      
+ 
     // Filter phone models by brand
     const brandPhones = phoneModelsResponse || [];
     
@@ -405,7 +404,6 @@ export default function BrandRepairPage({ params }) {
     const filteredPhones = brandPhones.filter(phone =>
         phone.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-console.log(brandPhones);
     // If brand not found, show 404
     if (brandPhones.length === 0) {
         return (
