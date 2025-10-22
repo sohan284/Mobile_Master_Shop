@@ -4,7 +4,9 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import QueryProvider from "@/providers/QueryProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
+import { Toaster } from 'react-hot-toast';
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -23,18 +25,50 @@ const nunito = Nunito({
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  const isDashboard = pathname.includes("/dashboard");
+  const isDashboard = pathname.includes("/dashboard") || pathname.includes("/login") || pathname.includes("/signup");
   return (
     <html lang="en">
       <body
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
         <QueryProvider>
-          {!isDashboard && <Header />}
-          <main className="">
-              {children}
-          </main>
-          <Footer />
+          <AuthProvider>
+            {!isDashboard && <Header />}
+            <main className="">
+                {children}
+            </main>
+            {!isDashboard && <Footer />}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
+                },
+                success: {
+                  duration: 3000,
+                  style: {
+                    background: '#10B981',
+                    color: '#fff',
+                  },
+                },
+                error: {
+                  duration: 5000,
+                  style: {
+                    background: '#EF4444',
+                    color: '#fff',
+                  },
+                },
+                loading: {
+                  style: {
+                    background: '#6B7E8D',
+                    color: '#fff',
+                  },
+                },
+              }}
+            />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>
