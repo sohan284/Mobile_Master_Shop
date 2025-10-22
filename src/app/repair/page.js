@@ -12,7 +12,7 @@ export default function RepairPage() {
   // Fetch brands from API using direct useApiGet
   const { data: brandsResponse, isLoading, error } = useApiGet(
     ['brands'],
-    () => apiFetcher.get('/brands/')
+    () => apiFetcher.get('/api/repair/brands/')
   );
   
   // Fallback brands if API fails

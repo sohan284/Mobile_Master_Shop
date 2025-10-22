@@ -394,7 +394,7 @@ export default function BrandRepairPage({ params }) {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: phoneModelsResponse, isLoading, error } = useApiGet(
         ['phoneModels', brand],
-        () => apiFetcher.get(`/models/?brand=${brand}`)
+        () => apiFetcher.get(`/api/repair/models/?brand=${brand}`)
       );
  
     // Filter phone models by brand
