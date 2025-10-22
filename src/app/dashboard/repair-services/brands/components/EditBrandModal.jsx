@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,13 +16,24 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 
-export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
+export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
   const [formData, setFormData] = useState({
     name: '',
     logo: null,
     logoPreview: null
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update form data when brand prop changes
+  useEffect(() => {
+    if (brand) {
+      setFormData({
+        name: brand.name || '',
+        logo: null,
+        logoPreview: brand.logo || null
+      });
+    }
+  }, [brand]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,29 +74,28 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
-    if (!formData.logo) {
-      toast.error('Please select a logo');
-      return;
-    }
-
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating brand...');
+    const loadingToast = toast.loading('Updating brand...');
 
     try {
       // Create FormData for file upload
       const submitData = new FormData();
       submitData.append('name', formData.name.trim());
-      submitData.append('logo', formData.logo);
+      
+      // Only append logo if a new one was selected
+      if (formData.logo) {
+        submitData.append('logo', formData.logo);
+      }
 
       // Make API call using apiFetcher
-      await apiFetcher.post('/api/repair/brands/', submitData, {
+      await apiFetcher.patch(`/api/repair/brands/${brand.id}/`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Brand created successfully!');
+      toast.success('Brand updated successfully!');
       
       // Reset form
       setFormData({
@@ -100,7 +110,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create brand');
+      toast.error(error.response?.data?.message || error.message || 'Failed to update brand');
     } finally {
       setIsSubmitting(false);
     }
@@ -121,7 +131,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Brand</DialogTitle>
+          <DialogTitle>Edit Brand</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -142,15 +152,33 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
 
           {/* Logo Upload */}
           <div className="space-y-2">
-            <Label htmlFor="logo">Brand Logo *</Label>
+            <Label htmlFor="logo">Brand Logo</Label>
             
-            {/* Logo Preview */}
-            {formData.logoPreview && (
+            {/* Current Logo Preview */}
+            {formData.logoPreview && !formData.logo && (
               <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.logoPreview}
-                    alt="Logo preview"
+                    alt="Current logo"
+                    fill
+                    className="object-contain rounded"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Current logo</p>
+                  <p className="text-xs text-gray-500">Click upload to change</p>
+                </div>
+              </div>
+            )}
+
+            {/* New Logo Preview */}
+            {formData.logo && (
+              <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
+                <div className="relative w-16 h-16">
+                  <Image
+                    src={formData.logoPreview}
+                    alt="New logo preview"
                     fill
                     className="object-contain rounded"
                   />
@@ -166,7 +194,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
                   onClick={() => setFormData(prev => ({
                     ...prev,
                     logo: null,
-                    logoPreview: null
+                    logoPreview: brand?.logo || null
                   }))}
                   className="text-red-500 hover:text-red-700"
                   disabled={isSubmitting}
@@ -179,7 +207,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
             )}
 
             {/* Upload Button */}
-            {!formData.logoPreview && (
+            {!formData.logo && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                 <input
                   id="logo"
@@ -198,7 +226,9 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
                     <Upload className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Upload logo</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {formData.logoPreview ? 'Change logo' : 'Upload new logo'}
+                    </p>
                     <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                   </div>
                 </label>
@@ -218,10 +248,10 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.logo}
+              disabled={isSubmitting || !formData.name.trim()}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Brand'}
+              {isSubmitting ? 'Updating...' : 'Update Brand'}
             </Button>
           </DialogFooter>
         </form>

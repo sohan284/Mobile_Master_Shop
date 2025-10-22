@@ -6,46 +6,53 @@ import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
-import { apiFetcher, deleteBrand } from '@/lib/api';
-import Image from 'next/image';
-import AddBrandModal from './components/AddBrandModal';
-import EditBrandModal from './components/EditBrandModal';
+import { apiFetcher, deleteProblem } from '@/lib/api';
+import AddProblemModal from './components/AddProblemModal';
+import EditProblemModal from './components/EditProblemModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
-export default function BrandsPage() {
+export default function ProblemsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedProblem, setSelectedProblem] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { data: brandsResponse, isLoading, error, refetch } = useApiGet(
-    ['brands'],
-    () => apiFetcher.get('/api/repair/brands/')
+  const { data: problemsResponse, isLoading, error, refetch } = useApiGet(
+    ['problems'],
+    () => apiFetcher.get('/api/repair/problems/')
   );
-  const brands = brandsResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   const columns = [
     {
-      header: 'Logo',
-      accessor: 'logo',
-      render: (item) => (
-        <div className="flex items-center">
-          <Image 
-            src={item?.logo || '/Apple.png'} 
-            alt={item?.name}
-            className="h-8 w-8 object-contain"
-            width={32}
-            height={32}
-          />
-        </div>
-      )
-    },
-    {
-      header: 'Brand Name',
+      header: 'Problem Name',
       accessor: 'name',
       sortable: true
     },
-   
+    {
+      header: 'Category',
+      accessor: 'category',
+      sortable: true
+    },
+    {
+      header: 'Price',
+      accessor: 'price',
+      sortable: true
+    },
+    {
+      header: 'Duration',
+      accessor: 'duration',
+      sortable: true
+    },
+    {
+      header: 'Status',
+      accessor: 'status',
+      render: (item) => (
+        <Badge variant={item.status === 'Active' ? 'default' : 'destructive'}>
+          {item.status}
+        </Badge>
+      )
+    },
     {
       header: 'Created At',
       accessor: 'created_at',
@@ -68,7 +75,7 @@ export default function BrandsPage() {
 
   const handleEditModalClose = () => {
     setIsEditModalOpen(false);
-    setSelectedBrand(null);
+    setSelectedProblem(null);
   };
 
   const handleModalSuccess = () => {
@@ -79,28 +86,28 @@ export default function BrandsPage() {
     refetch(); // Refresh the data after successful update
   };
 
-  const handleEdit = (brand) => {
-    setSelectedBrand(brand);
+  const handleEdit = (problem) => {
+    setSelectedProblem(problem);
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (brand) => {
-    setSelectedBrand(brand);
+  const handleDelete = (problem) => {
+    setSelectedProblem(problem);
     setIsDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedBrand) return;
+    if (!selectedProblem) return;
 
     setIsDeleting(true);
     try {
-      await deleteBrand(selectedBrand.id);
-      toast.success(`${selectedBrand.name} deleted successfully`);
+      await deleteProblem(selectedProblem.id);
+      toast.success(`${selectedProblem.name} deleted successfully`);
       refetch(); // Refresh the data after successful deletion
       setIsDeleteDialogOpen(false);
-      setSelectedBrand(null);
+      setSelectedProblem(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete brand');
+      toast.error(error.response?.data?.message || error.message || 'Failed to delete problem');
     } finally {
       setIsDeleting(false);
     }
@@ -108,47 +115,48 @@ export default function BrandsPage() {
 
   const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
-    setSelectedBrand(null);
+    setSelectedProblem(null);
     setIsDeleting(false);
   };
 
-
-
-  // Remove the loading check - let DataTable handle it
+  const handleView = (problem) => {
+    toast.success(`View problem: ${problem.name}`);
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Brands Management</h1>
-        <p className="text-gray-600">Manage phone brands and their information</p>
+        <h1 className="text-2xl font-bold text-gray-900">Problems Management</h1>
+        <p className="text-gray-600">Manage repair problems and their pricing</p>
       </div>
 
       <DataTable
-        data={brands}
+        data={problems}
         columns={columns}
-        title="Brands"
+        title="Repair Problems"
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onView={handleView}
         searchable={true}
         pagination={true}
         itemsPerPage={10}
         loading={isLoading}
       />
 
-      {/* Add Brand Modal */}
-      <AddBrandModal
+      {/* Add Problem Modal */}
+      <AddProblemModal
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
       />
 
-      {/* Edit Brand Modal */}
-      <EditBrandModal
+      {/* Edit Problem Modal */}
+      <EditProblemModal
         isOpen={isEditModalOpen}
         onClose={handleEditModalClose}
         onSuccess={handleEditModalSuccess}
-        brand={selectedBrand}
+        problem={selectedProblem}
       />
 
       {/* Delete Confirmation Dialog */}
@@ -156,8 +164,8 @@ export default function BrandsPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Brand"
-        message={`Are you sure you want to delete "${selectedBrand?.name}"? This action cannot be undone.`}
+        title="Delete Problem"
+        message={`Are you sure you want to delete "${selectedProblem?.name}"? This action cannot be undone.`}
         confirmText="Yes, delete it!"
         cancelText="Cancel"
         type="danger"

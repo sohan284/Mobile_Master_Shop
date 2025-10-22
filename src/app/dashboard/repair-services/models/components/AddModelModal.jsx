@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,17 +12,46 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 
-export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
+export default function AddModelModal({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
-    logo: null,
-    logoPreview: null
+    brand: '',
+    image: null,
+    imagePreview: null
   });
+  const [brands, setBrands] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingBrands, setIsLoadingBrands] = useState(false);
+
+  // Fetch brands when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      fetchBrands();
+    }
+  }, [isOpen]);
+
+  const fetchBrands = async () => {
+    setIsLoadingBrands(true);
+    try {
+      const response = await apiFetcher.get('/api/repair/brands/');
+      setBrands(response.data || []);
+    } catch (error) {
+      toast.error('Failed to fetch brands');
+    } finally {
+      setIsLoadingBrands(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +61,14 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     }));
   };
 
-  const handleLogoChange = (e) => {
+  const handleSelectChange = (name, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
@@ -49,8 +85,8 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
 
       setFormData(prev => ({
         ...prev,
-        logo: file,
-        logoPreview: URL.createObjectURL(file)
+        image: file,
+        imagePreview: URL.createObjectURL(file)
       }));
     }
   };
@@ -59,39 +95,46 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter brand name');
+      toast.error('Please enter model name');
       return;
     }
 
-    if (!formData.logo) {
-      toast.error('Please select a logo');
+    if (!formData.brand) {
+      toast.error('Please select a brand');
+      return;
+    }
+
+    if (!formData.image) {
+      toast.error('Please select an image');
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating brand...');
+    const loadingToast = toast.loading('Creating model...');
 
     try {
       // Create FormData for file upload
       const submitData = new FormData();
       submitData.append('name', formData.name.trim());
-      submitData.append('logo', formData.logo);
+      submitData.append('brand', formData.brand);
+      submitData.append('image', formData.image);
 
       // Make API call using apiFetcher
-      await apiFetcher.post('/api/repair/brands/', submitData, {
+      await apiFetcher.post('/api/repair/models/', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Brand created successfully!');
+      toast.success('Model created successfully!');
       
       // Reset form
       setFormData({
         name: '',
-        logo: null,
-        logoPreview: null
+        brand: '',
+        image: null,
+        imagePreview: null
       });
       
       // Close modal and refresh data
@@ -100,7 +143,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create brand');
+      toast.error(error.response?.data?.message || error.message || 'Failed to create model');
     } finally {
       setIsSubmitting(false);
     }
@@ -110,8 +153,9 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     if (!isSubmitting) {
       setFormData({
         name: '',
-        logo: null,
-        logoPreview: null
+        brand: '',
+        image: null,
+        imagePreview: null
       });
       onClose();
     }
@@ -121,52 +165,75 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Brand</DialogTitle>
+          <DialogTitle>Add New Model</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Brand Name */}
+          {/* Brand Selection */}
           <div className="space-y-2">
-            <Label htmlFor="name">Brand Name *</Label>
+            <Label htmlFor="brand">Brand *</Label>
+            <Select
+              value={formData.brand}
+              onValueChange={(value) => handleSelectChange('brand', value)}
+              disabled={isSubmitting || isLoadingBrands}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={isLoadingBrands ? "Loading brands..." : "Select a brand"} />
+              </SelectTrigger>
+              <SelectContent>
+                {brands.map((brand) => (
+                  <SelectItem key={brand.id} value={brand.slug}>
+                    {brand.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {/* Model Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Model Name *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter brand name"
+              placeholder="Enter model name"
               disabled={isSubmitting}
               required
             />
           </div>
 
-          {/* Logo Upload */}
+          
+
+
+          {/* Image Upload */}
           <div className="space-y-2">
-            <Label htmlFor="logo">Brand Logo *</Label>
+            <Label htmlFor="image">Model Image *</Label>
             
-            {/* Logo Preview */}
-            {formData.logoPreview && (
+            {/* Image Preview */}
+            {formData.imagePreview && (
               <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                 <div className="relative w-16 h-16">
                   <Image
-                    src={formData.logoPreview}
-                    alt="Logo preview"
+                    src={formData.imagePreview}
+                    alt="Image preview"
                     fill
                     className="object-contain rounded"
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{formData.logo.name}</p>
+                  <p className="text-sm font-medium text-gray-900">{formData.image.name}</p>
                   <p className="text-xs text-gray-500">
-                    {(formData.logo.size / 1024).toFixed(1)} KB
+                    {(formData.image.size / 1024).toFixed(1)} KB
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({
                     ...prev,
-                    logo: null,
-                    logoPreview: null
+                    image: null,
+                    imagePreview: null
                   }))}
                   className="text-red-500 hover:text-red-700"
                   disabled={isSubmitting}
@@ -179,26 +246,26 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
             )}
 
             {/* Upload Button */}
-            {!formData.logoPreview && (
+            {!formData.imagePreview && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
                 <input
-                  id="logo"
-                  name="logo"
+                  id="image"
+                  name="image"
                   type="file"
                   accept="image/*"
-                  onChange={handleLogoChange}
+                  onChange={handleImageChange}
                   className="hidden"
                   disabled={isSubmitting}
                 />
                 <label
-                  htmlFor="logo"
+                  htmlFor="image"
                   className="cursor-pointer flex flex-col items-center space-y-2"
                 >
                   <div className="p-3 bg-gray-100 rounded-full">
                     <Upload className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Upload logo</p>
+                    <p className="text-sm font-medium text-gray-900">Upload image</p>
                     <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
                   </div>
                 </label>
@@ -218,10 +285,10 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.logo}
+              disabled={isSubmitting || !formData.name.trim() || !formData.brand || !formData.image}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Brand'}
+              {isSubmitting ? 'Creating...' : 'Create Model'}
             </Button>
           </DialogFooter>
         </form>

@@ -5,40 +5,42 @@ import DataTable from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { useApiGet } from '@/hooks/useApi';
+import { apiFetcher, deleteModel } from '@/lib/api';
+import AddModelModal from './components/AddModelModal';
+import EditModelModal from './components/EditModelModal';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function ModelsPage() {
-  const [models, setModels] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Sample data - replace with API call
-  useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const sampleModels = [
-          { id: 1, name: 'iPhone 14 Pro', brand: 'Apple', category: 'Smartphone', status: 'Active', createdAt: '2024-01-15' },
-          { id: 2, name: 'Galaxy S23 Ultra', brand: 'Samsung', category: 'Smartphone', status: 'Active', createdAt: '2024-01-15' },
-          { id: 3, name: 'P60 Pro', brand: 'Huawei', category: 'Smartphone', status: 'Active', createdAt: '2024-01-15' },
-          { id: 4, name: 'Mi 13 Pro', brand: 'Xiaomi', category: 'Smartphone', status: 'Active', createdAt: '2024-01-15' },
-          { id: 5, name: 'Find X6 Pro', brand: 'Oppo', category: 'Smartphone', status: 'Active', createdAt: '2024-01-15' },
-          { id: 6, name: 'Magic 5 Pro', brand: 'Honor', category: 'Smartphone', status: 'Inactive', createdAt: '2024-01-15' },
-        ];
-        
-        setModels(sampleModels);
-      } catch (error) {
-        toast.error('Failed to fetch models');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchModels();
-  }, []);
-
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
+    ['models'],
+    () => apiFetcher.get('/api/repair/models/')
+  );
+  const models = modelsResponse || [];
   const columns = [
+    {
+      header: 'Image',
+      accessor: 'image',
+      render: (item) => (
+        <div className="flex items-center">
+          <Image 
+            src={item?.image || '/Apple.png'} 
+            alt={item?.name}
+            className="h-8 w-8 object-contain"
+            width={32}
+            height={32}
+          />
+        </div>
+      )
+    },
     {
       header: 'Model Name',
       accessor: 'name',
@@ -47,49 +49,72 @@ export default function ModelsPage() {
     {
       header: 'Brand',
       accessor: 'brand',
-      sortable: true
-    },
-    {
-      header: 'Category',
-      accessor: 'category',
-      sortable: true
-    },
-    {
-      header: 'Status',
-      accessor: 'status',
       render: (item) => (
-        <Badge variant={item.status === 'Active' ? 'default' : 'destructive'}>
-          {item.status}
-        </Badge>
-      )
-    },
-    {
-      header: 'Created At',
-      accessor: 'createdAt',
+        <div className="flex items-center">
+          <span className="text-sm font-medium">{item.brand || 'N/A'}</span>
+        </div>
+      ),
       sortable: true
-    }
+    },  
   ];
 
   const handleAdd = () => {
-    toast.success('Add model functionality will be implemented');
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleEditModalClose = () => {
+    setIsEditModalOpen(false);
+    setSelectedModel(null);
+  };
+
+  const handleModalSuccess = () => {
+    refetch(); // Refresh the data after successful creation
+  };
+
+  const handleEditModalSuccess = () => {
+    refetch(); // Refresh the data after successful update
   };
 
   const handleEdit = (model) => {
-    toast.success(`Edit model: ${model.name}`);
+    setSelectedModel(model);
+    setIsEditModalOpen(true);
   };
 
   const handleDelete = (model) => {
-    if (confirm(`Are you sure you want to delete ${model.name}?`)) {
-      setModels(prev => prev.filter(m => m.id !== model.id));
-      toast.success(`${model.name} deleted successfully`);
+    setSelectedModel(model);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedModel) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteModel(selectedModel.id);
+      toast.success(`${selectedModel.name} deleted successfully`);
+      refetch(); // Refresh the data after successful deletion
+      setIsDeleteDialogOpen(false);
+      setSelectedModel(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to delete model');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const handleView = (model) => {
-    toast.success(`View model: ${model.name}`);
+  const handleDeleteCancel = () => {
+    setIsDeleteDialogOpen(false);
+    setSelectedModel(null);
+    setIsDeleting(false);
   };
 
-  // Remove the loading check - let DataTable handle it
+  const handleView = (model) => {
+    router.push(`/dashboard/repair-services/models/${model.id}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -106,10 +131,39 @@ export default function ModelsPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onView={handleView}
+        onRowClick={handleView}
         searchable={true}
         pagination={true}
         itemsPerPage={10}
-        loading={loading}
+        loading={isLoading}
+      />
+
+      {/* Add Model Modal */}
+      <AddModelModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+      />
+
+      {/* Edit Model Modal */}
+      <EditModelModal
+        isOpen={isEditModalOpen}
+        onClose={handleEditModalClose}
+        onSuccess={handleEditModalSuccess}
+        model={selectedModel}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Model"
+        message={`Are you sure you want to delete "${selectedModel?.name}"? This action cannot be undone.`}
+        confirmText="Yes, delete it!"
+        cancelText="Cancel"
+        type="danger"
+        isLoading={isDeleting}
       />
     </div>
   );
