@@ -22,16 +22,10 @@ export const AuthProvider = ({ children }) => {
     // Check if user is logged in on app load
     const checkAuth = () => {
       const token = localStorage.getItem('authToken');
-      const userData = localStorage.getItem('userData');
       
-      if (token && userData) {
-        try {
-          setUser(JSON.parse(userData));
-        } catch (error) {
-          console.error('Error parsing user data:', error);
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('userData');
-        }
+      if (token) {
+        // Set a basic user object since we only have the token
+        setUser({ authenticated: true });
       }
       setLoading(false);
     };
@@ -54,13 +48,12 @@ export const AuthProvider = ({ children }) => {
       
       // Handle different response formats
       console.log(response)
-      const userData = response.user || response.data?.user || response;
       const authToken = response?.tokens?.access || response.access_token || response.data?.token;
-      if (authToken && userData) {
+      if (authToken) {
         localStorage.setItem('authToken', authToken);
-        // localStorage.setItem('userData', JSON.stringify(userData));
         
-        setUser(userData);
+        // Set a basic user object since we only have the token
+        setUser({ authenticated: true });
         return { success: true };
       } else {
         return { success: false, error: 'Invalid response from server' };
@@ -99,7 +92,6 @@ export const AuthProvider = ({ children }) => {
     } finally {
       // Clear local storage and state
       localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
       setUser(null);
       router.push('/login');
     }
