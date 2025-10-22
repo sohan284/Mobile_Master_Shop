@@ -30,29 +30,22 @@ export default function ProblemsPage() {
       sortable: true
     },
     {
-      header: 'Category',
-      accessor: 'category',
+      header: 'Description',
+      accessor: 'description',
       sortable: true
     },
-    {
-      header: 'Price',
-      accessor: 'price',
-      sortable: true
-    },
+
     {
       header: 'Duration',
       accessor: 'duration',
+      render: (item) => (
+        <div className="text-sm text-gray-500">
+          {item.estimated_time} 
+        </div>
+      ),
       sortable: true
     },
-    {
-      header: 'Status',
-      accessor: 'status',
-      render: (item) => (
-        <Badge variant={item.status === 'Active' ? 'default' : 'destructive'}>
-          {item.status}
-        </Badge>
-      )
-    },
+
     {
       header: 'Created At',
       accessor: 'created_at',

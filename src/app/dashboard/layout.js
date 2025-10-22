@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-xl font-semibold text-gray-900"></h1>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
                 Welcome, <span className="font-medium text-gray-900">{user?.username || user?.email || 'Admin'}</span>
