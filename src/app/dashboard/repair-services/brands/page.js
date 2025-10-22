@@ -45,15 +45,7 @@ export default function BrandsPage() {
       accessor: 'name',
       sortable: true
     },
-    {
-      header: 'Status',
-      accessor: 'status',
-      render: (item) => (
-        <Badge variant={item.status === 'Active' ? 'default' : 'destructive'}>
-          {item.status}
-        </Badge>
-      )
-    },
+   
     {
       header: 'Created At',
       accessor: 'created_at',
@@ -120,9 +112,7 @@ export default function BrandsPage() {
     setIsDeleting(false);
   };
 
-  const handleView = (brand) => {
-    toast.success(`View brand: ${brand.name}`);
-  };
+
 
   // Remove the loading check - let DataTable handle it
 
@@ -140,7 +130,6 @@ export default function BrandsPage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleView}
         searchable={true}
         pagination={true}
         itemsPerPage={10}

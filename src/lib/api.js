@@ -32,7 +32,6 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid, clear auth data
       localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
       // Redirect to login page
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
@@ -111,6 +110,20 @@ export const getBrandById = (id) => apiFetcher.get(`/api/repair/brands/${id}/`);
 export const createBrand = (data) => apiFetcher.post('/api/repair/brands/', data);
 export const updateBrand = (id, data) => apiFetcher.patch(`/api/repair/brands/${id}/`, data);
 export const deleteBrand = (id) => apiFetcher.delete(`/api/repair/brands/${id}/`);
+
+// Model API functions
+export const getModels = () => apiFetcher.get('/api/repair/models/');
+export const getModelById = (id) => apiFetcher.get(`/api/repair/models/${id}/`);
+export const createModel = (data) => apiFetcher.post('/api/repair/models/', data);
+export const updateModel = (id, data) => apiFetcher.patch(`/api/repair/models/${id}/`, data);
+export const deleteModel = (id) => apiFetcher.delete(`/api/repair/models/${id}/`);
+
+// Service API functions
+export const getServices = (modelId) => apiFetcher.get(`/api/repair/services/?model=${modelId}`);
+export const getServiceById = (id) => apiFetcher.get(`/api/repair/services/${id}/`);
+export const createService = (data) => apiFetcher.post('/api/repair/services/', data);
+export const updateService = (id, data) => apiFetcher.patch(`/api/repair/services/${id}/`, data);
+export const deleteService = (id) => apiFetcher.delete(`/api/repair/services/${id}/`);
 
 // Export the axios instance for custom requests
 export { apiClient };

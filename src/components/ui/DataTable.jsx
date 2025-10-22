@@ -36,6 +36,7 @@ export default function DataTable({
   onEdit,
   onDelete,
   onView,
+  onRowClick,
   searchable = true,
   pagination = true,
   itemsPerPage = 10,
@@ -194,7 +195,11 @@ export default function DataTable({
               </TableRow>
             ) : (
               paginatedData.map((item, index) => (
-                <TableRow key={item.id || index}>
+                <TableRow 
+                  key={item.id || index}
+                  onClick={onRowClick ? () => onRowClick(item) : undefined}
+                  className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                >
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
                       {renderCell(item, column)}
@@ -202,12 +207,21 @@ export default function DataTable({
                   ))}
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                     
+                     {onView && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => { e.stopPropagation(); onView(item); }}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      )}
                       {onEdit && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onEdit(item)}
+                          onClick={(e) => { e.stopPropagation(); onEdit(item); }}
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
@@ -217,7 +231,7 @@ export default function DataTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => onDelete(item)}
+                          onClick={(e) => { e.stopPropagation(); onDelete(item); }}
                           className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
