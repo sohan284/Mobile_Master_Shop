@@ -239,7 +239,6 @@ export default function PhoneModelPage({ params }) {
                                     }`}>
                                         {service.description}
                                     </p>
-                                  
                                 </div>
                             );
                         })}
@@ -272,7 +271,6 @@ export default function PhoneModelPage({ params }) {
                     )}
                     </div>
                     
-               
                     
                     {/* Phone Specifications */}
                     <div className="bg-white p-8 rounded-lg shadow-md mb-8">
