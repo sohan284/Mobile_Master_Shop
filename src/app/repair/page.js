@@ -5,6 +5,7 @@ import Link from "next/link";
 import PageTransition from "@/components/animations/PageTransition";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RepairPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,11 +100,17 @@ export default function RepairPage() {
           {/* Phone Brands Section */}
           <div className="mb-12"></div>
           
-          {/* Loading State */}
+          {/* Loading State - Skeleton Loader */}
           {isLoading && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              <p className="mt-4 text-gray-600">Loading brands...</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="bg-white h-30 w-30 p-4 rounded-lg shadow-md">
+                  <div className="flex flex-col items-center justify-center">
+                    <Skeleton className="w-12 h-12 rounded mb-3" />
+                    <Skeleton className="w-16 h-4" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
           
