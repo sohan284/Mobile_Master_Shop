@@ -114,8 +114,23 @@ const dummyPhones = {
 
 
 export default function BrandPage({ params }) {
-
   const brand = use(params).brand?.toLowerCase();
+  
+  // Add this check early in the component
+  if (!dummyPhones[brand]) {
+    return (
+      <PageTransition>
+        <div className='max-w-7xl mx-auto px-4 lg:px-8 py-8'>
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-bold text-[#6B7E8D]">Brand Not Found</h2>
+              <p className="text-gray-600">Sorry, we couldn't find any phones for the brand "{brand}".</p>
+            </div>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
 
   const [sortOrder, setSortOrder] = useState('asc');
   const [filteredPhones, setFilteredPhones] = useState([]);
@@ -146,7 +161,9 @@ export default function BrandPage({ params }) {
   return (
     <PageTransition>
       <div className='max-w-7xl mx-auto px-4 lg:px-8 py-8'>
-        <div className="flex gap-4 p-4">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 p-4">
+          {/* Changed items-center to items-start */}
+          
           {/* Filter Section */}
           <MotionFade delay={0.01}>
             <div className="w-1/4 min-w-[250px] bg-white p-4 rounded-lg shadow">
