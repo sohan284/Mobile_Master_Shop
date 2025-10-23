@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PageTransition from '@/components/animations/PageTransition';
@@ -392,7 +392,7 @@ const brandData = {
 };
 
 export default function BrandRepairPage({ params }) {
-    const { brand } = params;
+    const { brand } = use(params);
     const brandInfo = brandData[brand];
     const [searchTerm, setSearchTerm] = useState('');
     const { data: phoneModelsResponse, isLoading, error } = useApiGet(
