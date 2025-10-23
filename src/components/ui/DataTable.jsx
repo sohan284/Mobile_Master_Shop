@@ -209,15 +209,15 @@ export default function DataTable({
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 cursor-pointer">
                      {onView && (
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={(e) => { e.stopPropagation(); onView(item); }}
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 cursor-pointer"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-4 w-4 cursor-pointer" />
                         </Button>
                       )}
                       {onEdit && (
@@ -225,7 +225,7 @@ export default function DataTable({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                          className="h-8 w-8 p-0"
+                          className="h-8 w-8 p-0 cursor-pointer"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -235,7 +235,7 @@ export default function DataTable({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => { e.stopPropagation(); onDelete(item); }}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -262,7 +262,7 @@ export default function DataTable({
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -273,7 +273,7 @@ export default function DataTable({
                   variant={currentPage === page ? "default" : "outline"}
                   size="sm"
                   onClick={() => handlePageChange(page)}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 cursor-pointer"
                 >
                   {page}
                 </Button>
@@ -284,7 +284,7 @@ export default function DataTable({
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="h-8 w-8 p-0"
+                className="h-8 w-8 p-0 cursor-pointer"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

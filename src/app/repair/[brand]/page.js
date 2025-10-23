@@ -7,6 +7,9 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import { apiFetcher } from '@/lib/api';
 import { useApiGet } from '@/hooks/useApi';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import NotFound from '@/components/ui/NotFound';
 
 // Phone models data with brand property
 const phoneModels = [
@@ -404,20 +407,7 @@ export default function BrandRepairPage({ params }) {
     const filteredPhones = brandPhones.filter(phone =>
         phone.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    // If brand not found, show 404
-    if (brandPhones.length === 0) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">Brand Not Found</h1>
-                    <p className="text-gray-600 mb-6">The requested brand repair service is not available.</p>
-                    <Link href="/repair" className="bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/90">
-                        Back to Repair Services
-                    </Link>
-                </div>
-            </div>
-        );
-    }
+
 
     return (
         <PageTransition>
@@ -475,47 +465,87 @@ export default function BrandRepairPage({ params }) {
                         </div>
                           {/* Phone Models Section */}
                     <div className="mb-12">
-                        {filteredPhones.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {/* Loading State - Skeleton Loader */}
+                        {isLoading && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 3 }).map((_, index) => (
+                                    <Card key={index} className="group bg-white shadow-lg border border-gray-200 h-full overflow-hidden">
+                                        <CardContent className="p-6 text-center h-full flex flex-col relative">
+                                            <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 relative overflow-hidden">
+                                                <Skeleton className="w-full h-36 rounded" />
+                                            </div>
+                                            <div className="flex-grow flex flex-col justify-between">
+                                                <Skeleton className="w-3/4 h-6 mx-auto mb-4" />
+                                                
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Phone Models Grid */}
+                        {!isLoading && filteredPhones.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                 {filteredPhones.map((phone) => (
                                     <Link key={phone.id} href={`/repair/${brand}/${phone.id}`}>
-                                        <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                                            <div className="flex items-center mb-3">
-                                                <Image
-                                                    src={phone?.image}
-                                                    alt={phone?.name}
-                                                    width={32}
-                                                    height={32}
-                                                    className="object-contain mr-3"
-                                                />
-                                                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2">
-                                                    {phone?.name}
-                                                </h3>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="text-xs text-gray-500">
-                                                    Storage: {phone?.storage}
+                                        <Card className="group bg-white hover:shadow transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">
+                                            <CardContent className="p-6 text-center h-full flex flex-col relative">
+                                                {/* Premium badge */}
+                                                <div className="absolute top-3 right-3 bg-[#00bfb2] text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow-lg">
+                                                    Repair
                                                 </div>
-                                                <div className="text-sm font-bold text-primary">
-                                                    {phone?.price}
+                                                
+                                                <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
+                                                    {/* Subtle background pattern */}
+                                                    <div className="absolute inset-0 opacity-5">
+                                                        <div className="absolute top-2 left-2 w-8 h-8 bg-[#00bfb2] rounded-full"></div>
+                                                        <div className="absolute bottom-2 right-2 w-6 h-6 bg-[#6B7E8D] rounded-full"></div>
+                                                    </div>
+                                                    <Image
+                                                        src={phone?.image || '/Apple.png'}
+                                                        alt={phone?.name}
+                                                        width={144}
+                                                        height={144}
+                                                        className="w-full h-36 object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
+                                                    />
                                                 </div>
-                                            </div>
-                                        </div>
+                                                
+                                                <div className="flex-grow flex flex-col justify-between">
+                                                    <h3 className="font-bold text-lg text-[#6B7E8D] line-clamp-2 group-hover:text-[#00bfb2] transition-colors duration-300">
+                                                        {phone?.name}
+                                                    </h3>
+                                                  
+                                                </div>
+                                            </CardContent>
+                                        </Card>
                                     </Link>
                                 ))}
                             </div>
-                        ) : (
-                            <div className="text-center py-12">
-                                <div className="text-gray-500 text-lg mb-4">
-                                    No phones found matching &quot;{searchTerm}&quot;
-                                </div>
-                                <button
-                                    onClick={() => setSearchTerm('')}
-                                    className="text-primary hover:text-primary/90 underline"
-                                >
-                                    Clear search
-                                </button>
-                            </div>
+                        )}
+
+                        {/* No Results */}
+                        {!isLoading && filteredPhones.length === 0 && (
+                            <NotFound
+                                title="No Phones Found"
+                                description="We couldn't find any phone models matching your search."
+                                showSearch={true}
+                                searchTerm={searchTerm}
+                                onClearSearch={() => setSearchTerm('')}
+                                primaryAction={
+                                    <Link 
+                                        href="/repair" 
+                                        className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+                                    >
+                                        Browse All Brands
+                                    </Link>
+                                }
+                                secondaryAction={
+                                    <span>
+                                        or <Link href="/repair" className="text-primary hover:underline">try a different search</Link>
+                                    </span>
+                                }
+                            />
                         )}
                     </div>
                     

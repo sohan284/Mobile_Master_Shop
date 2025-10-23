@@ -26,7 +26,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    duration: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,11 +51,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
-    if (!formData.duration.trim()) {
-      toast.error('Please enter duration');
-      return;
-    }
-
     setIsSubmitting(true);
     const loadingToast = toast.loading('Creating problem...');
 
@@ -65,7 +59,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       await apiFetcher.post('/api/repair/problems/', {
         name: formData.name.trim(),
         description: formData.description.trim(),
-        estimated_time: formData.duration.trim()
       });
 
       toast.dismiss(loadingToast);
@@ -75,7 +68,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       setFormData({
         name: '',
         description: '',
-        duration: ''
       });
       
       // Close modal and refresh data
@@ -95,7 +87,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       setFormData({
         name: '',
         description: '',
-        duration: ''
       });
       onClose();
     }
@@ -142,22 +133,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
 
           {/* Price */}
           
-
-          {/* Duration */}
-          <div className="space-y-2">
-            <Label htmlFor="duration">Duration *</Label>
-            <Input
-              id="duration"
-              name="duration"
-              type="text"
-              value={formData.duration}
-              onChange={handleInputChange}
-              placeholder="Enter duration (e.g., 2-3 hours)"
-              disabled={isSubmitting}
-              required
-            />
-          </div>
-
 
           {/* Form Actions */}
           <DialogFooter>

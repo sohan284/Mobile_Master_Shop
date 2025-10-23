@@ -10,6 +10,7 @@ import { apiFetcher, deleteProblem } from '@/lib/api';
 import AddProblemModal from './components/AddProblemModal';
 import EditProblemModal from './components/EditProblemModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function ProblemsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,15 +33,18 @@ export default function ProblemsPage() {
     {
       header: 'Description',
       accessor: 'description',
-      sortable: true
-    },
-
-    {
-      header: 'Duration',
-      accessor: 'duration',
       render: (item) => (
-        <div className="text-sm text-gray-500">
-          {item.estimated_time} 
+        <div className="max-w-[200px]">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="text-sm text-gray-500 truncate cursor-pointer">
+                  {item.description}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{item.description}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       ),
       sortable: true
