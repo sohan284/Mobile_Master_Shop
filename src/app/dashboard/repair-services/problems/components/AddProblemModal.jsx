@@ -20,14 +20,13 @@ import {
 } from '@/components/ui/select';
 import toast from 'react-hot-toast';
 import { apiFetcher } from '@/lib/api';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
-    price: '',
-    duration: '',
-    status: 'Active'
+    description: '',
+    duration: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,12 +38,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
     }));
   };
 
-  const handleSelectChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,13 +47,8 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       return;
     }
 
-    if (!formData.category.trim()) {
-      toast.error('Please enter category');
-      return;
-    }
-
-    if (!formData.price.trim()) {
-      toast.error('Please enter price');
+    if (!formData.description.trim()) {
+      toast.error('Please enter description');
       return;
     }
 
@@ -76,10 +64,8 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       // Make API call using apiFetcher
       await apiFetcher.post('/api/repair/problems/', {
         name: formData.name.trim(),
-        category: formData.category.trim(),
-        price: formData.price.trim(),
-        duration: formData.duration.trim(),
-        status: formData.status
+        description: formData.description.trim(),
+        estimated_time: formData.duration.trim()
       });
 
       toast.dismiss(loadingToast);
@@ -88,10 +74,8 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
       // Reset form
       setFormData({
         name: '',
-        category: '',
-        price: '',
-        duration: '',
-        status: 'Active'
+        description: '',
+        duration: ''
       });
       
       // Close modal and refresh data
@@ -110,10 +94,8 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
     if (!isSubmitting) {
       setFormData({
         name: '',
-        category: '',
-        price: '',
-        duration: '',
-        status: 'Active'
+        description: '',
+        duration: ''
       });
       onClose();
     }
@@ -144,33 +126,22 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
-            <Input
-              id="category"
-              name="category"
-              type="text"
-              value={formData.category}
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              name="description"
+              type="textarea"
+              rows={2}
+              value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter category (e.g., Display, Battery)"
+              placeholder="Enter description"
               disabled={isSubmitting}
               required
             />
           </div>
 
           {/* Price */}
-          <div className="space-y-2">
-            <Label htmlFor="price">Price *</Label>
-            <Input
-              id="price"
-              name="price"
-              type="text"
-              value={formData.price}
-              onChange={handleInputChange}
-              placeholder="Enter price (e.g., $120)"
-              disabled={isSubmitting}
-              required
-            />
-          </div>
+          
 
           {/* Duration */}
           <div className="space-y-2">
@@ -187,23 +158,6 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
             />
           </div>
 
-          {/* Status */}
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value) => handleSelectChange('status', value)}
-              disabled={isSubmitting}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           {/* Form Actions */}
           <DialogFooter>
@@ -217,7 +171,7 @@ export default function AddProblemModal({ isOpen, onClose, onSuccess }) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.category.trim() || !formData.price.trim() || !formData.duration.trim()}
+              disabled={isSubmitting || !formData.name.trim() || !formData.description.trim() }
               className="text-secondary cursor-pointer"
             >
               {isSubmitting ? 'Creating...' : 'Create Problem'}
