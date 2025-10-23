@@ -156,8 +156,10 @@ export default function ModelDetailsPage() {
     if (!selectedService) return;
 
     setIsDeleting(true);
+    console.log(selectedService);
+    
     try {
-      await deleteService(selectedService.id);
+      await deleteService(selectedService.problem_id);
       toast.success(`${selectedService.name} deleted successfully`);
       refetchServices(); // Refresh the services data
       setIsDeleteDialogOpen(false);

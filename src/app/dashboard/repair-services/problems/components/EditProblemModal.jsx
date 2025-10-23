@@ -20,7 +20,6 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    duration: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,7 +29,6 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
       setFormData({
         name: problem.name || '',
         description: problem.description || '',
-        duration: problem.estimated_time || ''
       });
     }
   }, [problem]);
@@ -66,7 +64,6 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
       await apiFetcher.patch(`/api/repair/problems/${problem.id}/`, {
         name: formData.name.trim(),
         description: formData.description.trim(),
-        estimated_time: formData?.duration
       });
 
       toast.dismiss(loadingToast);
@@ -87,7 +84,6 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
       setFormData({
         name: '',
         description: '',
-        duration: ''
       });
       onClose();
     }
@@ -131,22 +127,6 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
               required
             />
           </div>
-
-          {/* Duration */}
-          <div className="space-y-2">
-            <Label htmlFor="duration">Duration *</Label>
-            <Input
-              id="duration"
-              name="duration"
-              type="text"
-              value={formData.duration}
-              onChange={handleInputChange}
-              placeholder="Enter duration (e.g., 2-3 hours)"
-              disabled={isSubmitting}
-              required
-            />
-          </div>
-
 
           {/* Form Actions */}
           <DialogFooter>
