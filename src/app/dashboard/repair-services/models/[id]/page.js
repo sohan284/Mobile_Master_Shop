@@ -35,12 +35,7 @@ export default function ModelDetailsPage() {
   );
   const model = modelResponse;
 
-  // Fetch services for this model
-  const { data: servicesResponse, isLoading: servicesLoading, error: servicesError, refetch: refetchServices } = useApiGet(
-    ['services', modelId],
-    () => apiFetcher.get(`/api/repair/models/?model=${modelId}`)
-  );
-  const services = servicesResponse?.data || [];
+
 
   const {data: modelServicesResponse, isLoading: isModelServicesLoading, error: modelServicesError, refetch: modelServicesRefetch} = useApiGet(
     ['modelServices',modelId],
@@ -337,7 +332,7 @@ export default function ModelDetailsPage() {
             <div className="space-y-2">
               <div>
                 <label className="text-sm font-medium text-gray-500">Services Count</label>
-                <p className="text-2xl font-bold text-blue-600">{services.length}</p>
+                <p className="text-2xl font-bold text-blue-600">{model.available_repairs_count}</p>
               </div>
             </div>
           </div>
