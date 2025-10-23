@@ -130,7 +130,6 @@ export default function ProblemsPage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onView={handleView}
         searchable={true}
         pagination={true}
         itemsPerPage={10}

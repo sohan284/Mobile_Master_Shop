@@ -23,35 +23,19 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 
-export default function AddModelModal({ isOpen, onClose, onSuccess }) {
+export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
     image: null,
     imagePreview: null
   });
-  const [brands, setBrands] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
-  // Fetch brands when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchBrands();
-    }
-  }, [isOpen]);
 
-  const fetchBrands = async () => {
-    setIsLoadingBrands(true);
-    try {
-      const response = await apiFetcher.get('/api/repair/brands/');
-      setBrands(response.data || []);
-    } catch (error) {
-      toast.error('Failed to fetch brands');
-    } finally {
-      setIsLoadingBrands(false);
-    }
-  };
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
