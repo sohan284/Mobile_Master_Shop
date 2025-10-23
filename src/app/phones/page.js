@@ -38,41 +38,40 @@ export default function PhonesPage() {
         <PageTransition>
             <div className="py-8">
                 <div className="max-w-7xl mx-auto px-4 lg:px-8">
-                    
                     {/* Header Section */}
-                   
-
                     {/* Brands Grid */}
                     <MotionFade delay={0.01}>
                         <div className="mb-12">
                             <h3 className="text-3xl font-bold text-center text-[#6B7E8D] mb-12">Featured Brands</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
                                 {randomBrands.map((brand, idx) => (
-                                    <MotionFade key={brand.id} delay={0.02 + idx * 0.05}>
-                                        <Card className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">
-                                            <CardContent className="p-3 text-center h-full flex flex-col relative">
-                                                <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
-                                                    <Image
-                                                        src={brand.logo}
-                                                        alt={brand.name}
-                                                        width={160}
-                                                        height={96}
-                                                        className="w-full h-28 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
-                                                    />
-                                                </div>
-
-                                                <div className="flex-grow flex flex-col justify-between">
-                                                    <h3 className="font-bold text-sm text-[#6B7E8D] group-hover:text-[#00bfb2] transition-colors duration-300">
-                                                        {brand.name}
-                                                    </h3>
-
-                                                    <div className="mt-3">
-                                                        <p className="text-xs text-gray-600">Official brand</p>
+                                    <Link href={`/phones/${brand.name}`} key={brand.id}>
+                                        <MotionFade delay={0.02 + idx * 0.05}>
+                                            <Card className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">
+                                                <CardContent className="p-3 text-center h-full flex flex-col relative">
+                                                    <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
+                                                        <Image
+                                                            src={brand.logo}
+                                                            alt={brand.name}
+                                                            width={160}
+                                                            height={96}
+                                                            className="w-full h-28 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
+                                                        />
                                                     </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </MotionFade>
+
+                                                    <div className="flex-grow flex flex-col justify-between">
+                                                        <h3 className="font-bold text-sm text-[#6B7E8D] group-hover:text-[#00bfb2] transition-colors duration-300">
+                                                            {brand.name}
+                                                        </h3>
+
+                                                        <div className="mt-3">
+                                                            <p className="text-xs text-gray-600">Official brand</p>
+                                                        </div>
+                                                    </div>
+                                                </CardContent>
+                                            </Card>
+                                        </MotionFade>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
