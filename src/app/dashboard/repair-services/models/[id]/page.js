@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import DataTable from '@/components/ui/DataTable';
+import DataTableSkeleton from '@/components/ui/DataTableSkeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
@@ -40,58 +42,82 @@ export default function ModelDetailsPage() {
   );
   const services = servicesResponse?.data || [];
 
+  const {data: modelServicesResponse, isLoading: isModelServicesLoading, error: modelServicesError, refetch: modelServicesRefetch} = useApiGet(
+    ['modelServices',modelId],
+    () => apiFetcher.get(`/api/repair/repair-prices/?phone_model=${modelId}`)
+  );
+  const modelServices = modelServicesResponse?.data || [];
   const serviceColumns = [
     {
-      header: 'Service Name',
-      accessor: 'name',
+      header: 'Problem',
+      accessor: 'problem_name',
       sortable: true
     },
     {
-      header: 'Description',
-      accessor: 'description',
-      render: (item) => (
-        <div className="max-w-xs truncate">
-          {item.description || 'No description'}
-        </div>
-      )
-    },
-    {
-      header: 'Price',
-      accessor: 'price',
+      header:"Original Price",
       render: (item) => (
         <div className="font-medium">
-          ${item.price || '0.00'}
+          {item?.original?.base_price || '0.00'}
         </div>
       ),
-      sortable: true
-    },
+    },  
     {
-      header: 'Duration',
-      accessor: 'duration',
+      header:"Original Discount Percentage",
+      render: (item) => (
+        <div className="font-medium text-center">
+          {item?.original?.discount_percentage || 'N/A'}
+        </div>
+      ),
+    },  
+    {
+      header:"Original Discount Amount",
+      render: (item) => (
+        <div className="font-medium text-center">
+          {item?.original?.discount_amount || '0.00'}
+        </div>
+      ),
+    },  
+    {
+      header:"Duplicate Price",
+      render: (item) => (
+        <div className="font-medium">
+          {item?.duplicate?.base_price || '0.00'}
+        </div>
+      ),
+    },
+    {header:"Duplicate Discount Percentage",
+      render: (item) => (
+        <div className="font-medium text-center">
+          {item?.duplicate?.discount_percentage || '0.00'}
+        </div>
+      ),
+    },  
+    {
+      header:"Duplicate Discount Amount",
+      render: (item) => (
+        <div className="font-medium text-center">
+        {item?.duplicate?.discount_amount || '0.00'}
+        </div>
+      ),
+    },  
+    {
+      header:"Warranty Days",
+      accessor: 'warranty_days',
       render: (item) => (
         <div className="text-sm text-gray-600">
-          {item.duration || 'N/A'}
+          {item?.original?.warranty_days || item?.duplicate?.warranty_days || 'N/A'}
         </div>
-      )
+      ),
     },
-    {
-      header: 'Status',
-      accessor: 'status',
-      render: (item) => (
-        <Badge variant={item.status === 'Active' ? 'default' : 'destructive'}>
-          {item.status}
-        </Badge>
-      )
-    },
+   
     {
       header: 'Created At',
       accessor: 'created_at',
       render: (item) => (
         <div className="text-sm text-gray-500">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item?.original?.created_at).toLocaleDateString() || new Date(item?.duplicate?.created_at).toLocaleDateString() || 'N/A'}
         </div>
       ),  
-      sortable: true
     }
   ];
 
@@ -155,8 +181,80 @@ export default function ModelDetailsPage() {
 
   if (modelLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading model details...</div>
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center space-x-4">
+          <Skeleton className="h-9 w-20" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+
+        {/* Model Information Card Skeleton */}
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-40" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Model Image Skeleton */}
+              <div className="flex flex-col items-center space-y-2">
+                <Skeleton className="h-24 w-24 rounded" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+
+              {/* Model Details Skeleton */}
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-12 w-12 rounded" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-6 w-16 rounded-full" />
+                </div>
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Services Section Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-9 w-24" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <DataTableSkeleton 
+              columns={serviceColumns}
+              rows={5}
+              showHeader={true}
+              showSearch={true}
+              showPagination={true}
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -244,20 +342,8 @@ export default function ModelDetailsPage() {
         </CardContent>
       </Card>
 
-      {/* Services Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Services</CardTitle>
-            <Button onClick={handleAddService} className="flex items-center space-x-2">
-              <Plus className="h-4 w-4" />
-              <span>Add Service</span>
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            data={services}
+   <DataTable
+            data={modelServices}
             columns={serviceColumns}
             title="Services"
             onAdd={handleAddService}
@@ -267,10 +353,9 @@ export default function ModelDetailsPage() {
             searchable={true}
             pagination={true}
             itemsPerPage={10}
-            loading={servicesLoading}
+            loading={isModelServicesLoading}
           />
-        </CardContent>
-      </Card>
+    
 
       {/* Add Service Modal */}
       <AddModelServiceModal
@@ -278,6 +363,7 @@ export default function ModelDetailsPage() {
         onClose={handleAddServiceModalClose}
         onSuccess={handleAddServiceSuccess}
         modelId={modelId}
+        existingServices={modelServices}
       />
 
       {/* Edit Service Modal */}

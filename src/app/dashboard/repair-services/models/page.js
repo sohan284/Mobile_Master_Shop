@@ -24,6 +24,11 @@ export default function ModelsPage() {
     ['models'],
     () => apiFetcher.get('/api/repair/models/')
   );
+  const { data: brandsResponse, isLoading: brandsLoading, error: brandsError, refetch: refetchBrands } = useApiGet(
+    ['brands'],
+    () => apiFetcher.get('/api/repair/brands/')
+  );
+  const brands = brandsResponse?.data || [];
   const models = modelsResponse || [];
   const columns = [
     {
@@ -143,10 +148,12 @@ export default function ModelsPage() {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
+        brands={brands}
       />
 
       {/* Edit Model Modal */}
       <EditModelModal
+        brands={brands}
         isOpen={isEditModalOpen}
         onClose={handleEditModalClose}
         onSuccess={handleEditModalSuccess}

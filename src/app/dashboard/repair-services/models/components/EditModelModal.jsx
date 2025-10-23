@@ -23,14 +23,13 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 
-export default function EditModelModal({ isOpen, onClose, onSuccess, model }) {
+export default function EditModelModal({ isOpen, onClose, onSuccess, model, brands }) {
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
     image: null,
     imagePreview: null
   });
-  const [brands, setBrands] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
@@ -39,19 +38,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model }) {
     if (model) {
       setFormData({
         name: model.name || '',
-        brand: model.brand?.id?.toString() || '',
+        brand: model.brand || '',
         image: null,
         imagePreview: model.image || null
       });
     }
   }, [model]);
 
-  // Fetch brands when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchBrands();
-    }
-  }, [isOpen]);
+
 
   const fetchBrands = async () => {
     setIsLoadingBrands(true);
@@ -194,7 +188,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model }) {
               </SelectTrigger>
               <SelectContent>
                 {brands.map((brand) => (
-                  <SelectItem key={brand.id} value={brand.id.toString()}>
+                  <SelectItem key={brand.id} value={brand.slug}>
                     {brand.name}
                   </SelectItem>
                 ))}
