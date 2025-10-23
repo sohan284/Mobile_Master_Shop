@@ -192,7 +192,7 @@ export default function DataTable({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + 1} className="h-24 text-center">
+                <TableCell colSpan={columns.length + 1} className="h-80 text-center">
                   No data found
                 </TableCell>
               </TableRow>
