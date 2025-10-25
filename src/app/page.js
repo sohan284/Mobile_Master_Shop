@@ -7,14 +7,14 @@ import PageTransition from '@/components/animations/PageTransition';
 export default function page() {
   return (
     <div>
-    <Banner />
-    <div className='max-w-[1200px] mx-auto'>
-<PageTransition>
+      <Banner />
+      <div className='max-w-[1200px] mx-auto'>
+        <PageTransition>
 
-        <Repair />
-        <Refurbished />
-</PageTransition>
-    </div>
+          <Repair />
+          <Refurbished />
+        </PageTransition>
+      </div>
     </div>
   )
 }
