@@ -3,6 +3,7 @@ import React, { use, useEffect, useState } from 'react'
 import Image from 'next/image';
 import MotionFade from '@/components/animations/MotionFade';
 import PageTransition from '@/components/animations/PageTransition';
+import Link from 'next/link';
 
 const dummyPhones = {
   apple: [
@@ -115,7 +116,7 @@ const dummyPhones = {
 
 export default function BrandPage({ params }) {
   const brand = use(params).brand?.toLowerCase();
-  
+
   // Add this check early in the component
   if (!dummyPhones[brand]) {
     return (
@@ -163,7 +164,7 @@ export default function BrandPage({ params }) {
       <div className='max-w-7xl mx-auto px-4 lg:px-8 py-8'>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-4 p-4">
           {/* Changed items-center to items-start */}
-          
+
           {/* Filter Section */}
           <MotionFade delay={0.01}>
             <div className="w-1/4 min-w-[250px] bg-white p-4 rounded-lg shadow">
@@ -219,34 +220,36 @@ export default function BrandPage({ params }) {
           {/* Phones Grid */}
           <div className="w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredPhones.map((phone, idx) => (
-              <MotionFade key={phone.id} delay={0.02 + idx * 0.05}>
-                <div className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden rounded-lg">
-                  <div className="p-4 text-center h-full flex flex-col relative">
-                    <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
-                      <Image
-                        src={phone.image}
-                        alt={phone.model}
-                        width={160}
-                        height={160}
-                        className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
-                      />
-                    </div>
+              <Link href={`/phones/${brand}/${phone.model}`} key={phone.id}>
+                <MotionFade delay={0.02 + idx * 0.05}>
+                  <div className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden rounded-lg">
+                    <div className="p-4 text-center h-full flex flex-col relative">
+                      <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
+                        <Image
+                          src={phone.image}
+                          alt={phone.model}
+                          width={160}
+                          height={160}
+                          className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
+                        />
+                      </div>
 
-                    <div className="flex-grow flex flex-col justify-between">
-                      <h3 className="font-bold text-lg text-[#6B7E8D] group-hover:text-[#00bfb2] transition-colors duration-300">
-                        {phone.model}
-                      </h3>
+                      <div className="flex-grow flex flex-col justify-between">
+                        <h3 className="font-bold text-lg text-[#6B7E8D] group-hover:text-[#00bfb2] transition-colors duration-300">
+                          {phone.model}
+                        </h3>
 
-                      <div className="mt-3 space-y-2">
-                        <p className="text-gray-600">{phone.storage} - {phone.color}</p>
-                        <p className="text-lg">
-                          from <span className='font-bold text-[#00bfb2]'>${phone.price}</span>
-                        </p>
+                        <div className="mt-3 space-y-2">
+                          <p className="text-gray-600">{phone.storage} - {phone.color}</p>
+                          <p className="text-lg">
+                            from <span className='font-bold text-[#00bfb2]'>${phone.price}</span>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </MotionFade>
+                </MotionFade>
+              </Link>
             ))}
           </div>
         </div>
