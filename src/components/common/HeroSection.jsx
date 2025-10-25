@@ -26,8 +26,8 @@ export default function HeroSection({
           <Image 
             src={image} 
             alt={imageAlt} 
-            width={200} 
-            height={150} 
+            width={100} 
+            height={80} 
             className="w-full max-w-xs mx-auto drop-shadow hover:scale-105 transition-transform duration-500" 
           />
         </div>

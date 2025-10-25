@@ -18,6 +18,7 @@ import NotFound from '@/components/ui/NotFound';
 export default function PhoneModelPage({ params }) {
     const { brand, phoneId } = params;
     const [selectedServices, setSelectedServices] = useState([]);
+    const [servicePartTypes, setServicePartTypes] = useState({}); // Store part type for each service
     const [searchTerm, setSearchTerm] = useState('');
     const [phoneInfo, setPhoneInfo] = useState(null);
     
@@ -77,7 +78,14 @@ export default function PhoneModelPage({ params }) {
         icon: service.icon,
         price: service.price,
         isSelected: selectedServices.includes(service.problem_id),
-        isDisabled: !selectedServices.includes(service.problem_id) && selectedServices.length >= 3
+        isDisabled: !selectedServices.includes(service.problem_id) && selectedServices.length >= 3,
+        hasOriginal: service?.original?.base_price ? true : false, // Only true if original price exists
+        hasDuplicate: service?.duplicate?.base_price ? true : false, // Only true if duplicate price exists
+        partType: servicePartTypes[service.problem_id] || 'original', // Default to original
+        original_price: service?.original?.base_price, // Original part price
+        original_discount_price: service?.original?.final_price, // Original discount price
+        duplicate_price: service?.duplicate?.base_price, // Compatible part price
+        duplicate_discount_price: service?.duplicate?.final_price, // Compatible discount price
     }));
 
 
@@ -86,7 +94,14 @@ export default function PhoneModelPage({ params }) {
         setSelectedServices(prev => {
             if (prev.includes(serviceId)) {
                 // If already selected, remove it
-                return prev.filter(id => id !== serviceId);
+                const newSelected = prev.filter(id => id !== serviceId);
+                // Also remove part type selection
+                setServicePartTypes(prevTypes => {
+                    const newTypes = { ...prevTypes };
+                    delete newTypes[serviceId];
+                    return newTypes;
+                });
+                return newSelected;
             } else {
                 // If not selected and we have less than 3, add it
                 if (prev.length < 3) {
@@ -96,6 +111,23 @@ export default function PhoneModelPage({ params }) {
                 return prev;
             }
         });
+    };
+
+    const handlePartTypeSelect = (serviceId, partType) => {
+        setServicePartTypes(prev => ({
+            ...prev,
+            [serviceId]: partType
+        }));
+    };
+
+    const handleContinueToBreakdown = () => {
+        // Store selected services and part types in sessionStorage
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+            sessionStorage.setItem('servicePartTypes', JSON.stringify(servicePartTypes));
+        }
+        // Navigate to breakdown page
+        window.location.href = `/repair/${brand}/${phoneId}/breakdown`;
     };
 
     return (
@@ -213,6 +245,76 @@ export default function PhoneModelPage({ params }) {
                                 }`}>
                                     {service.description}
                                 </p>
+                                
+                                {/* Part Type Selection - Only show when service is selected */}
+                                {service.isSelected && (
+                                    <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+                                      
+                                        
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handlePartTypeSelect(service.id, 'original');
+                                                }}
+                                                disabled={!service.hasOriginal}
+                                                className={`px-3 py-2 text-xs cursor-pointer rounded-md transition-colors ${
+                                                    service.partType === 'original'
+                                                        ? 'bg-primary text-white'
+                                                        : service.hasOriginal
+                                                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                <div className="text-center">
+                                                    {service?.original_price && service?.original_discount_price && service.original_price !== service.original_discount_price && (
+                                                        <div className="text-xs line-through opacity-75 mb-1">
+                                                            {service.original_price}
+                                                        </div>
+                                                    )}
+                                                    <div className="text-sm font-bold">
+                                                        {service?.original_discount_price || service?.original_price || 'N/A'}
+                                                    </div>
+                                                  
+                                                </div>
+                                            </button>
+                                           
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handlePartTypeSelect(service.id, 'duplicate');
+                                                }}
+                                                disabled={!service.hasDuplicate}
+                                                className={`px-3 py-2 text-xs cursor-pointer rounded-md transition-colors ${
+                                                    service.partType === 'duplicate'
+                                                        ? 'bg-primary text-white'
+                                                        : service.hasDuplicate
+                                                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                <div className="text-center">
+                                                    {service?.duplicate_price && service?.duplicate_discount_price && service.duplicate_price !== service.duplicate_discount_price && (
+                                                        <div className="text-xs line-through opacity-75 mb-1">
+                                                            {service.duplicate_price}
+                                                        </div>
+                                                    )}
+                                                    <div className="text-sm font-bold">
+                                                        {service?.duplicate_discount_price || service?.duplicate_price || 'N/A'}
+                                                    </div>
+                                              
+                                                </div>
+                                            </button>
+                                            <div className="text-xs opacity-90 mt-1 text-center">
+                                                        Original
+                                                    </div>
+                                            <div className="text-xs opacity-90 mt-1 text-center">
+                                                        Compatible
+                                                    </div>
+                                        </div>
+                                    </div>
+                                )}
+                                
                                 {service.price && (
                                     <div className="text-right">
                                         <span className="text-sm font-bold text-primary">{service.price}</span>
@@ -225,7 +327,10 @@ export default function PhoneModelPage({ params }) {
                         {!servicesLoading && repairServices.length > 0 && selectedServices.length > 0 && (
                         <MotionFade delay={0.3} immediate={true}>
                             <div className="text-center mb-8">
-                                <CustomButton className='bg-primary text-white hover:bg-primary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'>
+                                <CustomButton 
+                                    onClick={handleContinueToBreakdown}
+                                    className='bg-primary text-white hover:bg-primary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'
+                                >
                                 Continue with {selectedServices.length} selected service{selectedServices.length > 1 ? 's' : ''}
                                 </CustomButton>
                             </div>
