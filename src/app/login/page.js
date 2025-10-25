@@ -215,12 +215,7 @@ export default function LoginPage() {
                 console.log('Button clicked');
                 e.preventDefault();
                 e.stopPropagation();
-                e.nativeEvent.stopImmediatePropagation();
                 handleSubmit(e);
-              }}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
               }}
               disabled={isLoading || isSubmitting}
               className="w-full bg-[#6B7E8D] cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#0d416e] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"

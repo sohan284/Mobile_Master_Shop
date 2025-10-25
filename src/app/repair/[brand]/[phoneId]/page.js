@@ -1,8 +1,14 @@
 'use client';   
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PageTransition from '@/components/animations/PageTransition';
+import MotionFade from '@/components/animations/MotionFade';
+import HeroSection from '@/components/common/HeroSection';
+import SearchSection from '@/components/common/SearchSection';
+import GridSection from '@/components/common/GridSection';
+import FeaturesSection from '@/components/common/FeaturesSection';
+import CTASection from '@/components/common/CTASection';
 import { CustomButton } from '@/components/ui/button';
 import { apiFetcher } from '@/lib/api';
 import { useApiGet } from '@/hooks/useApi';
@@ -12,6 +18,9 @@ import NotFound from '@/components/ui/NotFound';
 export default function PhoneModelPage({ params }) {
     const { brand, phoneId } = params;
     const [selectedServices, setSelectedServices] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [phoneInfo, setPhoneInfo] = useState(null);
+    
       // Fetch services for this model
   const { data: servicesResponse, isLoading: servicesLoading, error: servicesError, refetch: refetchServices } = useApiGet(
     ['services', phoneId],
@@ -19,7 +28,57 @@ export default function PhoneModelPage({ params }) {
   );
   const repairServices = servicesResponse?.data || [];
  
+    // Filter services based on search term
+    const filteredServices = repairServices.filter(service =>
+        service.problem_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        service.problem_description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    // Get phone info from sessionStorage
+    React.useEffect(() => {
+        // Try to get phone data from sessionStorage first
+        if (typeof window !== 'undefined') {
+            const storedPhone = sessionStorage.getItem('selectedPhone');
+            if (storedPhone) {
+                try {
+                    const parsedPhone = JSON.parse(storedPhone);
+                    console.log('Phone data retrieved from sessionStorage:', parsedPhone);
+                    setPhoneInfo(parsedPhone);
+                    return;
+                } catch (e) {
+                    console.error('Error parsing stored phone data:', e);
+                }
+            }
+        }
+        
+        // Fallback - create basic phone info from URL params
+        const fallbackPhoneInfo = {
+            name: `${brand.charAt(0).toUpperCase() + brand.slice(1)} Phone`,
+            image: `/${brand.charAt(0).toUpperCase() + brand.slice(1)}.png`,
+            brand: brand.charAt(0).toUpperCase() + brand.slice(1),
+            brandLogo: `/${brand.charAt(0).toUpperCase() + brand.slice(1)}.png`
+        };
+        console.log('Using fallback phone info:', fallbackPhoneInfo);
+        setPhoneInfo(fallbackPhoneInfo);
+    }, [brand, phoneId]);
+    
 
+    
+    // Memoize hero image to prevent re-rendering
+    const heroImage = useMemo(() => {
+        return phoneInfo?.image || phoneInfo?.phone_image || phoneInfo?.model_image || phoneInfo?.logo || `/${brand.charAt(0).toUpperCase() + brand.slice(1)}.png`;
+    }, [phoneInfo, brand]);
+
+    // Transform services for GridSection
+    const serviceItems = filteredServices.map(service => ({
+        id: service.problem_id,
+        name: service.problem_name,
+        description: service.problem_description,
+        icon: service.icon,
+        price: service.price,
+        isSelected: selectedServices.includes(service.problem_id),
+        isDisabled: !selectedServices.includes(service.problem_id) && selectedServices.length >= 3
+    }));
 
 
 
@@ -41,118 +100,37 @@ export default function PhoneModelPage({ params }) {
 
     return (
         <PageTransition>
-        <div className="min-h-screen ">
-          <div className="container mx-auto px-4 py-8">
-                <div className="max-w-6xl mx-auto">
-                    {/* Breadcrumb */}
-                    <div className="mb-6">
-                        <Link href="/repair" className="text-primary hover:text-blue-800">
-                            ← Back to Repair Services
-                        </Link>
-                        <span className="mx-2 text-gray-400">/</span>
-                        <Link href={`/repair/${brand}`} className="text-primary hover:text-blue-800">
-                            {brand.charAt(0).toUpperCase() + brand.slice(1)} Repair
-                        </Link>
-                    </div>
-
-              
+            <div className="min-h-screen relative overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 py-8">
                     
-                    {/* Step System */}
-                    <div className="mb-12 bg-white min-h-[500px] p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
-                        <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
-                            3
-                        </div>
-                        <h2 className="title text-primary mb-8 text-center">
-                            Choose your repair service
-                        </h2>
-                        
-                        {/* Loading State - Skeleton Loader */}
-                        {servicesLoading && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                                {Array.from({ length: 6 }).map((_, index) => (
-                                    <div key={index} className="p-3 pb-1 rounded-xl shadow border-2 border-gray-100 bg-white">
-                                        <div className="flex items-center mb-4">
-                                            <Skeleton className="w-6 h-6 mr-3" />
-                                            <Skeleton className="flex-1 h-6" />
-                                            <Skeleton className="w-6 h-6 ml-auto" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Skeleton className="w-full h-4" />
-                                            <Skeleton className="w-3/4 h-4" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Empty State - No Services Available */}
-                        {!servicesLoading && repairServices.length === 0 && (
-                            <NotFound
-                                title="No Services Available"
-                                description="We don't have any repair services available for this phone model at the moment. Please check back later or contact us for assistance."
-                                primaryAction={
-                                    <Link 
-                                        href={`/repair/${brand}`} 
-                                        className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
-                                    >
-                                        Choose Different Model
-                                    </Link>
-                                }
-                                secondaryAction={
-                                    <span>
-                                        or <Link href="/repair" className="text-primary hover:underline">browse all brands</Link>
-                                    </span>
-                                }
-                            />
-                        )}
-
-                        {/* Services Grid */}
-                        {!servicesLoading && repairServices.length > 0 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                                {repairServices.map((service) => {
-                                    const isSelected = selectedServices.includes(service.problem_id);
-                                    const isDisabled = !isSelected && selectedServices.length >= 3;
-                                    return (
-                                        <div 
-                                            key={service.problem_id} 
-                                            onClick={() => handleServiceSelect(service.problem_id)}
-                                            className={` p-3 pb-1 rounded-xl shadow transition-all duration-300 border-2 cursor-pointer ${
-                                                isSelected 
-                                                    ? ' border-primary shadow-primary' 
-                                                    : isDisabled
-                                                    ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
-                                                    : 'bg-white border-gray-100 hover:border-blue-200 hover:shadow-xl'
-                                            }`}
-                                        >
-                                            <div className="flex items-center mb-4">
-                                                <div className="text-xl mr-3">{service.icon}</div>
-                                                <h3 className={`subtitle ${
-                                                    isSelected ? 'text-primary' : 'text-gray-800'
-                                                }`}>
-                                                    {service.problem_name}
-                                                </h3>   
-                                                {isSelected && (
-                                                    <div className="ml-auto">
-                                                        <div className="w-6 h-6  bg-primary rounded-full flex items-center justify-center">
-                                                            <span className="text-white text-sm">✓</span>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <p className={`mb-4 paragraph ${
-                                                isSelected ? 'text-primary' : isDisabled ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                {service.problem_description}
-                                            </p>
-                                          
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
+                    {/* Hero Section */}
+                    {React.useMemo(() => (
+                        <HeroSection
+                            title="Choose Your"
+                            subtitle="Repair Service"
+                            description={`Select the repair services you need for your ${phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1)} device. You can choose up to 3 services.`}
+                            image={heroImage}
+                            imageAlt={phoneInfo?.name || `${brand.charAt(0).toUpperCase() + brand.slice(1)} Phone`}
+                            badgeText="Step 3: Select Services"
+                            showBackButton={true}
+                            backButtonText="← Back to Models"
+                            backButtonHref={`/repair/${brand}`}
+                            layout="image-left"
+                        />
+                    ), [phoneInfo?.name, heroImage, brand])}
+                    
+                    {/* Search Section */}
+                    <SearchSection
+                        title="Find Your Repair Service"
+                        description="Search for specific repair services or browse all available options below."
+                        placeholder="Search repair services..."
+                        searchTerm={searchTerm}
+                        onSearchChange={(e) => setSearchTerm(e.target.value)}
+                    />
 
                         {/* Warning Message */}
                         {!servicesLoading && repairServices.length > 0 && selectedServices.length >= 3 && (
+                        <MotionFade delay={0.2} immediate={true}>
                             <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-md">
                                 <div className="flex">
                                     <div className="flex-shrink-0">
@@ -166,21 +144,117 @@ export default function PhoneModelPage({ params }) {
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </MotionFade>
+                    )}
 
+                    {/* Services Grid */}
+                    <GridSection
+                        title=""
+                        description=""
+                        items={serviceItems}
+                        isLoading={servicesLoading}
+                        loadingCount={6}
+                        onItemClick={(service) => {
+                            handleServiceSelect(service.id);
+                            return '#'; // Prevent navigation, just handle selection
+                        }}
+                        gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                        notFoundTitle="No Services Found"
+                        notFoundDescription={searchTerm 
+                            ? `No repair services found matching "${searchTerm}". Try a different search term.`
+                            : "We don't have any repair services available for this phone model at the moment. Please check back later or contact us for assistance."
+                        }
+                        searchTerm={searchTerm}
+                        onClearSearch={() => setSearchTerm('')}
+                        primaryAction={searchTerm ? {
+                            text: "Clear Search",
+                            href: "#",
+                            onClick: () => setSearchTerm('')
+                        } : {
+                            text: "Choose Different Model",
+                            href: `/repair/${brand}`
+                        }}
+                        secondaryAction={searchTerm ? {
+                            text: "Browse All Services",
+                            href: "#",
+                            onClick: () => setSearchTerm('')
+                        } : {
+                            text: "Browse All Brands",
+                            href: "/repair"
+                        }}
+                        renderItem={(service) => (
+                            <div 
+                                onClick={() => handleServiceSelect(service.id)}
+                                className={`p-4 rounded-lg shadow transition-all duration-300 border-2 cursor-pointer ${
+                                    service.isSelected 
+                                        ? 'border-primary shadow-primary bg-primary/5' 
+                                        : service.isDisabled
+                                        ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
+                                        : 'bg-white border-gray-100 hover:border-primary/50 hover:shadow-lg'
+                                }`}
+                            >
+                                <div className="flex items-center mb-3">
+                                    <div className="text-xl mr-2">{service.icon}</div>
+                                    <h3 className={`font-semibold text-sm ${
+                                        service.isSelected ? 'text-primary' : 'text-gray-800'
+                                    }`}>
+                                        {service.name}
+                                    </h3>   
+                                    {service.isSelected && (
+                                        <div className="ml-auto">
+                                            <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                                <span className="text-white text-xs">✓</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <p className={`mb-3 text-xs ${
+                                    service.isSelected ? 'text-primary' : service.isDisabled ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                    {service.description}
+                                </p>
+                                {service.price && (
+                                    <div className="text-right">
+                                        <span className="text-sm font-bold text-primary">{service.price}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    />
                         {/* Continue Button */}
                         {!servicesLoading && repairServices.length > 0 && selectedServices.length > 0 && (
+                        <MotionFade delay={0.3} immediate={true}>
                             <div className="text-center mb-8">
-                                <CustomButton className='bg-primary text-secondary hover:bg-primary/90'>
+                                <CustomButton className='bg-primary text-white hover:bg-primary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'>
                                 Continue with {selectedServices.length} selected service{selectedServices.length > 1 ? 's' : ''}
                                 </CustomButton>
                             </div>
-                        )}
-                    </div>
-                    
-               
-                  
-                </div>
+                        </MotionFade>
+                    )}
+                    {/* Features Section */}
+                    <FeaturesSection
+                        title="Why Choose Our Repair Services?"
+                        description="Professional repair services with guaranteed quality and customer satisfaction."
+                        features={[
+                            { title: "Expert Technicians", description: "Certified professionals with years of experience", icon: "🔧" },
+                            { title: "Quality Parts", description: "We use only genuine parts and components", icon: "🛡️" },
+                            { title: "Fast Service", description: "Most repairs completed within 24 hours", icon: "⚡" },
+                            { title: "Warranty", description: "90-day warranty on all repairs", icon: "✅" }
+                        ]}
+                    />
+
+                
+
+                    {/* CTA Section */}
+                    <CTASection
+                        title="Ready to Get Your Device Fixed?"
+                        description="Select your repair services above to get started with professional repair services!"
+                        primaryAction={{
+                            text: "Get Instant Quote",
+                            href: "/repair"
+                        }}
+                        features={["Free Diagnosis", "Same Day Service", "12 Month Warranty"]}
+                    />
             </div>
          </div>
         </PageTransition>
