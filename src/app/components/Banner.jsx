@@ -69,7 +69,7 @@ export default function Banner() {
                                 </h2>
                                 <div className='mt-6'>
                                     <Link href={slides[index].ctaHref} className='inline-block group'>
-                                        <CustomButton>
+                                        <CustomButton className='bg-secondary text-primary hover:bg-secondary/90 cursor-pointer' >
                                             {slides[index].ctaText}
                                         </CustomButton>
                                     </Link>
