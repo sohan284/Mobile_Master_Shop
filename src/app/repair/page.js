@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PageTransition from "@/components/animations/PageTransition";
+import MotionFade from "@/components/animations/MotionFade";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotFound from "@/components/ui/NotFound";
 
 export default function RepairPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,218 +65,249 @@ export default function RepairPage() {
   const filteredBrands = phoneBrands.filter(brand =>
     brand.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  console.log(filteredBrands);
+
   return (
-  <PageTransition>
-      <div className="min-h-screen max-w-[1200px] mx-auto">
-      <div className="container mx-auto px-4 py-8">
-        <div className="">
-       <div className="mb-12 bg-white p-8 rounded shadow-xl border border-gray-100 relative overflow-hidden">
-        <div className="bg-primary text-white w-30 h-30 absolute -top-10 pl-14 pt-8 -left-10 font-serif rounded-full text-7xl font-extrabold shadow-md">
-            1
-        </div>
-       <h1 className="title text-primary mb-8 text-center">
-            Choose the brand of your phone
-          </h1>
-          <p className="subtitle text-center mb-8">
-            Select your phone brand to get started with professional repair services
-          </p>
-      {/* Search Bar */}
-      <div className="mb-6">
-                            <div className="relative mx-auto">
-                                <input
-                                    type="text"
-                                    placeholder={`Search brand..`}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full px-4 py-3 pl-10 pr-4 text-gray-700 bg-transparent border-0 border-b-2 border-gray-300 rounded-none focus:outline-none focus:border-blue-500"
-                                />
-                                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    
-          {/* Phone Brands Section */}
-          <div className="mb-12"></div>
+    <PageTransition>
+      <div className="min-h-screen relative overflow-hidden">
+
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          
+          {/* Hero Section */}
+          <div className="relative mb-20">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left Visual */}
+              <MotionFade delay={0.06}>
+                <div className="relative">
+                  <div className="relative z-10">
+                    <img src="/1.png" alt="Phone Repair" className="w-full max-w-md mx-auto drop-shadow hover:scale-105 transition-transform duration-500" />
+                  </div>
+                  {/* Floating Elements */}
+                  <div className="absolute top-10 -left-4 w-20 h-20 bg-secondary/30 rounded-full blur animate-bounce"></div>
+                  <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/30 rounded-full blur animate-bounce" style={{animationDelay: '1s'}}></div>
+                  <div className="absolute top-1/4 -right-8 w-12 h-12 bg-secondary/25 rounded-full blur animate-bounce" style={{animationDelay: '2s'}}></div>
+                  <div className="absolute -top-8 right-1/4 w-8 h-8 bg-primary/25 rounded-full blur animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute bottom-1/4 -left-8 w-10 h-10 bg-secondary/20 rounded-full blur animate-bounce" style={{animationDelay: '1.5s'}}></div>
+                  
+                  {/* Additional floating particles */}
+                  <div className="absolute top-1/3 left-1/4 w-3 h-3 bg-secondary/40 rounded-full animate-ping" style={{animationDelay: '0.3s'}}></div>
+                  <div className="absolute bottom-1/3 right-1/3 w-2 h-2 bg-primary/40 rounded-full animate-ping" style={{animationDelay: '1.3s'}}></div>
+                  <div className="absolute top-2/3 right-1/4 w-1 h-1 bg-secondary/50 rounded-full animate-ping" style={{animationDelay: '2.3s'}}></div>
+                  <div className="absolute bottom-2/3 left-1/3 w-1 h-1 bg-primary/50 rounded-full animate-ping" style={{animationDelay: '3.3s'}}></div>
+                </div>
+              </MotionFade>
+
+              {/* Right Content */}
+              <div className="space-y-8">
+                <MotionFade delay={0.02}>
+                  <div className="inline-flex items-center gap-2 bg-secondary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
+                    <span className="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                    Professional Repair Services
+                  </div>
+                </MotionFade>
+
+                <MotionFade delay={0.03}>
+                  <h1 className="font-extrabold text-5xl lg:text-7xl text-primary leading-tight">
+                    Choose Your <span className="text-secondary relative">
+                      Brand
+                      <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary/30" viewBox="0 0 200 12" fill="none">
+                        <path d="M2 6C2 6 50 2 100 6C150 10 198 6 198 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                      </svg>
+                    </span>
+                  </h1>
+                </MotionFade>
+
+                <MotionFade delay={0.04}>
+                  <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
+                    Select your phone brand to get started with <span className="font-bold text-secondary">professional repair services</span> and expert support.
+                  </p>
+                </MotionFade>
+
+              </div>
+            </div>
+          </div>
+
+          {/* Search Section */}
+          <MotionFade delay={0.1}>
+            <div className="mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-primary mb-4">Find Your Phone Brand</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">Search for your phone brand or browse our supported manufacturers below.</p>
+              </div>
+              
+              <div className="max-w-md mx-auto">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search brand..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-4 pl-12 pr-4 text-gray-700 bg-white border-2 border-gray-200 rounded-md focus:outline-none focus:border-secondary transition-all duration-300 shadow hover:shadow-lg"
+                  />
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </MotionFade>
           
           {/* Loading State - Skeleton Loader */}
           {isLoading && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="bg-white h-30 w-30 p-4 rounded-lg shadow-md">
-                  <div className="flex flex-col items-center justify-center">
-                    <Skeleton className="w-12 h-12 rounded mb-3" />
-                    <Skeleton className="w-16 h-4" />
+            <MotionFade delay={0.15}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-16">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="bg-white p-6 rounded-md shadow hover:shadow-lg transition-all duration-300">
+                    <div className="flex flex-col items-center justify-center">
+                      <Skeleton className="w-16 h-16 rounded mb-4" />
+                      <Skeleton className="w-20 h-4" />
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </MotionFade>
           )}
           
           {/* Error State */}
           {error && (
-            <div className="text-center py-12">
-              <div className="text-red-500 mb-4">
-                Failed to load brands. Using fallback data.
+            <MotionFade delay={0.15}>
+              <div className="text-center py-12">
+                <div className="text-red-500 mb-4">
+                  Failed to load brands. Using fallback data.
+                </div>
               </div>
-            </div>
+            </MotionFade>
           )}
           
           {/* Brands Grid */}
           {!isLoading && filteredBrands.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-              {filteredBrands.map((brand) => (
-                <Link key={brand.id} href={brand.route || `/repair/${brand.name.toLowerCase()}`}>
-                  <div className="bg-white h-30 w-30 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer text-center flex flex-col items-center justify-center">
-                    <div className="flex justify-center mb-3">
-                      <Image
-                        src={brand.logo || `/Apple.png`}
-                        alt={brand.name}
-                        width={48}
-                        height={48}
-                        className="object-contain"
-                      />
-                    </div>
-                    <h3 className="subtitle text-center">
-                      {brand.name}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <MotionFade delay={0.2}>
+              <div className="mb-16">
+            
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                  {filteredBrands.map((brand, index) => (
+                    <MotionFade key={brand.id} delay={0.25 + index * 0.1}>
+                      <Link href={brand.route || `/repair/${brand.name.toLowerCase()}`}>
+                        <div className="group relative bg-white h-full p-6 rounded-md shadow hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center justify-center border border-gray-100 hover:border-secondary/50 hover:-translate-y-2 overflow-hidden">
+                          {/* Animated border effect */}
+                          <div className="absolute inset-0 rounded-md border-2 border-transparent group-hover:border-secondary/20 transition-all duration-300"></div>
+                          
+                          {/* Background gradient on hover */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></div>
+                          
+                          {/* Content */}
+                          <div className="relative z-10">
+                            <div className="flex justify-center mb-4">
+                              <Image
+                                src={brand.logo || `/Apple.png`}
+                                alt={brand.name}
+                                width={64}
+                                height={64}
+                                className="object-contain group-hover:scale-110 transition-transform duration-300"
+                              />
+                            </div>
+                            <h3 className="font-semibold text-primary group-hover:text-secondary transition-colors duration-300">
+                              {brand.name}
+                            </h3>
+                          </div>
+                        </div>
+                      </Link>
+                    </MotionFade>
+                  ))}
+                </div>
+              </div>
+            </MotionFade>
           )}
           
           {/* No Results */}
           {!isLoading && filteredBrands.length === 0 && (
-            <div className="text-center py-12">
-              <div className="subtitle text-gray-500 mb-4">
-                No brands found matching &quot;{searchTerm}&quot;
-              </div>
-              <button
-                onClick={() => setSearchTerm('')}
-                className="text-primary hover:text-blue-800 underline"
-              >
-                Clear search
-              </button>
-            </div>
+            <MotionFade delay={0.15}>
+                <NotFound
+                  title="No Brands Found"
+                  description={`No brands found matching ${searchTerm}`}
+                  showSearch={true}
+                  searchTerm={searchTerm}
+                  onClearSearch={() => setSearchTerm('')}
+                />
+            </MotionFade>
           )}
-          </div>
 
-       </div>
-          <div className="">
-          <ul className="space-y-4">
-              <li className="paragraph">
-                <span className="subtitle block mb-2">SMARTPHONE REPAIR NEAR YOU WITH SAVE</span>
-                For smartphone repairs in Nantes, Paris, Lyon, or Marseille, with Save, you can access one
-                of our 150 stores located throughout France. Always closer to
-                you, we repair your devices while respecting both industry and
-                manufacturer requirements.
-              </li>
-              <li>
-                With original components and exceptional support, Save is the <br />
-                ideal partner for hassle-free phone repairs. And the best part
-                is that we offer a wide range of services at unbeatable prices.
-              </li>
-              <li>
-                This way, you won&apos;t have to waste your money on throwing <br />
-                away your smartphone and buying another one. With our expert
-                qualifications, you won&apos;t have any trouble getting your
-                phone repaired.
-              </li>
-              <li>
-                FAST SUPPORT TO GET YOUR SMILE BACK <br /> At Save, we pride ourselves
-                on satisfying our customers by offering the best services in the
-                shortest possible time. In fact, weve made a commitment to
-                repair your phone in just 40 minutes. We meet this requirement
-                82% of the time.
-              </li>
-              <li>
-                However, for more complex breakdowns, immobilizing your <br />
-                smartphone will be necessary. In this case, we will not hesitate
-                to lend you a phone while the repair is carried out (subject to
-                available stock). This way, you will be able to receive your
-                calls and messages without the risk of missing an important
-                communication.
-              </li>
-              <li>
-                When you visit one of our 150 stores, you&apos;ll enjoy a warm <br />
-                welcome and personalized service. With their attentive listening
-                skills, our teams of expert technicians will perform a
-                comprehensive diagnostic of your problems.
-              </li>
-              <li>
-                This approach will allow you to benefit from a personalized <br />
-                quote. This way, you&apos;ll know the exact amount to pay, which
-                will avoid any unpleasant surprises. In complete transparency,
-                your technician will explain the breakdown to you and outline
-                the solution best suited to your needs.
-              </li>
-              <li>
-                MILLIMETER PRICING IN COMPLETE TRANSPARENCY <br /> Getting your phone
-                repaired can sometimes be very expensive. Especially when
-                it&apos;s out of warranty and you have to take it back to your
-                after-sales service. To save money with peace of mind, Point
-                Service Mobiles offers transparent quotes at competitive prices.
-              </li>
-              <li>
-                Depending on the brand (Samsung, Honor, Sony, Apple, etc.) and <br />
-                model (Galaxy Note 9, iPhone XR, Huawei P20, Xperia Z5, etc.) of
-                your smartphone, we offer you a precise quote. To make your life
-                easier, our services include both the cost of labor and the
-                price of the replacement part.
-              </li>
-              <li>
-                With Save, we&apos;ve done everything we can to ensure you <br />
-                don&apos;t spend more than you need to. Always with the goal of
-                saving you money, we frequently provide you with promo codes to
-                take advantage of great discounts. So be vigilant so you
-                don&apos;t miss out!
-              </li>
-              <li>
-                EXCEPTIONAL EXPERTISE TO SERVE EACH OF YOUR NEEDS <br /> The quality of
-                our services, the diligence of our repairs and the dynamism of
-                our teams are among the main assets that have allowed Save to
-                establish itself as the leader in smartphone repair in France.
-                Every day, we take pleasure in putting smiles back on our
-                customers&apos; faces by responding promptly to their needs
-                while offering competitive pricing. Our technicians receive
-                in-house training and upgrades to strengthen their operational
-                capabilities. Such high standards allow us to always meet even
-                the most complex needs of our valued customers. Whether
-                it&apos;s iPhone XS screen repair, Samsung Galaxy S9+ battery
-                replacement, or Huawei Mate 10 Pro rear camera replacement, Save
-                will ensure you&apos;re satisfied in every way. 
-                </li>
-                <li>
-                GENUINE SPARE
-                PARTS TO GIVE YOUR PHONE A SECOND LIFE <br /> Faulty charging
-                connector, broken volume keys, oxidized phone after falling into
-                the pool, unresponsive microphone, etc., the breakdowns are as
-                diverse as they are varied. Visiting one of your stores will
-                allow you to easily resolve your problem. Unlike a traditional
-                after-sales service where you have to spend a small fortune and
-                then be subjected to a horribly long repair time, Save offers
-                you a less expensive, but just as advantageous solution. In
-                addition to our technicians&apos; remarkable expertise,
-                you&apos;ll benefit from genuine parts for every repair. Our
-                mission is to give your smartphone a new lease on life, which is
-                why our replacement parts are the same as those used by
-                manufacturers. Even better, all our repairs come with a one-year
-                warranty! So, once it&apos;s been repaired, you won&apos;t have
-                to worry about your smartphone breaking down again. With genuine
-                parts, your smartphone will be just as good as a factory-fresh
-                model. Whether you&apos;re looking for HTC, Samsung, Nokia,
-                Wiko, or even Doro, our extensive catalog of spare parts will
-                ensure you get a durable and reliable repair.
-              </li>
-            </ul>
-          </div>
+          {/* Features Section */}
+          <MotionFade delay={0.3}>
+            <div className="mb-16">
+              <div className="text-center mb-12">
+                <h3 className="text-3xl font-bold text-primary mb-4">Why Choose Our Repair Services?</h3>
+                <p className="text-gray-600 max-w-2xl mx-auto">Professional repair services with guaranteed quality and customer satisfaction.</p>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">⚡</span>
+                  </div>
+                  <h4 className="font-bold text-primary mb-2">Fast Service</h4>
+                  <p className="text-sm text-gray-600">Quick turnaround times with same-day service available</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">🛡️</span>
+                  </div>
+                  <h4 className="font-bold text-primary mb-2">12 Month Warranty</h4>
+                  <p className="text-sm text-gray-600">Full coverage for peace of mind on all repairs</p>
+                </div>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-md flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl">🔧</span>
+                  </div>
+                  <h4 className="font-bold text-primary mb-2">Expert Technicians</h4>
+                  <p className="text-sm text-gray-600">Certified professionals with years of experience</p>
+                </div>
+              </div>
+            </div>
+          </MotionFade>
+
+          {/* CTA Section */}
+          <MotionFade delay={0.4}>
+            <div className="relative">
+              <div className="bg-gradient-to-r from-primary to-primary/90 rounded-md p-12 shadow relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-4 left-4 w-32 h-32 bg-secondary rounded-full blur-2xl"></div>
+                  <div className="absolute bottom-4 right-4 w-24 h-24 bg-white rounded-full blur-xl"></div>
+                </div>
+                
+                <div className="relative z-10 text-center">
+                  <h3 className="text-3xl font-bold text-white mb-4">Ready to Get Your Device Fixed?</h3>
+                  <p className="text-white/90 mb-8 text-lg">Choose your brand above to get started with professional repair services!</p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button className="bg-secondary text-primary hover:bg-secondary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300 cursor-pointer rounded-md">
+                      Get Instant Quote
+                    </button>
+                  </div>
+                  
+                  <div className="mt-8 flex justify-center items-center gap-8 text-white/80 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                      Free Diagnosis
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                      Same Day Service
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-secondary rounded-full"></span>
+                      12 Month Warranty
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </MotionFade>
         </div>
       </div>
-    
-  </PageTransition>
+    </PageTransition>
   );
 }

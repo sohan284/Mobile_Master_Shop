@@ -65,12 +65,6 @@ export default function Repair() {
 
     return (
         <div className="pt-16 relative overflow-hidden">
-            {/* Background Elements */}
-            <div className="absolute inset-0 -z-10">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-secondary/5 to-primary/5 rounded-full blur-3xl"></div>
-            </div>
 
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
                 
@@ -120,11 +114,19 @@ export default function Repair() {
                         <MotionFade delay={0.06}>
                             <div className="relative">
                                 <div className="relative z-10">
-                                    <img src="/1.png" alt="Phone Repair" className="w-full max-w-md mx-auto drop-shadow" />
+                                    <img src="/1.png" alt="Phone Repair" className="w-full max-w-md mx-auto drop-shadow hover:scale-105 transition-transform duration-500" />
                                 </div>
                                 {/* Floating Elements */}
                                 <div className="absolute -top-4 -right-4 w-20 h-20 bg-secondary/20 rounded-full blur-sm animate-bounce"></div>
                                 <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-primary/20 rounded-full blur-sm animate-bounce" style={{animationDelay: '1s'}}></div>
+                                <div className="absolute top-1/4 -left-8 w-12 h-12 bg-secondary/30 rounded-full blur-sm animate-bounce" style={{animationDelay: '2s'}}></div>
+                                <div className="absolute -top-8 left-1/4 w-8 h-8 bg-primary/30 rounded-full blur-sm animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                                <div className="absolute bottom-1/4 -right-8 w-10 h-10 bg-secondary/25 rounded-full blur-sm animate-bounce" style={{animationDelay: '1.5s'}}></div>
+                                
+                                {/* Additional floating particles */}
+                                <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-secondary/40 rounded-full animate-ping" style={{animationDelay: '0.3s'}}></div>
+                                <div className="absolute bottom-1/3 left-1/3 w-2 h-2 bg-primary/40 rounded-full animate-ping" style={{animationDelay: '1.3s'}}></div>
+                                <div className="absolute top-2/3 left-1/4 w-1 h-1 bg-secondary/50 rounded-full animate-ping" style={{animationDelay: '2.3s'}}></div>
                             </div>
                         </MotionFade>
                     </div>
