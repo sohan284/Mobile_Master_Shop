@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Header from "./Header";
 import Footer from "./Footer";
-import Breadcrumbs from "./Breadcrumbs";
+import BackgroundAnimations from "@/components/animations/BackgroundAnimations";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
@@ -11,9 +11,11 @@ export default function ClientLayout({ children }) {
 
   return (
     <>
+      {/* Global Background Animations for all pages */}
+      <BackgroundAnimations />
+      
       {!isDashboard && <Header />}
-      <main className="">
-        {!isDashboard && <Breadcrumbs />}
+      <main className="relative z-10">
         {children}
       </main>
       {!isDashboard && <Footer />}
