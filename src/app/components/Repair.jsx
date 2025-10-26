@@ -1,4 +1,6 @@
+"use client";
 import React from 'react';
+import { motion } from 'framer-motion';
 import { CustomButton } from '@/components/ui/button';
 import MotionFade from '@/components/animations/MotionFade';
 import Link from 'next/link';
@@ -67,130 +69,179 @@ export default function Repair() {
     ];
 
     return (
-        <div className="pt-16 relative overflow-hidden">
-
-            <div className="max-w-7xl mx-auto px-4 lg:px-8">
+        <div className="relative  text-white py-20 overflow-hidden">
+            <div className="container mx-auto px-4 z-10 relative">
                 
-                {/* Hero Section - Unique Layout */}
-                <HeroSection
-                    title="Fix Your"
-                    subtitle="Device"
-                    description="Expert technicians, premium parts, and a €25 repair bonus for every service. Get your device fixed with confidence."
-                    image="/1.png"
-                    imageAlt="Phone Repair"
-                    badgeText="Professional Repair Services"
-                    ctaText="Get Instant Quote"
-                    ctaHref="/repair"
-                    layout="image-left"
-                />
+                {/* Hero Section - Banner Style */}
+                <div className="text-center mb-16">
+                    <motion.h1 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-4xl md:text-6xl font-extrabold tracking-wider"
+                    >
+                        FIX YOUR DEVICE
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="mt-4 text-lg md:text-xl text-gray-300"
+                    >
+                        Expert technicians, premium parts, and a €25 repair bonus for every service. Get your device fixed with confidence.
+                    </motion.p>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                        className="mt-8 flex justify-center gap-4"
+                    >
+                <Link href="/repair">
+                <CustomButton variant="outline" className="border-secondary bg-secondary text-primary hover:bg-secondary hover:text-primary">
+                            Book Repair
+                        </CustomButton>
+                </Link>
+                       
+                    </motion.div>
+                </div>
 
-                {/* Features Section - Unique Card Layout */}
-                <FeaturesSection
-                    title="Why Choose Us?"
-                    description="We provide exceptional repair services with unmatched quality and customer satisfaction."
-                    features={features.map(feature => ({
-                        title: feature.text,
-                        description: feature.desc,
-                        icon: feature.icon
-                    }))}
-                />
+        
 
-                {/* Brand Trust Section */}
-                <MotionFade delay={0.2}>
-                    <div className="mb-20">
-                        <div className="text-center mb-12">
-                            <h3 className="text-2xl font-bold text-primary mb-4">Trusted by Leading Brands</h3>
-                            <p className="text-gray-600">We repair devices from all major manufacturers</p>
-                        </div>
-                        
-                        <div className="rounded-md p-8 ">
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center">
-                                {brandLogo.map((item, idx) => (
-                                    <MotionFade key={item.id} delay={0.25 + idx * 0.1}>
-                                        <div className="group flex justify-center">
-                                            <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-secondary/10">
-                                                <img
-                                                    src={item.src}
-                                                    alt={item.alt}
-                                                    className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
-                                                />
-                                            </div>
-                                        </div>
-                                    </MotionFade>
-                                ))}
-                            </div>
-                        </div>
+            
+
+                {/* Services Section - Banner Style */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 1.0 }}
+                    className="mb-16"
+                >
+                    <div className="text-center mb-12">
+                        <h3 className="text-3xl font-bold mb-4">Our Repair Services</h3>
+                        <p className="text-gray-300 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
                     </div>
-                </MotionFade>
-
-                {/* Services Section - Unique Layout */}
-                <MotionFade delay={0.3}>
-                    <div className="mb-20">
-                        <div className="text-center mb-12">
-                            <h3 className="text-3xl font-bold text-primary mb-4">Our Repair Services</h3>
-                            <p className="text-gray-600 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
-                        </div>
-                        
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {repairServices.map((service, idx) => (
-                                <MotionFade key={service.id} delay={0.35 + idx * 0.1}>
-                                    <div className="group relative">
-                                        <div className="bg-white rounded-md p-6 shadow-lg hover:shadow transition-all duration-500 border border-gray-100 hover:border-secondary/50 h-full overflow-hidden">
-                                            {/* Popular Badge */}
-                                            {service.popular && (
-                                                <div className="absolute -top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-10">
-                                                    Most Popular
-                                                </div>
-                                            )}
+                    
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {repairServices.map((service, idx) => (
+                            <motion.div 
+                                key={service.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 1.1 + idx * 0.1 }}
+                                className="group relative"
+                            >
+                                <div className="bg-white/10 backdrop-blur-sm rounded-md p-6 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                                    {/* Popular Badge */}
+                                    {service.popular && (
+                                        <div className="absolute -top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-10">
+                                            Most Popular
+                                        </div>
+                                    )}
+                                    
+                                    <div className="text-center h-full flex flex-col">
+                                        {/* Service Icon */}
+                                        <div className="mb-6 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-6 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
+                                            <img
+                                                src={service.src}
+                                                alt={service.alt}
+                                                className="w-full h-20 object-contain group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                        </div>
+                                        
+                                        <div className="flex-grow flex flex-col justify-between">
+                                            <div>
+                                                <h4 className="font-bold text-lg text-white mb-2 group-hover:text-secondary transition-colors duration-300">
+                                                    {service.title}
+                                                </h4>
+                                                <p className="text-gray-300 text-sm mb-4">{service.description}</p>
+                                            </div>
                                             
-                                            <div className="text-center h-full flex flex-col">
-                                                {/* Service Icon */}
-                                                <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-md p-6 group-hover:from-secondary/5 group-hover:to-primary/5 transition-all duration-500 relative overflow-hidden">
-                                                    <img
-                                                        src={service.src}
-                                                        alt={service.alt}
-                                                        className="w-full h-20 object-contain group-hover:scale-110 transition-transform duration-500"
-                                                    />
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-2xl font-bold text-secondary">{service.price}</span>
+                                                    <span className="text-sm text-gray-300">{service.time}</span>
                                                 </div>
                                                 
-                                                <div className="flex-grow flex flex-col justify-between">
-                                                    <div>
-                                                        <h4 className="font-bold text-lg text-primary mb-2 group-hover:text-secondary transition-colors duration-300">
-                                                            {service.title}
-                                                        </h4>
-                                                        <p className="text-gray-600 text-sm mb-4">{service.description}</p>
-                                                    </div>
-                                                    
-                                                    <div className="space-y-3">
-                                                        <div className="flex justify-between items-center">
-                                                            <span className="text-2xl font-bold text-secondary">{service.price}</span>
-                                                            <span className="text-sm text-gray-500">{service.time}</span>
-                                                        </div>
-                                                        
-                                                        <div className="bg-gradient-to-r from-secondary/10 to-primary/10 text-primary text-sm font-semibold px-4 py-2 rounded-full border border-secondary/20">
-                                                            12 Month Warranty
-                                                        </div>
-                                                    </div>
+                                                <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
+                                                    12 Month Warranty
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </MotionFade>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+    {/* Brand Trust Section - Marquee Style */}
+    <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                    className="mb-16"
+                >
+                    <div className="text-center mb-12">
+                        <h3 className="text-2xl font-bold mb-4">Trusted by Leading Brands</h3>
+                        <p className="text-gray-300">We repair devices from all major manufacturers</p>
+                    </div>
+                    
+                    <div className="relative overflow-hidden  backdrop-blur-sm rounded-lg py-8">
+                        <div className="flex animate-marquee">
+                            {/* First set of logos */}
+                            {brandLogo.map((item, idx) => (
+                                <div key={`first-${item.id}`} className="flex-shrink-0 mx-8 group">
+                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10">
+                                        <img
+                                            src={item.src}
+                                            alt={item.alt}
+                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                            {/* Duplicate set for seamless loop */}
+                            {brandLogo.map((item, idx) => (
+                                <div key={`second-${item.id}`} className="flex-shrink-0 mx-8 group">
+                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10">
+                                        <img
+                                            src={item.src}
+                                            alt={item.alt}
+                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                        />
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
-                </MotionFade>
-
-                {/* CTA Section - Unique Design */}
-                <CTASection
-                    title="Ready to Get Your Device Fixed?"
-                    description="Get an instant quote and book your repair today. Same-day service available!"
-                    primaryAction={{
-                        text: "Get Instant Quote",
-                        href: "/repair"
-                    }}
-                    features={["Free Diagnosis", "Same Day Service", "12 Month Warranty"]}
-                />
+                </motion.div>
+                      {/* Features Section - Banner Style */}
+                      <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    className="mb-16"
+                >
+                    <div className="text-center mb-12">
+                        <h3 className="text-3xl font-bold mb-4">Why Choose Us?</h3>
+                        <p className="text-gray-300 text-lg">We provide exceptional repair services with unmatched quality and customer satisfaction.</p>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-4 gap-8">
+                        {features.map((feature, index) => (
+                            <motion.div
+                                key={feature.text}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                                className="text-center"
+                            >
+                                <div className="text-4xl mb-4">{feature.icon}</div>
+                                <h4 className="text-xl font-bold mb-2">{feature.text}</h4>
+                                <p className="text-gray-300">{feature.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
             </div>
         </div>
     );
