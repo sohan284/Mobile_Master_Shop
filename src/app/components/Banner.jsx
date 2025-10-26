@@ -5,6 +5,8 @@ import { CustomButton } from '@/components/ui/button';
 import Image from 'next/image';
 import hero from '../../../public/banner.png'
 import Link from 'next/link';
+import repair from '../../../public/repair.png';
+import accessories from '../../../public/Accessories.png';
 
 export default function Banner() {
     return (
@@ -46,13 +48,18 @@ export default function Banner() {
                     </motion.div>
                 </div>
 
-                <div className="mt-16 flex justify-center items-center gap-8">
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.7, delay: 0.6 }}
-                        className="w-40 h-60 bg-gray-800/50 rounded-lg shadow-lg"
-                    ></motion.div>
+                <div className="mt-16 flex justify-center items-end gap-8">
+                    <Link href='/repair'>
+                        <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.7, delay: 0.6 }}
+                            className="w-40 h-40 bg-gray-800/50 rounded-lg shadow-lg text-2xl flex flex-col space-y-2 items-center justify-center border"
+                        >
+                            <Image src={repair} className='w-20' alt='repair logo' />
+                            <h2>Repair</h2>
+                        </motion.div>
+                    </Link>
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.5 }}
@@ -64,16 +71,21 @@ export default function Banner() {
                             alt="iPhone 14 Pro Max"
                             width={300}
                             height={300}
-                            className="object-contain"
+                            className="object-contain flex-1"
                         />
                     </motion.div>
 
-                    <motion.div
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.7, delay: 0.6 }}
-                        className="w-40 h-60 bg-gray-800/50 rounded-lg shadow-lg"
-                    ></motion.div>
+                    <Link href='/accessories'>
+                        <motion.div
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.7, delay: 0.6 }}
+                            className="w-40 h-40 bg-gray-800/50 rounded-lg shadow-lg text-2xl flex flex-col space-y-2 items-center justify-center border"
+                        >
+                            <Image src={accessories} className='w-20' alt='Accessories logo' />
+                            <h2>Accessories</h2>
+                        </motion.div>
+                    </Link>
                 </div>
             </div>
         </div>
