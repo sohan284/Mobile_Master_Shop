@@ -22,7 +22,7 @@ const NotFound = ({
         {/* Animated Icon */}
         <div className="mx-auto w-32 h-32 mb-6 relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full animate-pulse"></div>
-          <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center shadow-lg">
+          <div className="absolute inset-2 bg-white/10  rounded-full flex items-center justify-center shadow-lg">
             {icon || (
               <div className="relative">
                 {/* Phone icon with pulse effect */}

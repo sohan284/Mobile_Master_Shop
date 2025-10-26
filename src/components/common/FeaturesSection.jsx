@@ -20,7 +20,7 @@ export default function FeaturesSection({
           {features?.map((feature, idx) => (
             <MotionFade key={idx} delay={0.35 + idx * 0.1} immediate={true}>
               <div className="group relative">
-                <div className="bg-white rounded-md p-6 shadow hover:shadow-lg transition-all duration-500 border border-gray-100 hover:border-secondary/50 h-full">
+                <div className="bg-white/10  rounded-md p-6 shadow hover:shadow-lg transition-all duration-500 border border-gray-100 hover:border-secondary/50 h-full">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-secondary/10 to-primary/10 rounded-md flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
                       <span className="text-2xl">{feature.icon || "🔧"}</span>

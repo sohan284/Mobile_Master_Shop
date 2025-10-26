@@ -118,7 +118,7 @@ export default function DataTable({
   }
 
   return (
-    <div className={`bg-white rounded-lg border ${className}`}>
+    <div className={`bg-white/10  rounded-lg border ${className}`}>
       {/* Header */}
       <div className="px-6 py-4 border-b">
         <div className="flex items-center justify-between">

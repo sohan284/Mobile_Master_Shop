@@ -59,7 +59,7 @@ export default function Dashboard() {
       {/* Stats grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <div key={stat.name} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div key={stat.name} className="bg-white/10  p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.name}</p>
@@ -77,7 +77,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent orders */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white/10  rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
         </div>
@@ -102,7 +102,7 @@ export default function Dashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white/10  divide-y divide-gray-200">
               {recentOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">

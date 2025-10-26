@@ -339,7 +339,7 @@ export default function PhoneIndividualPage({ params }) {
         <h2 className="text-2xl font-bold mb-8 text-center">{testimonials.title}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.reviews.map((review, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow">
+            <div key={index} className="bg-white/10  p-6 rounded-lg shadow">
               <p className="italic mb-4">"{review.quote}"</p>
               <div className="text-sm">
                 <strong>{review.author}</strong>

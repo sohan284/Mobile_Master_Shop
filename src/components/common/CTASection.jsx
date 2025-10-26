@@ -19,7 +19,7 @@ export default function CTASection({
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-4 left-4 w-32 h-32 bg-secondary rounded-full blur-2xl"></div>
-            <div className="absolute bottom-4 right-4 w-24 h-24 bg-white rounded-full blur-xl"></div>
+            <div className="absolute bottom-4 right-4 w-24 h-24 bg-white/10  rounded-full blur-xl"></div>
           </div>
           
           <div className="relative z-10 text-center">
@@ -36,7 +36,7 @@ export default function CTASection({
               )}
               {secondaryAction && (
                 <Link href={secondaryAction.href}>
-                  <CustomButton className="border-2 border-white text-white hover:bg-white hover:text-primary text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300 cursor-pointer">
+                  <CustomButton className="border-2 border-white text-white hover:bg-white/10  hover:text-primary text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300 cursor-pointer">
                     {secondaryAction.text}
                   </CustomButton>
                 </Link>

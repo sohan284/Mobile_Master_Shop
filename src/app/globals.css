@@ -8,9 +8,11 @@ body {
 }
 
 h1,
+h4,
 h2,
 h3 {
   font-family: var(--font-nunito), sans-serif;
+  color: white;
 }
 
 @theme inline {
@@ -154,7 +156,7 @@ h3 {
 
   /* Marquee Animation */
   .animate-marquee {
-    animation: marquee 30s linear infinite;
+    animation: marquee 5s linear infinite;
   }
 
   @keyframes marquee {

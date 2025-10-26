@@ -162,7 +162,7 @@ export default function Refurbished() {
                     >
                         {images.map(({ id, path, name, price, brand, condition }) => (
                             <SwiperSlide key={id}>
-                                <Card className="group bg-white/10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                                <Card className="group bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                                     <CardContent className="p-6 text-center h-full flex flex-col relative">
                                         {/* Brand Badge */}
                                         {/* <div className="absolute top-3 left-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
@@ -213,7 +213,7 @@ export default function Refurbished() {
 
                     {/* Custom Navigation */}
                     <div className="absolute flex -top-12 right-0 justify-center items-center mt-2">
-                        <button className="swiper-button-prev-custom cursor-pointer bg-white/10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
+                        <button className="swiper-button-prev-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                             </svg>
@@ -221,7 +221,7 @@ export default function Refurbished() {
                         
                         <div className="swiper-pagination-custom flex gap-3"></div>
                         
-                        <button className="swiper-button-next-custom cursor-pointer bg-white/10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
+                        <button className="swiper-button-next-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                             </svg>

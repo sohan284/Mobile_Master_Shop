@@ -33,11 +33,11 @@ export default function BannerCard() {
         <div className="flex flex-col md:flex-row space-y-8 md:space-y-0 gap-6 py-20 max-w-[1200px] mx-auto">
             {cardsData.map((card, idx) => (
                 <MotionFade key={card.id} delay={idx * 0.05}>
-              <Card className="group relative shadow-xl overflow-visible w-64 md:w-80 transition-all duration-300 ease-out hover:shadow-2xl hover:-translate-y-1 bg-white border-2 border-slate-200 hover:border-blue-400">
+              <Card className="group relative shadow-xl overflow-visible w-64 md:w-80 transition-all duration-300 ease-out hover:shadow-2xl hover:-translate-y-1 bg-white/10  border-2 border-slate-200 hover:border-blue-400">
     <CardContent className="px-5 pb-5 pt-16">
         {/* Floating Image Container */}
         <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-blue-600 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl">
-            <div className="w-full h-full bg-white rounded-xl p-2.5 flex items-center justify-center">
+            <div className="w-full h-full bg-white/10  rounded-xl p-2.5 flex items-center justify-center">
                 <img
                     src={card.image}
                     alt={card.heading}

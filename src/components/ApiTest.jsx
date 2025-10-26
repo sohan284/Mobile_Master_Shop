@@ -36,7 +36,7 @@ export default function ApiTest() {
       </button>
       
       {testResult && (
-        <div className="mt-4 p-4 bg-white rounded border">
+        <div className="mt-4 p-4 bg-white/10  rounded border">
           <pre className="text-sm overflow-auto max-h-96">{testResult}</pre>
         </div>
       )}

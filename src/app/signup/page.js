@@ -78,7 +78,7 @@ export default function SignupPage() {
               alt="Logo" 
               width={80} 
               height={80}
-              className="rounded-full bg-white p-2 cursor-pointer"
+              className="rounded-full bg-white/10  p-2 cursor-pointer"
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
@@ -86,7 +86,7 @@ export default function SignupPage() {
         </div>
 
         {/* Signup Form */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="signup-form">
             {/* Email Field */}
             <div>

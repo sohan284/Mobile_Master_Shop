@@ -25,7 +25,7 @@ export default function SearchSection({
               placeholder={placeholder}
               value={searchTerm}
               onChange={onSearchChange}
-              className="w-full px-4 py-4 pl-12 pr-4 text-gray-700 bg-white border-2 border-gray-200 rounded-md focus:outline-none focus:border-secondary transition-all duration-300 shadow hover:shadow-lg"
+              className="w-full px-4 py-4 pl-12 pr-4 text-gray-700 bg-white/10  border-2 border-gray-200 rounded-md focus:outline-none focus:border-secondary transition-all duration-300 shadow hover:shadow-lg"
             />
             <div className="absolute inset-y-0 left-0 flex items-center pl-4">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

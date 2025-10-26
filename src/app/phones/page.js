@@ -47,7 +47,7 @@ export default function PhonesPage() {
                                 {randomBrands.map((brand, idx) => (
                                     <Link href={`/phones/${brand.name}`} key={brand.id}>
                                         <MotionFade delay={0.02 + idx * 0.05}>
-                                            <Card className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">
+                                            <Card className="group bg-white/10  shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden">
                                                 <CardContent className="p-3 text-center h-full flex flex-col relative">
                                                     <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
                                                         <Image
@@ -79,7 +79,7 @@ export default function PhonesPage() {
 
                     {/* Features Section */}
                     <MotionFade delay={0.02}>
-                        <div className="bg-white rounded-2xl p-8 shadow-lg mb-12">
+                        <div className="bg-white/10  rounded-2xl p-8 shadow-lg mb-12">
                             <h2 className="text-2xl font-bold text-[#6B7E8D] mb-6 text-center">Why Choose New Phones?</h2>
                             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <div className="text-center">

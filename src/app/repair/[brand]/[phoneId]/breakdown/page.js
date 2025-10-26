@@ -271,7 +271,7 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Price Breakdown */}
                     {priceData && (
                         <MotionFade delay={0.2} immediate={true}>
-                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 mb-8">
+                            <div className="bg-white/10  rounded-xl shadow-lg border border-gray-200 p-8 mb-8">
                                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Repair Cost Breakdown</h2>
                                 
                                 {/* Device Info */}

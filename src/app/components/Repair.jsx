@@ -80,7 +80,7 @@ export default function Repair() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
-                        className="text-4xl md:text-6xl font-extrabold tracking-wider"
+                        className="text-4xl md:text-6xl font-extrabold tracking-wider text-white"
                     >
                         FIX YOUR DEVICE
                     </motion.h1>
@@ -132,7 +132,7 @@ export default function Repair() {
                                 transition={{ duration: 0.5, delay: 1.1 + idx * 0.1 }}
                                 className="group relative"
                             >
-                                <div className="bg-white/10 backdrop-blur-sm rounded-md p-2 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                                <div className="bg-white/10 /10 backdrop-blur-sm rounded-md p-2 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                                     {/* Popular Badge */}
                                     {service.popular && (
                                         <div className="absolute top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-50">
@@ -194,7 +194,7 @@ export default function Repair() {
                             {/* First set of logos */}
                             {brandLogo.map((item, idx) => (
                                 <div key={`first-${item.id}`} className="flex-shrink-0 mx-8 group">
-                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10">
+                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 /10">
                                         <img
                                             src={item.src}
                                             alt={item.alt}
@@ -206,7 +206,7 @@ export default function Repair() {
                             {/* Duplicate set for seamless loop */}
                             {brandLogo.map((item, idx) => (
                                 <div key={`second-${item.id}`} className="flex-shrink-0 mx-8 group">
-                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10">
+                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 /10">
                                         <img
                                             src={item.src}
                                             alt={item.alt}

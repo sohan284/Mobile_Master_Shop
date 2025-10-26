@@ -95,7 +95,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[75]">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="bg-white/10  rounded-2xl shadow-2xl p-8 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">

@@ -35,7 +35,7 @@ export default function GridSection({
         }
       }}
     >
-      <div className="group relative bg-white h-full p-6 rounded-md shadow hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center justify-center border border-gray-100 hover:border-secondary/50 hover:-translate-y-2 overflow-hidden">
+      <div className="group relative bg-white/10  h-full p-6 rounded-md shadow hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center justify-center border border-gray-100 hover:border-secondary/50 hover:-translate-y-2 overflow-hidden">
         {/* Animated border effect */}
         <div className="absolute inset-0 rounded-md border-2 border-transparent group-hover:border-secondary/20 transition-all duration-300"></div>
         
@@ -75,7 +75,7 @@ export default function GridSection({
         <MotionFade delay={0.15} immediate={true}>
           <div className={`grid ${gridCols} gap-6`}>
             {Array.from({ length: loadingCount }).map((_, index) => (
-              <div key={index} className="bg-white p-6 rounded-md shadow hover:shadow-lg transition-all duration-300">
+              <div key={index} className="bg-white/10  p-6 rounded-md shadow hover:shadow-lg transition-all duration-300">
                 <div className="flex flex-col items-center justify-center">
                   <Skeleton className="w-16 h-16 rounded mb-4" />
                   <Skeleton className="w-20 h-4" />

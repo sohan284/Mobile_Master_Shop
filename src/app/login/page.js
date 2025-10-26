@@ -148,14 +148,14 @@ export default function LoginPage() {
               width={80} 
               height={80} 
               onClick={() => router.push('/')}
-              className="rounded-full bg-white p-2 cursor-pointer"
+              className="rounded-full bg-white/10  p-2 cursor-pointer"
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <div className="space-y-6" role="form" aria-label="Login form">
             {/* Username or Email Field */}
             <div>

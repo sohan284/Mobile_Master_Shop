@@ -8,7 +8,7 @@ export default function DataTableSkeleton({
   showPagination = true 
 }) {
   return (
-    <div className="bg-white rounded-lg border">
+    <div className="bg-white/10  rounded-lg border">
       {/* Header Skeleton */}
       {showHeader && (
         <div className="px-6 py-4 border-b">

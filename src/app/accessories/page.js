@@ -52,7 +52,7 @@ export default function AccessoriesPage() {
                             <h2 className="text-2xl font-bold text-gray-800 mb-6">{category.category}</h2>
                             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {category.items.map((item, itemIndex) => (
-                                    <div key={itemIndex} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                                    <div key={itemIndex} className="bg-white/10  p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                                         <div className="flex justify-center mb-3">
                                             <img 
                                                 src={item.image} 
@@ -72,7 +72,7 @@ export default function AccessoriesPage() {
                         </div>
                     ))}
                     
-                    <div className="bg-white p-8 rounded-lg shadow-md">
+                    <div className="bg-white/10  p-8 rounded-lg shadow-md">
                         <h2 className="text-2xl font-bold text-gray-800 mb-4">Why Choose Our Accessories?</h2>
                         <div className="grid md:grid-cols-3 gap-6">
                             <div className="text-center">

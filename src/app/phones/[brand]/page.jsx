@@ -167,7 +167,7 @@ export default function BrandPage({ params }) {
 
           {/* Filter Section */}
           <MotionFade delay={0.01}>
-            <div className="w-1/4 min-w-[250px] bg-white p-4 rounded-lg shadow">
+            <div className="w-1/4 min-w-[250px] bg-white/10  p-4 rounded-lg shadow">
               <h2 className="text-xl font-bold mb-4 text-[#6B7E8D]">Filters</h2>
 
               {/* Price Sort */}
@@ -222,7 +222,7 @@ export default function BrandPage({ params }) {
             {filteredPhones.map((phone, idx) => (
               <Link href={`/phones/${brand}/${phone.model}`} key={phone.id}>
                 <MotionFade delay={0.02 + idx * 0.05}>
-                  <div className="group bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden rounded-lg">
+                  <div className="group bg-white/10  shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-[#00bfb2] h-full overflow-hidden rounded-lg">
                     <div className="p-4 text-center h-full flex flex-col relative">
                       <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 group-hover:from-[#00bfb2]/5 group-hover:to-[#00bfb2]/10 transition-all duration-500 relative overflow-hidden">
                         <Image

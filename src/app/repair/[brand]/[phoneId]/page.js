@@ -222,7 +222,7 @@ export default function PhoneModelPage({ params }) {
                                         ? 'border-primary shadow-primary bg-primary/5' 
                                         : service.isDisabled
                                         ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
-                                        : 'bg-white border-gray-100 hover:border-primary/50 hover:shadow-lg'
+                                        : 'bg-white/10  border-gray-100 hover:border-primary/50 hover:shadow-lg'
                                 }`}
                             >
                                 <div className="flex items-center mb-3">
@@ -262,7 +262,7 @@ export default function PhoneModelPage({ params }) {
                                                     service.partType === 'original'
                                                         ? 'bg-primary text-white'
                                                         : service.hasOriginal
-                                                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                        ? 'bg-white/10  border border-gray-300 text-gray-700 hover:bg-gray-50'
                                                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 }`}
                                             >
@@ -289,7 +289,7 @@ export default function PhoneModelPage({ params }) {
                                                     service.partType === 'duplicate'
                                                         ? 'bg-primary text-white'
                                                         : service.hasDuplicate
-                                                        ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                                        ? 'bg-white/10  border border-gray-300 text-gray-700 hover:bg-gray-50'
                                                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                                 }`}
                                             >

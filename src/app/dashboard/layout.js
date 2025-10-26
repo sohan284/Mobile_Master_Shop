@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
         {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top bar */}
-          <div className="bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <div className="bg-white/10  shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
