@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { motion } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button, CustomButton } from "@/components/ui/button";
 import Link from "next/link";
@@ -12,6 +13,7 @@ import MotionFade from '@/components/animations/MotionFade';
 import HeroSection from '@/components/common/HeroSection';
 import FeaturesSection from '@/components/common/FeaturesSection';
 import CTASection from '@/components/common/CTASection';
+import Image from "next/image";
 
 // Custom styles for swiper
 const swiperStyles = `
@@ -66,42 +68,56 @@ export default function Refurbished() {
     ];
 
     return (
-        <div className="py-16 relative overflow-hidden">
-
+        <div className="relative  text-white py-20 overflow-hidden">
             <style dangerouslySetInnerHTML={{ __html: swiperStyles }} />
-            <div className="max-w-7xl mx-auto px-4 lg:px-8">
+            <div className="container mx-auto px-4 z-10 relative">
                 
-                {/* Header Section - Redesigned */}
-                <HeroSection
-                    title="Latest"
-                    subtitle="Phones"
-                    description="Discover our selection of new phones with a wide choice of Apple, Samsung, Xiaomi models and much more!"
-                    image="/2.png"
-                    imageAlt="New Phones"
-                    badgeText="Premium New Phones"
-                    ctaText="Browse All Phones"
-                    ctaHref="/phones"
-                    layout="image-left"
-                />
+                {/* Header Section - Banner Style */}
+                <div className="text-center mb-16">
+                    <motion.h1 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-4xl md:text-6xl font-extrabold tracking-wider"
+                    >
+                        LATEST PHONES
+                    </motion.h1>
+                    <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="mt-4 text-lg md:text-xl text-gray-300"
+                    >
+                        Discover our selection of new phones with a wide choice of Apple, Samsung, Xiaomi models and much more!
+                    </motion.p>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.4 }}
+                        className="mt-8 flex justify-center gap-4"
+                    >
+                        <Link href="/phones">
+                            <CustomButton className="bg-secondary text-primary hover:bg-secondary/90">
+                                Browse All Phones
+                            </CustomButton>
+                        </Link>
+                      
+                    </motion.div>
+                </div>
 
-                {/* Features Section */}
-                <FeaturesSection
-                    title="Why Choose Our New Phones?"
-                    description="Premium quality phones with comprehensive warranty and support."
-                    features={[
-                        { title: "24 Month Warranty", description: "Full coverage for peace of mind", icon: "🛡️" },
-                        { title: "Latest Models", description: "Brand new, never used", icon: "📱" },
-                        { title: "Best Prices", description: "Competitive pricing guaranteed", icon: "💰" }
-                    ]}
-                />
+               
 
-                {/* Products Swiper - Redesigned */}
-                <MotionFade delay={0.2} className="relative">
-                    <div className="mb-4">
-                        <div className="text-center mb-12">
-                            <h3 className="text-3xl font-bold text-primary mb-4">Featured New Phones</h3>
-                            <p className="text-gray-600 max-w-2xl mx-auto">Handpicked selection of the latest smartphones from top brands.</p>
-                        </div>
+                {/* Products Swiper - Banner Style */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                    className="relative mb-16"
+                >
+                    <div className="text-center mb-12">
+                        <h3 className="text-3xl font-bold mb-4">Featured New Phones</h3>
+                        <p className="text-gray-300 max-w-2xl mx-auto">Handpicked selection of the latest smartphones from top brands.</p>
+                    </div>
 
                         <Swiper
                         modules={[Navigation, Pagination, Autoplay]}
@@ -146,43 +162,45 @@ export default function Refurbished() {
                     >
                         {images.map(({ id, path, name, price, brand, condition }) => (
                             <SwiperSlide key={id}>
-                                <Card className="group bg-white shadow-lg hover:shadow transition-all duration-500 border border-gray-200 hover:border-secondary/50 h-full overflow-hidden">
+                                <Card className="group bg-white/10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                                     <CardContent className="p-6 text-center h-full flex flex-col relative">
                                         {/* Brand Badge */}
-                                        <div className="absolute top-3 left-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
+                                        {/* <div className="absolute top-3 left-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
                                             {brand}
-                                        </div>
+                                        </div> */}
                                         
                                         {/* Condition Badge */}
-                                        <div className="absolute top-3 right-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
+                                        {/* <div className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
                                             {condition}
-                                        </div>
+                                        </div> */}
                                         
-                                        <div className="mb-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-md p-6 group-hover:from-secondary/5 group-hover:to-primary/5 transition-all duration-500 relative overflow-hidden">
+                                        <div className="mb-4 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
                                             {/* Subtle background pattern */}
-                                            <div className="absolute inset-0 opacity-5">
+                                            <div className="absolute inset-0 opacity-10">
                                                 <div className="absolute top-2 left-2 w-8 h-8 bg-secondary rounded-full"></div>
                                                 <div className="absolute bottom-2 right-2 w-6 h-6 bg-primary rounded-full"></div>
                                             </div>
-                                            <img
+                                            <Image
                                                 src={path}
                                                 alt={name}
-                                                className="w-full h-36 object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
+                                                width={160}
+                                                height={160}
+                                                // className="w-42 h-48 object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
                                             />
                                         </div>
                                         
                                         <div className="flex-grow flex flex-col justify-between">
-                                            <h3 className="font-bold text-lg text-primary line-clamp-2 group-hover:text-secondary transition-colors duration-300">
+                                            <h3 className="font-bold text-lg text-white group-hover:text-secondary transition-colors duration-300">
                                                 {name.replace('.png', '').replace(/[-_]/g, ' ')}
                                             </h3>
                                             
-                                            <div className="space-y-3">
+                                            <div className="space-y-2">
                                                 <div className="text-center">
-                                                    <p className="text-sm text-gray-600 mb-1">Starting from</p>
+                                                    <p className="text-sm text-gray-300 mb-1">Starting from</p>
                                                     <p className="font-bold text-3xl text-secondary mb-2">€{price}</p>
                                                 </div>
                                                 
-                                                <div className="bg-gradient-to-r from-secondary/10 to-primary/10 text-primary text-sm font-semibold px-4 py-2 rounded-full border border-secondary/20">
+                                                <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
                                                     24 Month Warranty
                                                 </div>
                                             </div>
@@ -195,7 +213,7 @@ export default function Refurbished() {
 
                     {/* Custom Navigation */}
                     <div className="absolute flex -top-12 right-0 justify-center items-center mt-2">
-                        <button className="swiper-button-prev-custom cursor-pointer bg-transparent text-primary w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 group">
+                        <button className="swiper-button-prev-custom cursor-pointer bg-white/10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                             </svg>
@@ -203,25 +221,47 @@ export default function Refurbished() {
                         
                         <div className="swiper-pagination-custom flex gap-3"></div>
                         
-                        <button className="swiper-button-next-custom cursor-pointer bg-transparent text-primary w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 group">
+                        <button className="swiper-button-next-custom cursor-pointer bg-white/10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
                             <svg className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
                     </div>
-                    </div>
-                </MotionFade>
+                </motion.div>
 
-                {/* CTA Section - Redesigned */}
-                <CTASection
-                    title="Ready to Get Your New Phone?"
-                    description="Browse our complete collection of new smartphones with the best prices and warranty!"
-                    primaryAction={{
-                        text: "See All Phones",
-                        href: "/phones"
-                    }}
-                    features={["Free Shipping", "24 Month Warranty", "Best Prices"]}
-                />
+                 {/* Features Section - Banner Style */}
+                 <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                    className="mb-16"
+                >
+                    <div className="text-center mb-12">
+                        <h3 className="text-3xl font-bold mb-4">Why Choose Our New Phones?</h3>
+                        <p className="text-gray-300 text-lg">Premium quality phones with comprehensive warranty and support.</p>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            { title: "24 Month Warranty", description: "Full coverage for peace of mind", icon: "🛡️" },
+                            { title: "Latest Models", description: "Brand new, never used", icon: "📱" },
+                            { title: "Best Prices", description: "Competitive pricing guaranteed", icon: "💰" }
+                        ].map((feature, index) => (
+                            <motion.div
+                                key={feature.title}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                                className="text-center"
+                            >
+                                <div className="text-4xl mb-4">{feature.icon}</div>
+                                <h4 className="text-xl font-bold mb-2">{feature.title}</h4>
+                                <p className="text-gray-300">{feature.description}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+              
             </div>
         </div>
     );

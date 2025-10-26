@@ -6,7 +6,7 @@ import PageTransition from '@/components/animations/PageTransition';
 
 export default function page() {
   return (
-    <div>
+    <div className='bg-primary'>
       <Banner />
       <div className='max-w-[1200px] mx-auto'>
         <PageTransition>

@@ -73,7 +73,7 @@ export default function RepairPage() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen relative overflow-hidden bg-primary">
 
         <div className="max-w-7xl mx-auto px-4 py-8">
           
