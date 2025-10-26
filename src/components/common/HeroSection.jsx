@@ -23,26 +23,14 @@ export default function HeroSection({
     <MotionFade delay={0.06} immediate={true}>
       <div className="relative">
         <div className="relative z-10">
-          <Image 
-            src={image} 
-            alt={imageAlt} 
-            width={100} 
-            height={80} 
-            className="w-full max-w-xs mx-auto drop-shadow hover:scale-105 transition-transform duration-500" 
+          <Image
+            src={image}
+            alt={imageAlt}
+            width={100}
+            height={80}
+            className="w-full max-w-xs mx-auto drop-shadow hover:scale-105 transition-transform duration-500"
           />
         </div>
-        {/* Floating Elements */}
-        <div className="absolute top-10 -left-4 w-20 h-20 bg-secondary/30 rounded-full blur animate-bounce"></div>
-        <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/30 rounded-full blur animate-bounce" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/4 -right-8 w-12 h-12 bg-secondary/25 rounded-full blur animate-bounce" style={{animationDelay: '2s'}}></div>
-        <div className="absolute -top-8 right-1/4 w-8 h-8 bg-primary/25 rounded-full blur animate-bounce" style={{animationDelay: '0.5s'}}></div>
-        <div className="absolute bottom-1/4 -left-8 w-10 h-10 bg-secondary/20 rounded-full blur animate-bounce" style={{animationDelay: '1.5s'}}></div>
-        
-        {/* Additional floating particles */}
-        <div className="absolute top-1/3 left-1/4 w-3 h-3 bg-secondary/40 rounded-full animate-ping" style={{animationDelay: '0.3s'}}></div>
-        <div className="absolute bottom-1/3 right-1/3 w-2 h-2 bg-primary/40 rounded-full animate-ping" style={{animationDelay: '1.3s'}}></div>
-        <div className="absolute top-2/3 right-1/4 w-1 h-1 bg-secondary/50 rounded-full animate-ping" style={{animationDelay: '2.3s'}}></div>
-        <div className="absolute bottom-2/3 left-1/3 w-1 h-1 bg-primary/50 rounded-full animate-ping" style={{animationDelay: '3.3s'}}></div>
       </div>
     </MotionFade>
   );
@@ -61,7 +49,7 @@ export default function HeroSection({
           {title} <span className="text-secondary relative">
             {subtitle}
             <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary/30" viewBox="0 0 200 12" fill="none">
-              <path d="M2 6C2 6 50 2 100 6C150 10 198 6 198 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+              <path d="M2 6C2 6 50 2 100 6C150 10 198 6 198 6" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
             </svg>
           </span>
         </h1>

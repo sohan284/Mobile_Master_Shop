@@ -10,7 +10,6 @@ export default function page() {
       <Banner />
       <div className='max-w-[1200px] mx-auto'>
         <PageTransition>
-
           <Repair />
           <Refurbished />
         </PageTransition>

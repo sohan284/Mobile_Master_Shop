@@ -1,7 +1,5 @@
 "use client";
 import React from 'react';
-import { motion } from 'framer-motion';
-import { CustomButton } from '@/components/ui/button';
 import MotionFade from '@/components/animations/MotionFade';
 import Link from 'next/link';
 import HeroSection from '@/components/common/HeroSection';
@@ -70,8 +68,9 @@ export default function Repair() {
     ];
 
     return (
-        <div className="relative  text-white py-20 overflow-hidden">
-            <div className="container mx-auto px-4 z-10 relative">
+        <div className="pt-16 relative overflow-hidden ">
+
+            <div className="max-w-7xl mx-auto px-4 lg:px-8">
                 
                 {/* Hero Section - Banner Style */}
                 <div className="text-center mb-16">
