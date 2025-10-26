@@ -6,6 +6,9 @@ import HeroSection from '@/components/common/HeroSection';
 import FeaturesSection from '@/components/common/FeaturesSection';
 import CTASection from '@/components/common/CTASection';
 import Image from 'next/image';
+import { motion } from "framer-motion";
+import { CustomButton } from '@/components/ui/button';
+
 
 export default function Repair() {
     const brandLogo = [
