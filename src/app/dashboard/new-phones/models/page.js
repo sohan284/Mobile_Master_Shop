@@ -28,6 +28,13 @@ export default function NewPhoneModelsPage() {
   );
   const brands = brandsResponse?.data || [];
 
+  // Fetch colors for the dropdown
+  const { data: colorsResponse, isLoading: colorsLoading } = useApiGet(
+    ['new-phone-colors'],
+    () => apiFetcher.get('/api/brandnew/color/')
+  );
+  const colors = colorsResponse?.data || [];
+
   // Fetch models from API
   const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
     ['new-phone-models'],
@@ -180,15 +187,7 @@ export default function NewPhoneModelsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link 
-          href="/dashboard/new-phones"
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to New Phones
-        </Link>
-      </div>
+    
 
       <div>
         <h1 className="text-2xl font-bold text-gray-900">New Phone Models</h1>
@@ -214,6 +213,7 @@ export default function NewPhoneModelsPage() {
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
         brands={brands}
+        colors={colors}
       />
 
       {/* Edit Model Modal */}
@@ -223,6 +223,7 @@ export default function NewPhoneModelsPage() {
         onSuccess={handleEditModalSuccess}
         model={selectedModel}
         brands={brands}
+        colors={colors}
       />
 
       {/* Delete Confirmation Dialog */}
