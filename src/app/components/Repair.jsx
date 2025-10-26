@@ -7,6 +7,7 @@ import Link from 'next/link';
 import HeroSection from '@/components/common/HeroSection';
 import FeaturesSection from '@/components/common/FeaturesSection';
 import CTASection from '@/components/common/CTASection';
+import Image from 'next/image';
 
 export default function Repair() {
     const brandLogo = [
@@ -21,7 +22,7 @@ export default function Repair() {
     const repairServices = [
         { 
             id: 1, 
-            src: "/screen.png", 
+            src: "/screen.jpg", 
             alt: "Screen Repair", 
             title: "Screen Repair",
             description: "Cracked or broken screens",
@@ -31,9 +32,9 @@ export default function Repair() {
         },
         { 
             id: 2, 
-            src: "/battery.png", 
+            src: "/battery.webp", 
             alt: "Battery Replacement", 
-            title: "Battery",
+            title: "Battery Replacement",
             description: "Poor battery life",
             price: "From €39",
             time: "20-30 min",
@@ -41,9 +42,9 @@ export default function Repair() {
         },
         { 
             id: 3, 
-            src: "/camera.png", 
+            src: "/camera.jpg", 
             alt: "Camera Repair", 
-            title: "Camera",
+            title: "Camera Repair",
             description: "Blurry or damaged camera",
             price: "From €49",
             time: "45-60 min",
@@ -51,9 +52,9 @@ export default function Repair() {
         },
         { 
             id: 4, 
-            src: "/hood.png", 
+            src: "/backshell.jpg", 
             alt: "Back Cover", 
-            title: "Back Cover",
+            title: "Back Shell Repair",
             description: "Damaged back housing",
             price: "From €35",
             time: "25-35 min",
@@ -130,10 +131,10 @@ export default function Repair() {
                                 transition={{ duration: 0.5, delay: 1.1 + idx * 0.1 }}
                                 className="group relative"
                             >
-                                <div className="bg-white/10 backdrop-blur-sm rounded-md p-6 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                                <div className="bg-white/10 backdrop-blur-sm rounded-md p-2 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                                     {/* Popular Badge */}
                                     {service.popular && (
-                                        <div className="absolute -top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-10">
+                                        <div className="absolute top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-50">
                                             Most Popular
                                         </div>
                                     )}
@@ -141,10 +142,12 @@ export default function Repair() {
                                     <div className="text-center h-full flex flex-col">
                                         {/* Service Icon */}
                                         <div className="mb-6 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-6 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
-                                            <img
+                                            <Image
+                                            width={100}
+                                            height={100}
                                                 src={service.src}
                                                 alt={service.alt}
-                                                className="w-full h-20 object-contain group-hover:scale-110 transition-transform duration-500"
+                                                className="w-full h-40 object-contain group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
                                         
