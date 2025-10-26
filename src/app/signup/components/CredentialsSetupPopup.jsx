@@ -84,7 +84,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[85]">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -126,7 +126,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7E8D] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Choose a username"
                 autoComplete="off"
                 required
@@ -200,7 +200,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#6B7E8D] text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#0d416e] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

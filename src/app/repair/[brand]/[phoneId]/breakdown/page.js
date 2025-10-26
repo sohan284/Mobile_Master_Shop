@@ -7,16 +7,20 @@ import HeroSection from '@/components/common/HeroSection';
 import { CustomButton } from '@/components/ui/button';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from '@/components/AuthModal';
 
 export default function PriceBreakdownPage({ params }) {
     const { brand, phoneId } = params;
     const router = useRouter();
+    const { isAuthenticated } = useAuth();
     const [phoneInfo, setPhoneInfo] = useState(null);
     const [selectedServices, setSelectedServices] = useState([]);
     const [servicePartTypes, setServicePartTypes] = useState({});
     const [priceData, setPriceData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showAuthModal, setShowAuthModal] = useState(false);
 
     // Get phone info and selected services from sessionStorage
     useEffect(() => {
@@ -145,18 +149,34 @@ export default function PriceBreakdownPage({ params }) {
         if (selectedServices.length > 0) {
             calculatePrice();
         }
-    }, [selectedServices, servicePartTypes, phoneId]);
+    }, [selectedServices, servicePartTypes, phoneId, brand, phoneInfo?.brand, phoneInfo?.name]);
 
     const handleBackToServices = () => {
         router.back();
     };
 
     const handleProceedToBooking = () => {
+        // Check if user is authenticated
+        if (!isAuthenticated()) {
+            setShowAuthModal(true);
+            return;
+        }
+        
         // Store price data for booking page
         if (typeof window !== 'undefined' && priceData) {
             sessionStorage.setItem('priceBreakdown', JSON.stringify(priceData));
         }
         // Navigate to booking page (you can create this later)
+        router.push(`/repair/${brand}/${phoneId}/booking`);
+    };
+
+    const handleAuthSuccess = (user) => {
+        setShowAuthModal(false);
+        // Store price data for booking page
+        if (typeof window !== 'undefined' && priceData) {
+            sessionStorage.setItem('priceBreakdown', JSON.stringify(priceData));
+        }
+        // Navigate to booking page
         router.push(`/repair/${brand}/${phoneId}/booking`);
     };
 
@@ -359,6 +379,14 @@ export default function PriceBreakdownPage({ params }) {
                     </MotionFade>
                 </div>
             </div>
+            
+            {/* Authentication Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                onSuccess={handleAuthSuccess}
+                redirectPath={`/repair/${brand}/${phoneId}/booking`}
+            />
         </PageTransition>
     );
 }

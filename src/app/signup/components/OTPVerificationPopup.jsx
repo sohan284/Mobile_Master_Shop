@@ -94,12 +94,12 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[75]">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="bg-[#6B7E8D] rounded-full p-2 mr-3">
+            <div className="bg-primary rounded-full p-2 mr-3">
               <Mail className="text-white" size={20} />
             </div>
             <div>
@@ -140,7 +140,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-12 text-center text-lg font-bold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7E8D] focus:border-transparent"
+                  className="w-12 h-12 text-center text-lg font-bold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               ))}
             </div>
@@ -153,7 +153,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                 type="button"
                 onClick={handleResend}
                 disabled={isLoading}
-                className="text-[#6B7E8D] hover:text-[#0d416e] font-medium transition-colors disabled:opacity-50"
+                className="text-primary hover:text-primary/80 font-medium transition-colors disabled:opacity-50"
               >
                 <RotateCcw size={16} className="inline mr-1" />
                 Resend Code
@@ -169,7 +169,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
           <button
             type="submit"
             disabled={isLoading || otp.join('').length !== 6}
-            className="w-full bg-[#6B7E8D] text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#0d416e] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
