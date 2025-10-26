@@ -18,40 +18,40 @@ export default function Repair() {
     ];
 
     const repairServices = [
-        { 
-            id: 1, 
-            src: "/screen.jpg", 
-            alt: "Screen Repair", 
+        {
+            id: 1,
+            src: "/screen.jpg",
+            alt: "Screen Repair",
             title: "Screen Repair",
             description: "Cracked or broken screens",
             price: "From €29",
             time: "30-45 min",
             popular: true
         },
-        { 
-            id: 2, 
-            src: "/battery.webp", 
-            alt: "Battery Replacement", 
+        {
+            id: 2,
+            src: "/battery.webp",
+            alt: "Battery Replacement",
             title: "Battery Replacement",
             description: "Poor battery life",
             price: "From €39",
             time: "20-30 min",
             popular: false
         },
-        { 
-            id: 3, 
-            src: "/camera.jpg", 
-            alt: "Camera Repair", 
+        {
+            id: 3,
+            src: "/camera.jpg",
+            alt: "Camera Repair",
             title: "Camera Repair",
             description: "Blurry or damaged camera",
             price: "From €49",
             time: "45-60 min",
             popular: false
         },
-        { 
-            id: 4, 
-            src: "/backshell.jpg", 
-            alt: "Back Cover", 
+        {
+            id: 4,
+            src: "/backshell.jpg",
+            alt: "Back Cover",
             title: "Back Shell Repair",
             description: "Damaged back housing",
             price: "From €35",
@@ -71,10 +71,10 @@ export default function Repair() {
         <div className="pt-16 relative overflow-hidden ">
 
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
-                
+
                 {/* Hero Section - Banner Style */}
                 <div className="text-center mb-16">
-                    <motion.h1 
+                    <motion.h1
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
@@ -82,7 +82,7 @@ export default function Repair() {
                     >
                         FIX YOUR DEVICE
                     </motion.h1>
-                    <motion.p 
+                    <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
@@ -90,27 +90,26 @@ export default function Repair() {
                     >
                         Expert technicians, premium parts, and a €25 repair bonus for every service. Get your device fixed with confidence.
                     </motion.p>
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, delay: 0.4 }}
                         className="mt-8 flex justify-center gap-4"
                     >
-                <Link href="/repair">
-                <CustomButton variant="outline" className="border-secondary bg-secondary text-primary hover:bg-secondary hover:text-primary">
-                            Book Repair
-                        </CustomButton>
-                </Link>
-                       
+                        <Link href="/repair">
+                            <CustomButton variant="outline" className="border-secondary bg-secondary text-primary hover:bg-secondary hover:text-primary">
+                                Book Repair
+                            </CustomButton>
+                        </Link>
                     </motion.div>
                 </div>
 
-        
 
-            
+
+
 
                 {/* Services Section - Banner Style */}
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 1.0 }}
@@ -120,10 +119,10 @@ export default function Repair() {
                         <h3 className="text-3xl font-bold mb-4">Our Repair Services</h3>
                         <p className="text-gray-300 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {repairServices.map((service, idx) => (
-                            <motion.div 
+                            <motion.div
                                 key={service.id}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -137,19 +136,19 @@ export default function Repair() {
                                             Most Popular
                                         </div>
                                     )}
-                                    
+
                                     <div className="text-center h-full flex flex-col">
                                         {/* Service Icon */}
                                         <div className="mb-6 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-6 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
                                             <Image
-                                            width={100}
-                                            height={100}
+                                                width={100}
+                                                height={100}
                                                 src={service.src}
                                                 alt={service.alt}
                                                 className="w-full h-40 object-contain group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
-                                        
+
                                         <div className="flex-grow flex flex-col justify-between">
                                             <div>
                                                 <h4 className="font-bold text-lg text-white mb-2 group-hover:text-secondary transition-colors duration-300">
@@ -157,13 +156,13 @@ export default function Repair() {
                                                 </h4>
                                                 <p className="text-gray-300 text-sm mb-4">{service.description}</p>
                                             </div>
-                                            
+
                                             <div className="space-y-3">
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-2xl font-bold text-secondary">{service.price}</span>
                                                     <span className="text-sm text-gray-300">{service.time}</span>
                                                 </div>
-                                                
+
                                                 <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
                                                     12 Month Warranty
                                                 </div>
@@ -175,8 +174,8 @@ export default function Repair() {
                         ))}
                     </div>
                 </motion.div>
-    {/* Brand Trust Section - Marquee Style */}
-    <motion.div 
+                {/* Brand Trust Section - Marquee Style */}
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.8 }}
@@ -186,7 +185,7 @@ export default function Repair() {
                         <h3 className="text-2xl font-bold mb-4">Trusted by Leading Brands</h3>
                         <p className="text-gray-300">We repair devices from all major manufacturers</p>
                     </div>
-                    
+
                     <div className="relative overflow-hidden  backdrop-blur-sm rounded-lg py-8">
                         <div className="flex animate-marquee">
                             {/* First set of logos */}
@@ -216,8 +215,8 @@ export default function Repair() {
                         </div>
                     </div>
                 </motion.div>
-                      {/* Features Section - Banner Style */}
-                      <motion.div 
+                {/* Features Section - Banner Style */}
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.6 }}
@@ -227,7 +226,7 @@ export default function Repair() {
                         <h3 className="text-3xl font-bold mb-4">Why Choose Us?</h3>
                         <p className="text-gray-300 text-lg">We provide exceptional repair services with unmatched quality and customer satisfaction.</p>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-4 gap-8">
                         {features.map((feature, index) => (
                             <motion.div
