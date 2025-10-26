@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Tag,
   List,
-  Smartphone as PhoneIcon
+  Smartphone as PhoneIcon,
+  Percent
 } from 'lucide-react';
 
 const navigation = [
@@ -54,6 +55,7 @@ const navigation = [
   { name: 'Users', href: '/dashboard/users', icon: Users },
   { name: 'Content', href: '/dashboard/content', icon: Megaphone },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Global Discount', href: '/dashboard/global-discount', icon: Percent },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
