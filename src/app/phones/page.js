@@ -37,7 +37,7 @@ export default function PhonesPage() {
     return (
         <PageTransition>
             <div className="py-8 bg-primary">
-                <div className="max-w-7xl mx-auto px-4 lg:px-8">
+                <div className="container  mx-auto px-4 lg:px-8">
                     {/* Header Section */}
                     {/* Brands Grid */}
                     <MotionFade delay={0.01}>

@@ -46,11 +46,11 @@ export default function Header() {
 
   return (
     <header
-      className={`dark-blue-vignette text-secondary w-full pt-4 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
+      className={`bg-[#0a1525] text-secondary w-full pt-4 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
+      <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
         
         {/* ✅ Mobile Header: Hamburger + Logo + User */}
         <div className="md:hidden flex justify-between items-center w-full">
@@ -59,13 +59,12 @@ export default function Header() {
           </button>
 
           <Link href="/" className="group relative">
-            <Image
-              className="rounded-full hover:scale-110 transition-transform duration-300 hover:rotate-12 group-hover:shadow-lg"
-              src={logo}
-              alt="Logo"
-              width={40}
-              height={40}
-            />
+             <div className="flex items-center gap-2">
+            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-xl font-semibold tracking-wide">MLKPHONE</span>
+          </div>
           </Link>
 
           {isAuthenticated() ? (
@@ -91,13 +90,12 @@ export default function Header() {
           {/* Logo */}
           <div className="text-2xl font-bold text-center">
             <Link href="/" className="group relative">
-              <Image
-                className="rounded-full hover:scale-110 transition-transform duration-300 hover:rotate-12 group-hover:shadow-lg"
-                src={logo}
-                alt="Logo"
-                width={40}
-                height={40}
-              />
+              <div className="flex items-center gap-2">
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-4xl font-semibold tracking-wide">MLKPHONE</span>
+          </div>
             </Link>
           </div>
 

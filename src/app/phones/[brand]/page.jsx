@@ -121,7 +121,7 @@ export default function BrandPage({ params }) {
   if (!dummyPhones[brand]) {
     return (
       <PageTransition>
-        <div className='max-w-7xl mx-auto px-4 lg:px-8 py-8'>
+        <div className='container  mx-auto px-4 lg:px-8 py-8'>
           <div className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-bold text-[#6B7E8D]">Brand Not Found</h2>
@@ -161,7 +161,7 @@ export default function BrandPage({ params }) {
 
   return (
     <PageTransition>
-      <div className='max-w-7xl mx-auto px-4 lg:px-8 py-8'>
+      <div className='container  mx-auto px-4 lg:px-8 py-8'>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-4 p-4">
           {/* Changed items-center to items-start */}
 

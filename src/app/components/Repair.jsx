@@ -6,9 +6,9 @@ import Link from 'next/link';
 import HeroSection from '@/components/common/HeroSection';
 import FeaturesSection from '@/components/common/FeaturesSection';
 import CTASection from '@/components/common/CTASection';
-import Image from 'next/image';
-import { motion } from "framer-motion";
+import Image from 'next/image'; 
 import { CustomButton } from '@/components/ui/button';
+import { Award, Clock, ShieldCheck, Wrench } from 'lucide-react';
 
 
 export default function Repair() {
@@ -64,17 +64,37 @@ export default function Repair() {
         }
     ];
 
-    const features = [
-        { icon: "🔧", text: "Expert Technicians", desc: "Certified professionals" },
-        { icon: "⚡", text: "Same Day Service", desc: "Quick turnaround" },
-        { icon: "🛡️", text: "12 Month Warranty", desc: "Quality guarantee" },
-        { icon: "💰", text: "€25 Repair Bonus", desc: "Cash back offer" }
-    ];
+   const features = [
+    { 
+      text: "Expert Technicians", 
+      desc: "Certified professionals with years of experience", 
+      icon: Wrench,
+      gradient: "from-orange-500 to-red-500"
+    },
+    { 
+      text: "Quick Turnaround", 
+      desc: "Most repairs completed within 24 hours", 
+      icon: Clock,
+      gradient: "from-blue-500 to-indigo-500"
+    },
+    { 
+      text: "Warranty Guarantee", 
+      desc: "All repairs backed by our quality guarantee", 
+      icon: ShieldCheck,
+      gradient: "from-green-500 to-teal-500"
+    },
+    { 
+      text: "Premium Quality", 
+      desc: "Only genuine parts and materials used", 
+      icon: Award,
+      gradient: "from-purple-500 to-pink-500"
+    }
+  ];
 
     return (
-        <div className="pt-16 relative overflow-hidden text-secondary">
+        <div className="pt-16 relative overflow-hidden text-secondary bg-[#0a1525]">
 
-            <div className="max-w-7xl mx-auto px-4 lg:px-8">
+            <div className="container  mx-auto px-4 lg:px-8">
 
                 {/* Hero Section - Banner Style */}
                 <div className="text-center mb-16">
@@ -221,32 +241,49 @@ export default function Repair() {
                 </motion.div>
                 {/* Features Section - Banner Style */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 }}
-                    className="mb-16"
-                >
-                    <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold mb-4">Why Choose Us?</h3>
-                        <p className="text-gray-300 text-lg">We provide exceptional repair services with unmatched quality and customer satisfaction.</p>
-                    </div>
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.6 }}
+      className="mb-16"
+    >
+      <div className="text-center mb-12">
+        <h3 className="text-3xl font-bold mb-4 text-white">Why Choose Us?</h3>
+        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          We provide exceptional repair services with unmatched quality and customer satisfaction.
+        </p>
+      </div>
 
-                    <div className="grid md:grid-cols-4 gap-8">
-                        {features.map((feature, index) => (
-                            <motion.div
-                                key={feature.text}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-                                className="text-center"
-                            >
-                                <div className="text-4xl mb-4">{feature.icon}</div>
-                                <h4 className="text-xl font-bold mb-2">{feature.text}</h4>
-                                <p className="text-gray-300">{feature.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
+      <div className="grid md:grid-cols-4 gap-6 lg:gap-8">
+        {features.map((feature, index) => {
+          const Icon = feature.icon;
+          return (
+            <motion.div
+              key={feature.text}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+              className="group relative"
+            >
+              <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105 h-full flex flex-col">
+                {/* Gradient background on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
+                
+                {/* Icon container with gradient background */}
+                <div className="relative mb-5 inline-flex mx-auto">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-300`}></div>
+                  <div className={`relative bg-gradient-to-br ${feature.gradient} p-3.5 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-8 h-8 text-white" strokeWidth={1.5} />
+                  </div>
+                </div>
+                
+                <h4 className="text-lg font-bold mb-2 text-white">{feature.text}</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </motion.div>
             </div>
         </div>
     );

@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <footer className="bg-primary text-secondary py-10 px-6 md:px-20 relative overflow-hidden">
             {/* Top grid with 4 sections */}
-            <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+            <div className="container  mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
                 {/* Repair Section */}
                 <div className="group">
                     <h3 className="text-secondary text-lg font-semibold mb-4 group-hover:text-white transition-colors duration-300">Repair</h3>
@@ -50,7 +50,7 @@ export default function Footer() {
             </div>
 
             {/* Social icons */}
-            <div className="max-w-7xl mx-auto mt-10 flex flex-col items-center relative z-10">
+            <div className="container  mx-auto mt-10 flex flex-col items-center relative z-10">
                 <h3 className="text-secondary text-lg font-semibold mb-4 hover:text-white transition-colors duration-300">Follow Us</h3>
                 <div className="flex space-x-6">
                     <Link href="#" aria-label="Instagram" className="hover:text-white transition-all duration-300 hover:scale-125 hover:rotate-12 group">

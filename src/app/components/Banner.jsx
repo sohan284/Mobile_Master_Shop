@@ -11,56 +11,52 @@ import accessories from "../../../public/Accessories.png";
 
 export default function Banner() {
   return (
-    <div className="relative dark-blue-vignette text-white pb-20 pt-8 overflow-hidden">
-      <div className="container mx-auto p-4 z-10 relative">
+    <div className="relative bg-[#0a1525] text-white pb-20 pt-8 overflow-hidden min-h-screen">
+      <div className="container mx-auto px-4 z-10 relative">
         {/* Text Section */}
-        <div className="text-center">
+        <div className="text-center mt-8 md:mt-12">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-4xl md:text-6xl font-extrabold tracking-wider"
+            className="text-5xl md:text-7xl font-bold tracking-tight"
           >
-            REPAIR. SELL. BUY.
+            Repair. Sell. Buy.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-4 text-lg md:text-xl text-gray-300"
+            className="mt-6 text-xl md:text-2xl text-gray-300 font-light"
           >
-            Experience Premium at MLKPHONE
+            Experience Premium at MLKPHONE.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-8 flex justify-center gap-4"
+            className="mt-8 flex justify-center gap-4 flex-wrap"
           >
-            <Link href="/phones">
-              <CustomButton className="bg-secondary text-primary hover:bg-secondary/90">
-                Shop Now
+            <Link href="/repair">
+              <CustomButton className="bg-blue-600 text-white hover:bg-blue-700">
+                Book Appointment
               </CustomButton>
             </Link>
-            <Link href="/repair">
-              <CustomButton
+            <Link href="/phones">
+              <CustomButton 
                 variant="outline"
-                className="border-secondary text-secondary hover:bg-secondary hover:text-primary"
+                className="bg-transparent border-2 border-white text-white hover:bg-white/10"
               >
-                Book a Repair
+                View Models
               </CustomButton>
             </Link>
           </motion.div>
         </div>
 
-        {/* Fixed Row Layout with Screen Protection */}
-    {/* Background Shade */}
-        <div className="absolute inset-0 bg-gradient-radial from-blue-900/20 via-transparent to-transparent pointer-events-none" />
-        
         {/* Desktop Layout (md and up) */}
-        <div className="hidden md:flex mt-16 md:mt-24 justify-center items-end gap-6 md:gap-16 lg:gap-20 px-4 md:px-10 max-w-7xl mx-auto relative z-10">
+        <div className="hidden md:flex mt-16 md:mt-20 justify-center items-end gap-8 lg:gap-12 px-4 md:px-10 max-w-6xl mx-auto relative z-10">
           {/* Repair */}
           <Link href="/repair">
             <motion.div
@@ -78,7 +74,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Réparer</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Repair</h2>
             </motion.div>
           </Link>
 
@@ -117,7 +113,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Accessoires</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Accessories</h2>
             </motion.div>
           </Link>
         </div>
@@ -159,7 +155,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Réparer</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Repair</h2>
               </motion.div>
             </Link>
 
@@ -178,7 +174,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Accessoires</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Accessories</h2>
               </motion.div>
             </Link>
           </div>

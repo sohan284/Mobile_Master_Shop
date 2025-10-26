@@ -184,7 +184,7 @@ export default function PriceBreakdownPage({ params }) {
         return (
             <PageTransition>
                 <div className="min-h-screen relative overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="container  mx-auto px-4 py-8">
                         <div className="text-center">
                             <Skeleton className="h-8 w-64 mx-auto mb-4" />
                             <Skeleton className="h-4 w-96 mx-auto mb-8" />
@@ -200,7 +200,7 @@ export default function PriceBreakdownPage({ params }) {
         return (
             <PageTransition>
                 <div className="min-h-screen relative overflow-hidden">
-                    <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="container  mx-auto px-4 py-8">
                         <div className="text-center">
                             <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
                                 <div className="text-red-600 text-xl mb-2">⚠️</div>
@@ -237,7 +237,7 @@ export default function PriceBreakdownPage({ params }) {
     return (
         <PageTransition>
             <div className="min-h-screen relative overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="container  mx-auto px-4 py-8">
                     
                     {/* Hero Section */}
                     <HeroSection
