@@ -3,13 +3,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@custom-variant dark (&:is(.dark *));
-
 body {
   font-family: var(--font-roboto), sans-serif;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-family: var(--font-nunito), sans-serif;
 }
 
@@ -59,7 +59,7 @@ h1, h2, h3 {
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #2F3C4F;
+  --primary: #0a0a2a;
   --primary-foreground: oklch(0.6 0.118 184.704)lch(0.985 0 0);
   --secondary: #F3CBA5;
   --secondary-foreground: oklch(0.205 0 0);
@@ -124,22 +124,31 @@ h1, h2, h3 {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer components {
+
   /* Title Styles */
   .title {
-    @apply  text-2xl font-bold leading-tight text-gray-900;
+    @apply text-2xl font-bold leading-tight text-gray-900;
   }
-  
+
   .subtitle {
     @apply text-xl font-semibold leading-relaxed text-gray-600;
   }
+
   .paragraph {
     @apply text-sm text-gray-600;
   }
-}
 
+  .dark-blue-vignette {
+    background-color: var(--primary);
+    background-image: radial-gradient(circle at center,
+        rgba(10, 10, 42, 0) 0%,
+        var(--primary) 70%);
+  }
+}
