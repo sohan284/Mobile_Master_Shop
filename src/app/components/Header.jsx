@@ -145,7 +145,7 @@ export default function Header() {
 
             {/* Mobile Sidebar */}
             {isOpen && (
-                <div className="lg:hidden fixed inset-0 z-40 bg-black bg-opacity-50" onClick={toggleSidebar}>
+                <div className="lg:hidden h-56  inset-0 z-40 bg-black bg-opacity-50" onClick={toggleSidebar}>
                     <div
                         className="fixed top-0 left-0 w-full h-full bg-[#6B7E8D] text-white p-6 z-50"
                         onClick={(e) => e.stopPropagation()}
