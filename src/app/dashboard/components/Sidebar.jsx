@@ -24,7 +24,8 @@ import {
   Tag,
   List,
   Smartphone as PhoneIcon,
-  Percent
+  Percent,
+  Palette
 } from 'lucide-react';
 
 const navigation = [
@@ -48,15 +49,10 @@ const navigation = [
     submenu: [
       { name: 'Brands', href: '/dashboard/new-phones/brands', icon: Tag },
       { name: 'Models', href: '/dashboard/new-phones/models', icon: PhoneIcon },
+      { name: 'Colors', href: '/dashboard/new-phones/colors', icon: Palette },
     ]
   },
-  { name: 'Products', href: '/dashboard/products', icon: Package },
-  { name: 'Bookings', href: '/dashboard/bookings', icon: Calendar },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
-  { name: 'Content', href: '/dashboard/content', icon: Megaphone },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Global Discount', href: '/dashboard/global-discount', icon: Percent },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
