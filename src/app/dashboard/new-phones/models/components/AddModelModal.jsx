@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Upload } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 
-export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
+export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colors }) {
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -66,6 +67,15 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
     }
   };
 
+  const handleColorChange = (colorId, checked) => {
+    setFormData(prev => ({
+      ...prev,
+      colors: checked 
+        ? [...prev.colors, colorId]
+        : prev.colors.filter(id => id !== colorId)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -110,11 +120,9 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       submitData.append('description', formData.description.trim());
       submitData.append('stock_quantity', formData.stock_quantity || '0');
       
-      // Add colors array
+      // Add color_ids as array
       if (formData.colors.length > 0) {
-        formData.colors.forEach((color, index) => {
-          submitData.append(`colors`, color);
-        });
+        submitData.append('color_ids', JSON.stringify(formData.colors));
       }
 
       if (formData.icon) {
@@ -358,6 +366,48 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
               disabled={isSubmitting}
               rows={3}
             />
+          </div>
+
+          {/* Color Selection */}
+          <div className="space-y-2">
+            <Label className="flex items-center space-x-2">
+              <Palette className="h-4 w-4" />
+              <span>Available Colors</span>
+            </Label>
+            {colors.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-lg">
+                {colors.map((color) => (
+                    <div key={color.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`color-${color.id}`}
+                        checked={formData.colors.includes(color.id)}
+                        onCheckedChange={(checked) => handleColorChange(color.id, checked)}
+                        disabled={isSubmitting}
+                      />
+                      <div className="flex items-center space-x-2 flex-1">
+                        <div 
+                          className="w-4 h-4 rounded border border-gray-300"
+                          style={{ backgroundColor: color.hex_code }}
+                          title={color.name}
+                        />
+                        <label 
+                          htmlFor={`color-${color.id}`}
+                          className="text-sm cursor-pointer flex-1"
+                        >
+                          {color.name}
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 p-4 border border-gray-200 rounded-lg">
+                No colors available. Please add colors first.
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Select the colors available for this phone model
+            </p>
           </div>
 
           {/* Icon Upload */}
