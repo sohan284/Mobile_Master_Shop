@@ -71,7 +71,7 @@ export default function Repair() {
     ];
 
     return (
-        <div className="pt-16 relative overflow-hidden ">
+        <div className="pt-16 relative overflow-hidden text-secondary">
 
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
 
