@@ -84,7 +84,7 @@ export default function Header() {
                 </div>
             </div>
 
-            <div className="max-w-5xl mx-auto px-4 flex items-center justify-between lg:justify-center relative z-10">
+            <div className="max-w-[1200px] mx-auto px-4 flex items-center justify-between lg:justify-center relative z-10">
 
                 {/* Mobile: Hamburger - Logo - User */}
                 <div className="lg:hidden flex justify-between items-center w-full">
@@ -131,7 +131,7 @@ export default function Header() {
                     </div>
 
                     {/* Center Logo */}
-                    <div className="text-2xl font-bold text-center">
+                    <div className="text-2xl -ml-48 font-bold text-center">
                         <Link href="/" className="group relative">
                             <Image className='rounded-full hover:scale-110 transition-transform duration-300 hover:rotate-12 group-hover:shadow-lg' src={logo} alt="Logo" width={40} height={40} />
                             {/* Pulsing ring around logo */}
@@ -141,7 +141,7 @@ export default function Header() {
 
                     {/* Right Nav */}
                     <div className="flex items-center space-x-4 text-lg">
-                        <Link href="#" className="hover:underline hover:text-white transition-all duration-300 hover:scale-105 relative group">
+                        {/* <Link href="#" className="hover:underline hover:text-white transition-all duration-300 hover:scale-105 relative group">
                             <span className="relative z-10">Our Services</span>
                             <div className="absolute inset-0 bg-secondary/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                         </Link>
@@ -152,11 +152,9 @@ export default function Header() {
                         <Link href="#" className="hover:underline hover:text-white transition-all duration-300 hover:scale-105 relative group">
                             <span className="relative z-10">About</span>
                             <div className="absolute inset-0 bg-secondary/10 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
-                        </Link>
+                        </Link> */}
                         <div className="flex items-center space-x-3 ml-4">
-                            <button className="hover:text-gray-300" title="Search">
-                                <Search size={25} />
-                            </button>
+                         
                             {isAuthenticated() ? (
                                 <div className="flex items-center space-x-3">
                                     <Link 
@@ -216,9 +214,7 @@ export default function Header() {
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Repair</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Refurbished</Link>
                             <Link href="#" onClick={toggleSidebar} className="hover:underline">Accessories</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Our Services</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">Blog</Link>
-                            <Link href="#" onClick={toggleSidebar} className="hover:underline">About</Link>
+                        
                         </nav>
                         {isAuthenticated() ? (
                             <div className='p-6 text-[#85a4bf] font-bold text-xl'>
