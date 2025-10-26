@@ -1,5 +1,4 @@
 import React from 'react';
-import { CustomButton } from '@/components/ui/button';
 import MotionFade from '@/components/animations/MotionFade';
 import Link from 'next/link';
 import HeroSection from '@/components/common/HeroSection';
@@ -67,7 +66,7 @@ export default function Repair() {
     ];
 
     return (
-        <div className="pt-16 relative overflow-hidden">
+        <div className="pt-16 relative overflow-hidden ">
 
             <div className="max-w-7xl mx-auto px-4 lg:px-8">
                 
