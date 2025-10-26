@@ -168,7 +168,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       }
 
       // Make API call using apiFetcher
-      await apiFetcher.put(`https://save-co.lumivancelabs.com/api/brandnew/models/${model.id}/`, submitData, {
+      await apiFetcher.patch(`/api/brandnew/models/${model.id}/`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
