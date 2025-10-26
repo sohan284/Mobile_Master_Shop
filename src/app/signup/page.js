@@ -68,7 +68,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#6B7E8D] to-[#0d416e] flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/80 via-primary/90 to-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
@@ -82,7 +82,7 @@ export default function SignupPage() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-[#85a4bf]">Get started with your new account</p>
+          <p className="text-secondary">Get started with your new account</p>
         </div>
 
         {/* Signup Form */}
@@ -113,7 +113,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[#6B7E8D] text-white py-3 cursor-pointer  px-4 rounded-xl font-semibold hover:bg-[#0d416e] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -127,7 +127,7 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <button
               onClick={() => router.push('/login')}
-              className="flex items-center cursor-pointer justify-center text-[#6B7E8D] hover:text-[#0d416e] transition-colors duration-200"
+              className="flex items-center cursor-pointer justify-center text-primary hover:text-primary transition-colors duration-200"
             >
               <ArrowLeft size={16} className="mr-2" />
               Back to Login
@@ -137,7 +137,7 @@ export default function SignupPage() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-[#85a4bf] text-sm">
+          <p className="text-secondary text-sm">
             © 2024 Mobile Shop Repair. All rights reserved.
           </p>
         </div>

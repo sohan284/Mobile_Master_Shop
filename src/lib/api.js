@@ -32,6 +32,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid, clear auth data
       localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
       // Redirect to login page
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
@@ -93,6 +94,9 @@ export const logoutUser = () =>
 
 export const refreshToken = () => 
   apiFetcher.post('/auth/refresh');
+
+export const getCurrentUser = () => 
+  apiFetcher.get('/auth/me/');
 
 // Signup API functions
 export const sendOTP = (email) => 
