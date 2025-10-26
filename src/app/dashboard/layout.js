@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { useAuth } from '@/contexts/AuthContext';
+import UserInfo from '@/components/UserInfo';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useAuth();
 
   return (
-    <ProtectedRoute>
+    <ProtectedRoute requireAdmin={true}>
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -27,17 +26,9 @@ export default function DashboardLayout({ children }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-xl font-semibold text-gray-900"></h1>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Welcome, <span className="font-medium text-gray-900">{user?.username || user?.email || 'Admin'}</span>
-              </div>
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-medium">
-                  {(user?.username || user?.email || 'A').charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
+            <div></div>
+            {/* <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1> */}
+            <UserInfo />
           </div>
           
           {/* Page content */}

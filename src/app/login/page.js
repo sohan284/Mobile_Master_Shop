@@ -86,11 +86,15 @@ export default function LoginPage() {
       toast.dismiss(loadingToast);
       
       if (result.success) {
-        toast.success('Welcome back! Redirecting to dashboard...');
+        toast.success('Welcome back! Redirecting ...');
         // Use setTimeout to ensure toast is visible before redirect
         setTimeout(() => {
-          console.log('Redirecting to dashboard...');
-          router.push('/dashboard');
+          const user = result.user;
+          if (user && user.role === 'admin') {
+            router.push('/dashboard');
+          } else {
+            router.push('/');
+          }
         }, 1000);
       } else {
         const errorMessage = result.error || 'Login failed. Please check your credentials.';
@@ -133,7 +137,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#6B7E8D] to-[#0d416e] flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/80 via-primary/90 to-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
@@ -147,8 +151,7 @@ export default function LoginPage() {
               className="rounded-full bg-white p-2 cursor-pointer"
             />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Admin Login</h1>
-          <p className="text-[#85a4bf]">Access your dashboard</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
         </div>
 
         {/* Login Form */}
@@ -218,7 +221,7 @@ export default function LoginPage() {
                 handleSubmit(e);
               }}
               disabled={isLoading || isSubmitting}
-              className="w-full bg-[#6B7E8D] cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-[#0d416e] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -234,7 +237,7 @@ export default function LoginPage() {
               Don&apos;t have an account?{' '}
               <button
                 onClick={() => router.push('/signup')}
-                className="text-[#6B7E8D] hover:text-[#0d416e] font-medium transition-colors"
+                className="text-[#6B7E8D] hover:text-[#0d416e] font-medium transition-colors cursor-pointer"
               >
                 Create Account
               </button>
@@ -242,20 +245,12 @@ export default function LoginPage() {
           </div>
 
           {/* Admin Access Info */}
-          <div className="mt-6 p-4 bg-[#FEFACD] rounded-xl">
-            <div className="flex items-center mb-2">
-              <Smartphone className="text-[#6B7E8D] mr-2" size={16} />
-              <span className="text-sm font-medium text-[#0d416e]">Admin Access</span>
-            </div>
-            <div className="text-sm text-gray-600">
-              <p>Enter your admin credentials to access the dashboard</p>
-            </div>
-          </div>
+         
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-[#85a4bf] text-sm">
+        <div className="text-center mt-12">
+          <p className="text-secondary text-sm">
             © 2024 Mobile Shop Repair. All rights reserved.
           </p>
         </div>

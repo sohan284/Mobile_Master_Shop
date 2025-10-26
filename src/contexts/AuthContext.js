@@ -3,6 +3,24 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginUser, logoutUser } from '@/lib/api.js';
 
+// Simple encryption/decryption for user data security
+const encryptData = (data) => {
+  const key = 'mlkPhone2024';
+  const encrypted = btoa(JSON.stringify(data) + key);
+  return encrypted;
+};
+
+const decryptData = (encryptedData) => {
+  try {
+    const key = 'mlkPhone2024';
+    const decrypted = atob(encryptedData);
+    const dataString = decrypted.replace(key, '');
+    return JSON.parse(dataString);
+  } catch {
+    return null;
+  }
+};
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -22,10 +40,34 @@ export const AuthProvider = ({ children }) => {
     // Check if user is logged in on app load
     const checkAuth = () => {
       const token = localStorage.getItem('authToken');
+      const encryptedUserData = localStorage.getItem('userData');
       
-      if (token) {
-        // Set a basic user object since we only have the token
-        setUser({ authenticated: true });
+      if (token && encryptedUserData) {
+        try {
+          const decryptedUser = decryptData(encryptedUserData);
+          
+          if (!decryptedUser) {
+            // Data tampered or corrupted, clear auth data
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
+            setUser(null);
+            return;
+          }
+          
+          setUser({ 
+            authenticated: true, 
+            ...decryptedUser,
+            role: decryptedUser.role || 'user',
+            email: decryptedUser.email,
+            name: decryptedUser.name || decryptedUser.username
+          });
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          // Clear invalid data
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userData');
+          setUser(null);
+        }
       }
       setLoading(false);
     };
@@ -49,12 +91,22 @@ export const AuthProvider = ({ children }) => {
       // Handle different response formats
       console.log(response)
       const authToken = response?.tokens?.access || response.access_token || response.data?.token;
-      if (authToken) {
-        localStorage.setItem('authToken', authToken);
+      const userData = response.user || response.data?.user;
+      
+      if (authToken && userData) {
+        const encryptedUserData = encryptData(userData);
         
-        // Set a basic user object since we only have the token
-        setUser({ authenticated: true });
-        return { success: true };
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('userData', encryptedUserData);
+        
+        setUser({ 
+          authenticated: true, 
+          ...userData,
+          role: userData.role || 'user',
+          email: userData.email,
+          name: userData.name || userData.username
+        });
+        return { success: true, user: userData };
       } else {
         return { success: false, error: 'Invalid response from server' };
       }
@@ -92,6 +144,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       // Clear local storage and state
       localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
       setUser(null);
       router.push('/login');
     }
@@ -101,12 +154,22 @@ export const AuthProvider = ({ children }) => {
     return !!user;
   };
 
+  const isAdmin = () => {
+    return user?.role === 'admin';
+  };
+
+  const getUserRole = () => {
+    return user?.role || 'user';
+  };
+
   const value = {
     user,
     loading,
     login,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    isAdmin,
+    getUserRole
   };
 
   return (
