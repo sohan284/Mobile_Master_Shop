@@ -24,7 +24,7 @@ export default function Repair() {
     const repairServices = [
         {
             id: 1,
-            src: "/screen.jpg",
+            src: "/screen.png",
             alt: "Screen Repair",
             title: "Screen Repair",
             description: "Cracked or broken screens",
@@ -34,7 +34,7 @@ export default function Repair() {
         },
         {
             id: 2,
-            src: "/battery.webp",
+            src: "/battery.png",
             alt: "Battery Replacement",
             title: "Battery Replacement",
             description: "Poor battery life",
@@ -44,7 +44,7 @@ export default function Repair() {
         },
         {
             id: 3,
-            src: "/camera.jpg",
+            src: "/camera.png",
             alt: "Camera Repair",
             title: "Camera Repair",
             description: "Blurry or damaged camera",
@@ -54,7 +54,7 @@ export default function Repair() {
         },
         {
             id: 4,
-            src: "/backshell.jpg",
+            src: "/backshell.png",
             alt: "Back Cover",
             title: "Back Shell Repair",
             description: "Damaged back housing",
@@ -92,7 +92,7 @@ export default function Repair() {
   ];
 
     return (
-        <div className="pt-16 relative overflow-hidden text-secondary bg-[#0a1525]">
+        <div className="pt-16 relative overflow-hidden text-secondary">
 
             <div className="container  mx-auto px-4 lg:px-8">
 
@@ -219,7 +219,7 @@ export default function Repair() {
                                         <img
                                             src={item.src}
                                             alt={item.alt}
-                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                            className="w-20 h-20 object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />
                                     </div>
                                 </div>
@@ -231,7 +231,7 @@ export default function Repair() {
                                         <img
                                             src={item.src}
                                             alt={item.alt}
-                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                            className="w-20 h-20 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />
                                     </div>
                                 </div>
