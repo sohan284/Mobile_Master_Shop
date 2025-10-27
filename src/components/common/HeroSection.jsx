@@ -26,9 +26,9 @@ export default function HeroSection({
           <Image
             src={image}
             alt={imageAlt}
-            width={100}
-            height={80}
-            className="w-full max-w-xs mx-auto drop-shadow hover:scale-105 transition-transform duration-500"
+            width={320}
+            height={320}
+            className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] mx-auto drop-shadow hover:scale-105 transition-transform duration-500"
           />
         </div>
       </div>
@@ -38,14 +38,14 @@ export default function HeroSection({
   const ContentComponent = () => (
     <div className="space-y-8">
       <MotionFade delay={0.02} immediate={true}>
-        <div className="inline-flex items-center gap-2 bg-secondary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
-          <span className="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+        <div className="inline-flex items-center gap-2 bg-secondary/20 text-secondary px-4 py-2 rounded-full text-sm font-semibold">
+          <span className="w-2 h-2 bg-secondary text-secondary rounded-full animate-pulse"></span>
           {badgeText}
         </div>
       </MotionFade>
 
       <MotionFade delay={0.03} immediate={true}>
-        <h1 className="font-extrabold text-5xl lg:text-7xl text-primary leading-tight">
+        <h1 className="font-extrabold text-5xl lg:text-7xl text-accent leading-tight">
           {title} <span className="text-secondary relative">
             {subtitle}
             <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary/30" viewBox="0 0 200 12" fill="none">
@@ -56,7 +56,7 @@ export default function HeroSection({
       </MotionFade>
 
       <MotionFade delay={0.04} immediate={true}>
-        <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
+        <p className="text-xl text-accent/80 leading-relaxed max-w-lg">
           {description}
         </p>
       </MotionFade>
@@ -65,7 +65,7 @@ export default function HeroSection({
         <div className="flex flex-col sm:flex-row gap-4">
           {showBackButton && (
             <Link href={backButtonHref}>
-              <CustomButton className="bg-primary text-white hover:bg-primary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300 cursor-pointer">
+              <CustomButton className="bg-secondary text-primary hover:bg-secondary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300 cursor-pointer">
                 {backButtonText}
               </CustomButton>
             </Link>

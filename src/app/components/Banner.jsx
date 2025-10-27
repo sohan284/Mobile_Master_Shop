@@ -11,7 +11,7 @@ import accessories from "../../../public/Accessories.png";
 
 export default function Banner() {
   return (
-    <div className="relative bg-[#0a1525] text-white pb-20 pt-8 overflow-hidden min-h-screen">
+    <div className="relative bg-[#0a1525] text-white pb-20 pt-3 overflow-hidden min-h-screen">
       <div className="container mx-auto px-4 z-10 relative">
         {/* Text Section */}
         <div className="text-center mt-8 md:mt-12">
@@ -28,7 +28,7 @@ export default function Banner() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-6 text-xl md:text-2xl text-gray-300 font-light"
+            className="mt-8 text-xl md:text-2xl text-gray-300 font-light"
           >
             Experience Premium at MLKPHONE.
           </motion.p>
@@ -37,7 +37,7 @@ export default function Banner() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-8 flex justify-center gap-4 flex-wrap"
+            className="mt-6 flex justify-center gap-4 flex-wrap"
           >
             <Link href="/repair">
               <CustomButton className="bg-blue-600 text-white hover:bg-blue-700">
@@ -47,7 +47,7 @@ export default function Banner() {
             <Link href="/phones">
               <CustomButton 
                 variant="outline"
-                className="bg-transparent border-2 border-white text-white hover:bg-white/10"
+                className="bg-transparent border-2 border-white text-white hover:text-white"
               >
                 View Models
               </CustomButton>
@@ -56,7 +56,7 @@ export default function Banner() {
         </div>
 
         {/* Desktop Layout (md and up) */}
-        <div className="hidden md:flex mt-16 md:mt-20 justify-center items-end gap-8 lg:gap-12 px-4 md:px-10 max-w-6xl mx-auto relative z-10">
+        <div className="hidden md:flex mt-6 md:mt-8 justify-center items-end gap-8 lg:gap-12 px-4 md:px-10 max-w-6xl mx-auto relative z-10">
           {/* Repair */}
           <Link href="/repair">
             <motion.div

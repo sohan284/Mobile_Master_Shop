@@ -94,37 +94,37 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[75]">
-      <div className="bg-white/10  rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[75]">
+      <div className="bg-[#39404D] backdrop-blur-sm rounded-2xl shadow-2xl p-8 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <div className="bg-primary rounded-full p-2 mr-3">
-              <Mail className="text-white" size={20} />
+            <div className="bg-secondary rounded-full p-2 mr-3">
+              <Mail className="text-primary" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Verify Email</h2>
-              <p className="text-sm text-gray-600">Enter the code sent to your email</p>
+              <h2 className="text-xl font-bold text-accent">Verify Email</h2>
+              <p className="text-sm text-accent/80">Enter the code sent to your email</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-accent/60 hover:text-accent transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Email Display */}
-        <div className="bg-gray-50 rounded-xl p-4 mb-6">
-          <p className="text-sm text-gray-600">Code sent to:</p>
-          <p className="font-medium text-gray-900">{email}</p>
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-6">
+          <p className="text-sm text-accent/80">Code sent to:</p>
+          <p className="font-medium text-accent">{email}</p>
         </div>
 
         {/* OTP Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-accent mb-3">
               Enter 6-digit verification code
             </label>
             <div className="flex space-x-2 justify-center">
@@ -140,7 +140,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-12 text-center text-lg font-bold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  className="w-12 h-12 text-center text-lg font-bold border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                 />
               ))}
             </div>
@@ -153,13 +153,13 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                 type="button"
                 onClick={handleResend}
                 disabled={isLoading}
-                className="text-primary hover:text-primary/80 font-medium transition-colors disabled:opacity-50"
+                className="text-secondary hover:text-secondary/80 font-medium transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RotateCcw size={16} className="inline mr-1" />
                 Resend Code
               </button>
             ) : (
-              <p className="text-gray-500 text-sm">
+              <p className="text-accent/60 text-sm cursor-pointer">
                 Resend code in {timeLeft}s
               </p>
             )}
@@ -169,10 +169,10 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
           <button
             type="submit"
             disabled={isLoading || otp.join('').length !== 6}
-            className="w-full bg-primary text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full cursor-pointer bg-secondary text-primary py-3 px-4 rounded-xl font-semibold hover:bg-secondary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
             ) : (
               'Verify Code'
             )}

@@ -123,7 +123,7 @@ export default function DataTable({
       <div className="px-6 py-4 border-b">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+            <p className="text-lg font-semibold text-gray-900">{title}</p>
             <p className="text-sm text-muted-foreground">
               {filteredData.length} {filteredData.length === 1 ? 'item' : 'items'}
             </p>

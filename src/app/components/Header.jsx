@@ -46,7 +46,7 @@ export default function Header() {
 
   return (
     <header
-      className={`bg-[#0a1525] text-secondary w-full pt-4 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
+      className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
     >

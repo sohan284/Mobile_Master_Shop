@@ -8,6 +8,7 @@ import OTPVerificationPopup from './components/OTPVerificationPopup';
 import CredentialsSetupPopup from './components/CredentialsSetupPopup';
 import { sendOTP } from '@/lib/api.js';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -68,40 +69,42 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/80 via-primary/90 to-primary flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/90 via-primary/95 to-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Image 
-              src={logo} 
-              alt="Logo" 
-              width={80} 
-              height={80}
-              className="rounded-full bg-white/10  p-2 cursor-pointer"
-            />
+          <Link href="/" className="group relative text-secondary">
+             <div className="flex items-center gap-2">
+            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-xl font-semibold tracking-wide">MLKPHONE</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-secondary">Get started with your new account</p>
+          </Link>
+          </div>
+
         </div>
 
         {/* Signup Form */}
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="signup-form">
+          <h1 className="text-3xl font-bold text-accent mb-2">Create Account</h1>
+          <p className="text-secondary">Get started with your new account</p>
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-accent mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
                 <input
                   id="email"
                   name="signup-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7E8D] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                   placeholder="Enter your email address"
                   autoComplete="off"
                   required
@@ -113,10 +116,10 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-secondary cursor-pointer text-primary py-3 px-4 rounded-xl font-semibold hover:bg-secondary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
               ) : (
                 'Send Verification Code'
               )}
@@ -127,7 +130,7 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <button
               onClick={() => router.push('/login')}
-              className="flex items-center cursor-pointer justify-center text-primary hover:text-primary transition-colors duration-200"
+              className="flex items-center cursor-pointer justify-center text-accent hover:text-secondary transition-colors duration-200"
             >
               <ArrowLeft size={16} className="mr-2" />
               Back to Login

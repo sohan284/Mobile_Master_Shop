@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import OTPVerificationPopup from '@/app/signup/components/OTPVerificationPopup';
 import CredentialsSetupPopup from '@/app/signup/components/CredentialsSetupPopup';
+import Link from 'next/link';
 
 const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'signup'
@@ -193,19 +194,20 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-[#39404D] backdrop-blur-sm border border-accent/20">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="">
             <div className="flex justify-center mb-4">
-              <Image 
-                src={logo} 
-                alt="Logo" 
-                width={60} 
-                height={60}
-                className="rounded-full bg-primary/10 p-2"
-              />
+            <Link href="/" className="group relative text-secondary">
+             <div className="flex items-center gap-2">
+            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-xl font-semibold tracking-wide">MLKPHONE</span>
+          </div>
+          </Link>
             </div>
-            <span className="text-2xl font-bold text-gray-800">
+            <span className="text-2xl font-bold text-accent test-start">
               {activeTab === 'login' ? 'Login' : 'Sign Up'}
             </span>
           </DialogTitle>
@@ -216,11 +218,11 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
               <form onSubmit={handleLogin}>
                 {/* Username or Email Field */}
                 <div>
-                  <label htmlFor="modal-userName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="modal-userName" className="block text-sm font-medium text-accent mb-2">
                     Username or Email
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
                     <input
                       id="modal-userName"
                       name="login-username"
@@ -228,24 +230,24 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                       placeholder="Enter your userName or email"
                       autoComplete="off"
                       required
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-accent/80">
                     You can use either your userName or email address to sign in
                   </p>
                 </div>
 
                 {/* Password Field */}
                 <div>
-                  <label htmlFor="modal-password" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="modal-password" className="block text-sm font-medium text-accent mb-2">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
                     <input
                       id="modal-password"
                       name="login-password"
@@ -253,7 +255,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleLogin(e)}
-                      className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                       placeholder="Enter your password"
                       autoComplete="new-password"
                       required
@@ -261,7 +263,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent/60 hover:text-accent"
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
@@ -277,10 +279,10 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                     handleLogin(e);
                   }}
                   disabled={isLoading || isSubmitting}
-                  className="w-full mt-4 bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full mt-4 bg-secondary cursor-pointer text-primary py-3 px-4 rounded-xl font-semibold hover:bg-secondary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {isLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                   ) : (
                     'Sign In'
                   )}
@@ -290,11 +292,11 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
               <form onSubmit={handleSignup}>
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="modal-email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="modal-email" className="block text-sm font-medium text-accent mb-2">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
                     <input
                       id="modal-email"
                       name="signup-email"
@@ -302,13 +304,13 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSignup(e)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                       placeholder="Enter your email address"
                       autoComplete="email"
                       required
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-accent/80">
                     We'll send you a verification code
                   </p>
                 </div>
@@ -322,10 +324,10 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                     handleSignup(e);
                   }}
                   disabled={isLoading || isSubmitting}
-                  className="w-full mt-4 bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full mt-4 bg-secondary cursor-pointer text-primary py-3 px-4 rounded-xl font-semibold hover:bg-secondary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {isLoading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                   ) : (
                     'Send Verification Code'
                   )}
@@ -335,13 +337,13 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
 
           {/* Footer */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className="text-accent/80 text-sm">
               {activeTab === 'login' ? (
                 <>
                   Don&apos;t have an account?{' '}
                   <button
                     onClick={() => setActiveTab('signup')}
-                    className="text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer"
+                    className="text-secondary hover:text-secondary/80 font-medium transition-colors cursor-pointer"
                   >
                     Create Account
                   </button>
@@ -351,7 +353,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, redirectPath }) => {
                   Already have an account?{' '}
                   <button
                     onClick={() => setActiveTab('login')}
-                    className="text-primary hover:text-primary/80 font-medium transition-colors cursor-pointer"
+                    className="text-secondary hover:text-secondary/80 font-medium transition-colors cursor-pointer"
                   >
                     Sign In
                   </button>

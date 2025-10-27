@@ -21,8 +21,8 @@ const NotFound = ({
       <div className="relative z-10 mb-6">
         {/* Animated Icon */}
         <div className="mx-auto w-32 h-32 mb-6 relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full animate-pulse"></div>
-          <div className="absolute inset-2 bg-white/10  rounded-full flex items-center justify-center shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-br  from-secondary/20 to-secondary/40 rounded-full animate-pulse"></div>
+          <div className="absolute inset-2 bg-secondary/20  rounded-full flex items-center justify-center shadow-lg">
             {icon || (
               <div className="relative">
                 {/* Phone icon with pulse effect */}
@@ -70,7 +70,7 @@ const NotFound = ({
                 <Link 
                   href={primaryAction.href || '#'} 
                   onClick={primaryAction.onClick}
-                  className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+                  className="inline-block bg-secondary text-primary px-6 py-3 rounded-lg hover:bg-secondary/90 transition-colors"
                 >
                   {primaryAction.text}
                 </Link>

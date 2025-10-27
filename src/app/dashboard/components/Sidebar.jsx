@@ -98,7 +98,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Admin Panel</h2>
+          <p className="text-lg font-semibold text-gray-900">Admin Panel</p>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600"

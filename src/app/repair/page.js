@@ -85,9 +85,9 @@ export default function RepairPage() {
             image="/1.png"
             imageAlt="Phone Repair"
             badgeText="Professional Repair Services"
-             backButtonText="← Back to Home"
-             showBackButton={true}
-    backButtonHref="/"
+            backButtonText="← Back to Home"
+            showBackButton={true}
+            backButtonHref="/"
           />
 
           {/* Search Section */}
@@ -150,13 +150,14 @@ export default function RepairPage() {
             title="Why Choose Our Repair Services?"
             description="Professional repair services with guaranteed quality and customer satisfaction."
             features={[
-              { title: "Fast Service", description: "Quick turnaround times with same-day service available", icon: "⚡" },
+              { title: "Fast Service", description: "Quick  times with same-day service available", icon: "⚡" },
               { title: "12 Month Warranty", description: "Full coverage for peace of mind on all repairs", icon: "🛡️" },
-              { title: "Expert Technicians", description: "Certified professionals with years of experience", icon: "🔧" }
+              { title: "Expert Technicians", description: "Certified professionals with years of experience", icon: "🔧" },
+              { title: "Free Diagnosis", description: " Device assessment before any repair work", icon: "🔍" }
             ]}
           />
 
-          {/* CTA Section */}
+          {/* CTA Section
           <CTASection
             title="Ready to Get Your Device Fixed?"
             description="Choose your brand above to get started with professional repair services!"
@@ -165,7 +166,7 @@ export default function RepairPage() {
               href: "/repair"
             }}
             features={["Free Diagnosis", "Same Day Service", "12 Month Warranty"]}
-          />
+          /> */}
         </div>
       </div>
     </PageTransition>

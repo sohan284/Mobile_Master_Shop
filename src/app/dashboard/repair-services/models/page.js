@@ -124,7 +124,7 @@ export default function ModelsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Models Management</h1>
+        <p className="text-2xl font-bold text-gray-900">Models Management</p>
         <p className="text-gray-600">Manage phone models and their information</p>
       </div>
 

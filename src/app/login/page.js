@@ -6,6 +6,7 @@ import { Eye, EyeOff, Lock, Mail, User, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import logo from "@/assets/mlkLogo.png";
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [userName, setUserName] = useState('');
@@ -137,33 +138,34 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/80 via-primary/90 to-primary flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/90 via-primary/95 to-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Image 
-              src={logo} 
-              alt="Logo" 
-              width={80} 
-              height={80} 
-              onClick={() => router.push('/')}
-              className="rounded-full bg-white/10  p-2 cursor-pointer"
-            />
+          <Link href="/" className="group relative text-secondary">
+             <div className="flex items-center gap-2">
+            <svg className="w-10 h-10" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-xl font-semibold tracking-wide">MLKPHONE</span>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
+          </Link>
+          </div>
+         
         </div>
 
         {/* Login Form */}
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <div className="space-y-6" role="form" aria-label="Login form">
             {/* Username or Email Field */}
+             <h1 className="text-3xl font-bold text-accent mb-2">Login</h1>
             <div>
-              <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="userName" className="block text-sm font-medium text-accent mb-2">
                 Username or Email
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
                 <input
                   id="userName"
                   name="login-username"
@@ -171,24 +173,24 @@ export default function LoginPage() {
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7E8D] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                   placeholder="Enter your userName or email"
                   autoComplete="off"
                   required
                 />
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-accent/80">
                 You can use either your userName or email address to sign in
               </p>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-accent mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
                 <input
                   id="password"
                   name="login-password"
@@ -196,7 +198,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6B7E8D] focus:border-transparent"
+                  className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
                   placeholder="Enter your password"
                   autoComplete="new-password"
                   required
@@ -204,7 +206,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent hover:text-accent/80"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -221,10 +223,10 @@ export default function LoginPage() {
                 handleSubmit(e);
               }}
               disabled={isLoading || isSubmitting}
-              className="w-full bg-primary/90 cursor-pointer text-white py-3 px-4 rounded-xl font-semibold hover:bg-primary/95 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-secondary cursor-pointer text-primary py-3 px-4 rounded-xl font-semibold hover:bg-secondary/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
               ) : (
                 'Sign In'
               )}
@@ -233,11 +235,11 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+            <p className="text-accent text-sm">
               Don&apos;t have an account?{' '}
               <button
                 onClick={() => router.push('/signup')}
-                className="text-[#6B7E8D] hover:text-[#0d416e] font-medium transition-colors cursor-pointer"
+                className="text-secondary hover:text-secondary/80 font-medium transition-colors cursor-pointer"
               >
                 Create Account
               </button>

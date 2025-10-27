@@ -132,8 +132,8 @@ export default function PhoneModelPage({ params }) {
 
     return (
         <PageTransition>
-            <div className="min-h-screen relative overflow-hidden">
-                <div className="container  mx-auto px-4 py-8">
+            <div className="min-h-screen relative overflow-hidden bg-primary">
+                <div className="container mx-auto px-4 py-8">
                     
                     {/* Hero Section */}
                     {React.useMemo(() => (
@@ -163,13 +163,13 @@ export default function PhoneModelPage({ params }) {
                         {/* Warning Message */}
                         {!servicesLoading && repairServices.length > 0 && selectedServices.length >= 3 && (
                         <MotionFade delay={0.2} immediate={true}>
-                            <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-md">
+                            <div className="mb-6 p-4 bg-secondary/20 border-l-4 border-secondary rounded-md">
                                 <div className="flex">
                                     <div className="flex-shrink-0">
-                                        <span className="text-yellow-400 text-xl">⚠️</span>
+                                        <span className="text-secondary text-xl">⚠️</span>
                                     </div>
                                     <div className="ml-3">
-                                        <p className="text-sm text-yellow-700">
+                                        <p className="text-sm text-accent">
                                             <strong>Maximum limit reached:</strong> You can select up to 3 services. 
                                             Deselect a service to choose a different one.
                                         </p>
@@ -217,38 +217,38 @@ export default function PhoneModelPage({ params }) {
                         renderItem={(service) => (
                             <div 
                                 onClick={() => handleServiceSelect(service.id)}
-                                className={`p-4 rounded-lg shadow transition-all duration-300 border-2 cursor-pointer ${
+                                className={`p-4 rounded-lg shadow transition-all duration-300 border-2 cursor-pointer flex flex-col ${
                                     service.isSelected 
-                                        ? 'border-primary shadow-primary bg-primary/5' 
+                                        ? 'border-secondary shadow-secondary bg-secondary/10 h-48' 
                                         : service.isDisabled
-                                        ? 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
-                                        : 'bg-white/10  border-gray-100 hover:border-primary/50 hover:shadow-lg'
+                                        ? 'bg-white/5 border-accent/20 cursor-not-allowed opacity-60'
+                                        : 'bg-white/10 backdrop-blur-sm border-accent/20 hover:border-secondary/50 hover:shadow-lg'
                                 }`}
                             >
                                 <div className="flex items-center mb-3">
                                     <div className="text-xl mr-2">{service.icon}</div>
                                     <h3 className={`font-semibold text-sm ${
-                                        service.isSelected ? 'text-primary' : 'text-gray-800'
+                                        service.isSelected ? 'text-secondary' : 'text-accent'
                                     }`}>
                                         {service.name}
                                     </h3>   
                                     {service.isSelected && (
                                         <div className="ml-auto">
-                                            <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                                                <span className="text-white text-xs">✓</span>
+                                            <div className="w-5 h-5 bg-secondary rounded-full flex items-center justify-center">
+                                                <span className="text-primary text-xs">✓</span>
                                             </div>
                                         </div>
                                     )}
                                 </div>
                                 <p className={`mb-3 text-xs ${
-                                    service.isSelected ? 'text-primary' : service.isDisabled ? 'text-gray-400' : 'text-gray-600'
+                                    service.isSelected ? 'text-secondary' : service.isDisabled ? 'text-accent/40' : 'text-accent/80'
                                 }`}>
                                     {service.description}
                                 </p>
                                 
                                 {/* Part Type Selection - Only show when service is selected */}
                                 {service.isSelected && (
-                                    <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+                                    <div className="mb-3 p-2 bg-white/5 backdrop-blur-sm rounded-lg">
                                       
                                         
                                         <div className="grid grid-cols-2 gap-2">
@@ -260,10 +260,10 @@ export default function PhoneModelPage({ params }) {
                                                 disabled={!service.hasOriginal}
                                                 className={`px-3 py-2 text-xs cursor-pointer rounded-md transition-colors ${
                                                     service.partType === 'original'
-                                                        ? 'bg-primary text-white'
+                                                        ? 'bg-secondary text-primary'
                                                         : service.hasOriginal
-                                                        ? 'bg-white/10  border border-gray-300 text-gray-700 hover:bg-gray-50'
-                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                        ? 'bg-white/10 backdrop-blur-sm border border-accent/30 text-accent hover:bg-white/20'
+                                                        : 'bg-white/5 text-accent/40 cursor-not-allowed'
                                                 }`}
                                             >
                                                 <div className="text-center">
@@ -287,10 +287,10 @@ export default function PhoneModelPage({ params }) {
                                                 disabled={!service.hasDuplicate}
                                                 className={`px-3 py-2 text-xs cursor-pointer rounded-md transition-colors ${
                                                     service.partType === 'duplicate'
-                                                        ? 'bg-primary text-white'
+                                                        ? 'bg-secondary text-primary'
                                                         : service.hasDuplicate
-                                                        ? 'bg-white/10  border border-gray-300 text-gray-700 hover:bg-gray-50'
-                                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                        ? 'bg-white/10 backdrop-blur-sm border border-accent/30 text-accent hover:bg-white/20'
+                                                        : 'bg-white/5 text-accent/40 cursor-not-allowed'
                                                 }`}
                                             >
                                                 <div className="text-center">
@@ -305,10 +305,10 @@ export default function PhoneModelPage({ params }) {
                                               
                                                 </div>
                                             </button>
-                                            <div className="text-xs opacity-90 mt-1 text-center">
+                                            <div className="text-xs text-accent/80 mt-1 text-center">
                                                         Original
                                                     </div>
-                                            <div className="text-xs opacity-90 mt-1 text-center">
+                                            <div className="text-xs text-accent/80 mt-1 text-center">
                                                         Compatible
                                                     </div>
                                         </div>
@@ -317,7 +317,7 @@ export default function PhoneModelPage({ params }) {
                                 
                                 {service.price && (
                                     <div className="text-right">
-                                        <span className="text-sm font-bold text-primary">{service.price}</span>
+                                        <span className="text-sm font-bold text-secondary">{service.price}</span>
                                     </div>
                                 )}
                             </div>
@@ -329,7 +329,7 @@ export default function PhoneModelPage({ params }) {
                             <div className="text-center mb-8">
                                 <CustomButton 
                                     onClick={handleContinueToBreakdown}
-                                    className='bg-primary text-white hover:bg-primary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'
+                                    className='bg-secondary text-primary hover:bg-secondary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'
                                 >
                                 Continue with {selectedServices.length} selected service{selectedServices.length > 1 ? 's' : ''}
                                 </CustomButton>
@@ -350,16 +350,7 @@ export default function PhoneModelPage({ params }) {
 
                 
 
-                    {/* CTA Section */}
-                    <CTASection
-                        title="Ready to Get Your Device Fixed?"
-                        description="Select your repair services above to get started with professional repair services!"
-                        primaryAction={{
-                            text: "Get Instant Quote",
-                            href: "/repair"
-                        }}
-                        features={["Free Diagnosis", "Same Day Service", "12 Month Warranty"]}
-                    />
+                 
             </div>
          </div>
         </PageTransition>

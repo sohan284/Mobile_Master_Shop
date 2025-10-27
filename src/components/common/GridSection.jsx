@@ -35,12 +35,12 @@ export default function GridSection({
         }
       }}
     >
-      <div className="group relative bg-white/10  h-full p-6 rounded-md shadow hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center justify-center border border-gray-100 hover:border-secondary/50 hover:-translate-y-2 overflow-hidden">
+      <div className="group relative bg-white/10 backdrop-blur-sm h-full p-6 rounded-md shadow hover:shadow-lg transition-all duration-300 cursor-pointer text-center flex flex-col items-center justify-center border border-accent/20 hover:border-secondary/50 hover:-translate-y-2 overflow-hidden">
         {/* Animated border effect */}
         <div className="absolute inset-0 rounded-md border-2 border-transparent group-hover:border-secondary/20 transition-all duration-300"></div>
         
         {/* Background gradient on hover */}
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></div>
         
         {/* Content */}
         <div className="relative z-10">
@@ -53,7 +53,7 @@ export default function GridSection({
               className="object-contain group-hover:scale-110 transition-transform duration-300"
             />
           </div>
-          <h3 className="font-semibold text-primary group-hover:text-secondary transition-colors duration-300">
+          <h3 className="font-semibold text-accent group-hover:text-secondary transition-colors duration-300">
             {item.name || item.title}
           </h3>
         </div>
@@ -65,8 +65,8 @@ export default function GridSection({
     <div className={`mb-16 ${className}`}>
       {title && (
         <div className="text-center mb-12">
-          <h3 className="text-3xl font-bold text-primary mb-4">{title}</h3>
-          <p className="text-gray-600 max-w-2xl mx-auto">{description}</p>
+          <h3 className="text-3xl font-bold text-secondary mb-4">{title}</h3>
+          <p className="text-accent/80 max-w-2xl mx-auto">{description}</p>
         </div>
       )}
 
@@ -75,7 +75,7 @@ export default function GridSection({
         <MotionFade delay={0.15} immediate={true}>
           <div className={`grid ${gridCols} gap-6`}>
             {Array.from({ length: loadingCount }).map((_, index) => (
-              <div key={index} className="bg-white/10  p-6 rounded-md shadow hover:shadow-lg transition-all duration-300">
+              <div key={index} className="bg-white/10 backdrop-blur-sm p-6 rounded-md shadow hover:shadow-lg transition-all duration-300">
                 <div className="flex flex-col items-center justify-center">
                   <Skeleton className="w-16 h-16 rounded mb-4" />
                   <Skeleton className="w-20 h-4" />

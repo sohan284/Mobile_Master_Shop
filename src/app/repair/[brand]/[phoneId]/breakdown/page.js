@@ -183,12 +183,81 @@ export default function PriceBreakdownPage({ params }) {
     if (isLoading) {
         return (
             <PageTransition>
-                <div className="min-h-screen relative overflow-hidden">
-                    <div className="container  mx-auto px-4 py-8">
-                        <div className="text-center">
-                            <Skeleton className="h-8 w-64 mx-auto mb-4" />
-                            <Skeleton className="h-4 w-96 mx-auto mb-8" />
-                            <Skeleton className="h-64 w-full mb-8" />
+                <div className="min-h-screen relative overflow-hidden bg-primary">
+                    <div className="container mx-auto px-4 py-8">
+                        
+                        {/* Hero Section Skeleton */}
+                        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 mb-12">
+                            {/* Image Skeleton */}
+                            <div className="flex-shrink-0">
+                                <Skeleton className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] rounded-2xl bg-white/10" />
+                            </div>
+                            
+                            {/* Content Skeleton */}
+                            <div className="flex-1 text-center lg:text-left">
+                                <Skeleton className="h-12 w-48 mx-auto lg:mx-0 mb-4 bg-white/10" />
+                                <Skeleton className="h-16 w-64 mx-auto lg:mx-0 mb-6 bg-white/10" />
+                                <Skeleton className="h-6 w-96 mx-auto lg:mx-0 mb-8 bg-white/10" />
+                                <Skeleton className="h-12 w-40 mx-auto lg:mx-0 bg-white/10" />
+                            </div>
+                        </div>
+
+                        {/* Price Breakdown Card Skeleton */}
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+                            <Skeleton className="h-8 w-64 mb-6 bg-white/10" />
+                            
+                            {/* Device Info Skeleton */}
+                            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
+                                <div className="flex items-center">
+                                    <Skeleton className="w-12 h-12 rounded-lg bg-white/10" />
+                                    <div className="ml-4 flex-1">
+                                        <Skeleton className="h-6 w-48 mb-2 bg-white/10" />
+                                        <Skeleton className="h-4 w-32 bg-white/10" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Selected Services Skeleton */}
+                            <div className="mb-6">
+                                <Skeleton className="h-6 w-40 mb-4 bg-white/10" />
+                                <div className="space-y-3">
+                                    {[1, 2, 3].map((item) => (
+                                        <div key={item} className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
+                                            <div className="flex-1">
+                                                <Skeleton className="h-5 w-32 mb-2 bg-white/10" />
+                                                <Skeleton className="h-4 w-24 bg-white/10" />
+                                            </div>
+                                            <div className="text-right">
+                                                <Skeleton className="h-6 w-16 bg-white/10" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Price Summary Skeleton */}
+                            <div className="border-t border-accent/20 pt-6">
+                                <div className="space-y-3">
+                                    {[1, 2, 3, 4].map((item) => (
+                                        <div key={item} className="flex justify-between">
+                                            <Skeleton className="h-4 w-32 bg-white/10" />
+                                            <Skeleton className="h-4 w-16 bg-white/10" />
+                                        </div>
+                                    ))}
+                                    <div className="border-t border-accent/20 pt-3">
+                                        <div className="flex justify-between">
+                                            <Skeleton className="h-6 w-40 bg-white/10" />
+                                            <Skeleton className="h-6 w-20 bg-white/10" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Action Buttons Skeleton */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Skeleton className="h-12 w-40 bg-white/10" />
+                            <Skeleton className="h-12 w-48 bg-white/10" />
                         </div>
                     </div>
                 </div>
@@ -199,7 +268,7 @@ export default function PriceBreakdownPage({ params }) {
     if (error && !priceData) {
         return (
             <PageTransition>
-                <div className="min-h-screen relative overflow-hidden">
+                <div className="min-h-screen relative overflow-hidden bg-primary">
                     <div className="container  mx-auto px-4 py-8">
                         <div className="text-center">
                             <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
@@ -236,8 +305,8 @@ export default function PriceBreakdownPage({ params }) {
 
     return (
         <PageTransition>
-            <div className="min-h-screen relative overflow-hidden">
-                <div className="container  mx-auto px-4 py-8">
+            <div className="min-h-screen relative overflow-hidden bg-primary">
+                <div className="container mx-auto px-4 py-8">
                     
                     {/* Hero Section */}
                     <HeroSection
@@ -256,12 +325,12 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Warning for fallback pricing */}
                     {error && priceData && (
                         <MotionFade delay={0.1} immediate={true}>
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                            <div className="bg-secondary/20 border border-secondary rounded-lg p-4 mb-6">
                                 <div className="flex items-center">
-                                    <div className="text-yellow-600 text-xl mr-3">⚠️</div>
+                                    <div className="text-secondary text-xl mr-3">⚠️</div>
                                     <div>
-                                        <h3 className="font-semibold text-yellow-800">Estimated Pricing</h3>
-                                        <p className="text-yellow-700 text-sm">{error}</p>
+                                        <h3 className="font-semibold text-accent">Estimated Pricing</h3>
+                                        <p className="text-accent/80 text-sm">{error}</p>
                                     </div>
                                 </div>
                             </div>
@@ -271,40 +340,40 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Price Breakdown */}
                     {priceData && (
                         <MotionFade delay={0.2} immediate={true}>
-                            <div className="bg-white/10  rounded-xl shadow-lg border border-gray-200 p-8 mb-8">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-6">Repair Cost Breakdown</h2>
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+                                <h2 className="text-2xl font-bold text-secondary mb-6">Repair Cost Breakdown</h2>
                                 
                                 {/* Device Info */}
-                                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
                                     <div className="flex items-center">
-                                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mr-4">
+                                        <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mr-4">
                                             <span className="text-2xl">📱</span>
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold text-lg text-gray-800">{priceData.phone_model}</h3>
-                                            <p className="text-gray-600">{priceData.brand}</p>
+                                            <h3 className="font-semibold text-lg text-accent">{priceData.phone_model}</h3>
+                                            <p className="text-accent/80">{priceData.brand}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Selected Services */}
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Selected Services</h3>
+                                    <h3 className="text-lg font-semibold text-accent mb-4">Selected Services</h3>
                                     <div className="space-y-3">
                                         {priceData.items.map((item, index) => (
-                                            <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                                            <div key={index} className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
                                                 <div>
-                                                    <h4 className="font-medium text-gray-800">{item.problem_name}</h4>
-                                                    <p className="text-sm text-gray-600">
+                                                    <h4 className="font-medium text-accent">{item.problem_name}</h4>
+                                                    <p className="text-sm text-accent/80">
                                                         Part Type: <span className="font-medium capitalize">{item.part_type}</span>
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-lg font-bold text-primary">
+                                                    <div className="text-lg font-bold text-secondary">
                                                         {parseFloat(item.final_price).toFixed(2)}
                                                     </div>
                                                     {parseFloat(item.discount) > 0 && (
-                                                        <div className="text-sm text-green-600">
+                                                        <div className="text-sm text-secondary/80">
                                                             -{parseFloat(item.discount).toFixed(2)} discount
                                                         </div>
                                                     )}
@@ -315,41 +384,41 @@ export default function PriceBreakdownPage({ params }) {
                                 </div>
 
                                 {/* Price Summary */}
-                                <div className="border-t border-gray-200 pt-6">
+                                <div className="border-t border-accent/20 pt-6">
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Subtotal:</span>
-                                            <span className="font-medium">{parseFloat(priceData.subtotal).toFixed(2)}</span>
+                                            <span className="text-accent/80">Subtotal:</span>
+                                            <span className="font-medium text-accent">{parseFloat(priceData.subtotal).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.item_discount) > 0 && (
-                                            <div className="flex justify-between text-green-600">
+                                            <div className="flex justify-between text-secondary">
                                                 <span>Item Discount:</span>
                                                 <span>-{parseFloat(priceData.item_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
                                         <div className="flex justify-between">
-                                            <span className="text-gray-600">Price after item discount:</span>
-                                            <span className="font-medium">{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
+                                            <span className="text-accent/80">Price after item discount:</span>
+                                            <span className="font-medium text-accent">{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.website_discount) > 0 && (
-                                            <div className="flex justify-between text-green-600">
+                                            <div className="flex justify-between text-secondary">
                                                 <span>Website Discount ({priceData.website_discount_percentage}%):</span>
                                                 <span>-{parseFloat(priceData.website_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
-                                        <div className="border-t border-gray-200 pt-3">
+                                        <div className="border-t border-accent/20 pt-3">
                                             <div className="flex justify-between text-lg font-bold">
-                                                <span>Total Amount:</span>
-                                                <span className="text-primary">{parseFloat(priceData.total_amount).toFixed(2)}</span>
+                                                <span className="text-accent">Total Amount:</span>
+                                                <span className="text-secondary">{parseFloat(priceData.total_amount).toFixed(2)}</span>
                                             </div>
                                         </div>
                                         
                                         {parseFloat(priceData.total_discount) > 0 && (
-                                            <div className="text-center text-green-600 font-medium">
+                                            <div className="text-center text-secondary font-medium">
                                                 You saved {parseFloat(priceData.total_discount).toFixed(2)}!
                                             </div>
                                         )}
@@ -364,14 +433,14 @@ export default function PriceBreakdownPage({ params }) {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <CustomButton 
                                 onClick={handleBackToServices}
-                                className="bg-gray-500 text-white hover:bg-gray-600 px-8 py-3"
+                                className="bg-accent/20 text-accent hover:bg-accent/30 px-8 py-3"
                             >
                                 ← Back to Services
                             </CustomButton>
                             
                             <CustomButton 
                                 onClick={handleProceedToBooking}
-                                className="bg-primary text-white hover:bg-primary/90 px-8 py-3"
+                                className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
                             >
                                 Proceed to Booking →
                             </CustomButton>
