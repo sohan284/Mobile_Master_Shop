@@ -269,13 +269,14 @@ export default function Refurbished() {
                         <div className="absolute top-2 left-2 w-8 h-8 bg-secondary rounded-full"></div>
                         <div className="absolute bottom-2 right-2 w-6 h-6 bg-primary rounded-full"></div>
                       </div>
-                      <Image
-                        src={path}
-                        alt={name}
-                        width={160}
-                        height={160}
-                        // className="w-42 h-48 object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
-                      />
+                      <div className='flex justify-center items-center'>
+                        <Image
+                          src={path}
+                          alt={name}
+                          width={160}
+                          height={160}
+                        />
+                      </div>
                     </div>
 
                     <div className="flex-grow flex flex-col justify-between">
@@ -305,7 +306,7 @@ export default function Refurbished() {
           </Swiper>
 
           {/* Custom Navigation */}
-          <div className="absolute flex -top-12 right-0 justify-center items-center mt-2">
+          <div className="absolute top-24 md:top-16 right-0 flex gap-2">
             <button className="swiper-button-prev-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
@@ -321,8 +322,6 @@ export default function Refurbished() {
                 />
               </svg>
             </button>
-
-            <div className="swiper-pagination-custom flex gap-3"></div>
 
             <button className="swiper-button-next-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
               <svg
@@ -343,48 +342,48 @@ export default function Refurbished() {
         </motion.div>
 
         {/* Features Section - Banner Style */}
-         <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.6 }}
-      className="mb-16"
-    >
-      <div className="text-center mb-12">
-        <h3 className="text-3xl font-bold mb-4 text-white">Why Choose Our New Phones?</h3>
-        <p className="text-gray-300 text-lg">Premium quality phones with comprehensive warranty and support.</p>
-      </div>
-      
-      <div className="grid md:grid-cols-3 gap-8">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          return (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-              className="group relative"
-            >
-              <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
-                {/* Gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
-                
-                {/* Icon container with gradient background */}
-                <div className="relative mb-6 inline-flex">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300`}></div>
-                  <div className={`relative bg-gradient-to-br ${feature.gradient} p-4 rounded-2xl shadow-lg`}>
-                    <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="mb-16"
+        >
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4 text-white">Why Choose Our New Phones?</h3>
+            <p className="text-gray-300 text-lg">Premium quality phones with comprehensive warranty and support.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
+                  className="group relative"
+                >
+                  <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
+                    {/* Gradient background on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
+
+                    {/* Icon container with gradient background */}
+                    <div className="relative mb-6 inline-flex">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300`}></div>
+                      <div className={`relative bg-gradient-to-br ${feature.gradient} p-4 rounded-2xl shadow-lg`}>
+                        <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                      </div>
+                    </div>
+
+                    <h4 className="text-xl font-bold mb-3 text-white">{feature.title}</h4>
+                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
                   </div>
-                </div>
-                
-                <h4 className="text-xl font-bold mb-3 text-white">{feature.title}</h4>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </motion.div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
