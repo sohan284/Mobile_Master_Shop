@@ -13,7 +13,7 @@ h4,
 h2,
 h3 {
   font-family: var(--font-nunito), sans-serif;
-  color: white;
+  /* color: white; */
 }
 
 @theme inline {

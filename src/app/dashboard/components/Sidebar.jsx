@@ -94,10 +94,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white/10  shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        fixed inset-y-0 left-0 z-50 w-64 bg-white/10   shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
           <p className="text-lg font-semibold text-gray-900">Admin Panel</p>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -107,7 +107,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </button>
         </div>
         
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-white" >
           <nav className="mt-8 px-4 flex flex-col justify-between h-[90vh]">
             <ul className="space-y-2">
               {navigation.map((item) => {

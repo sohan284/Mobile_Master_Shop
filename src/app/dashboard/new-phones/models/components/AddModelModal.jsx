@@ -32,7 +32,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     icon: null,
     iconPreview: null,
     stock_quantity: '',
-    colors: []
+    color_ids: []
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,9 +70,9 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
   const handleColorChange = (colorId, checked) => {
     setFormData(prev => ({
       ...prev,
-      colors: checked 
-        ? [...prev.colors, colorId]
-        : prev.colors.filter(id => id !== colorId)
+      color_ids: checked 
+        ? [...prev.color_ids, colorId]
+        : prev.color_ids.filter(id => id !== colorId)
     }));
   };
 
@@ -120,9 +120,19 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       submitData.append('description', formData.description.trim());
       submitData.append('stock_quantity', formData.stock_quantity || '0');
       
-      // Add color_ids as array
-      if (formData.colors.length > 0) {
-        submitData.append('color_ids', JSON.stringify(formData.colors));
+  
+       
+      if (formData.color_ids.length > 0) {
+        Object.keys(formData).forEach(key => {
+          if (key === 'color_ids') {
+            // Append each color ID separately
+            formData.color_ids.forEach(colorId => {
+              submitData.append('color_ids', parseInt(colorId));
+            });
+          } else if (formData[key] !== undefined && formData[key] !== null) {
+            submitData.append(key, formData[key]);
+          }
+        });
       }
 
       if (formData.icon) {
@@ -152,7 +162,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
         icon: null,
         iconPreview: null,
         stock_quantity: '',
-        colors: []
+        color_ids: []
       });
       
       // Close modal and refresh data
@@ -181,7 +191,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
         icon: null,
         iconPreview: null,
         stock_quantity: '',
-        colors: []
+        color_ids: []
       });
       onClose();
     }
@@ -357,15 +367,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
           {/* Description - Full Width */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Enter model description"
-              disabled={isSubmitting}
-              rows={3}
-            />
+          
           </div>
 
           {/* Color Selection */}
@@ -380,10 +382,11 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                     <div key={color.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`color-${color.id}`}
-                        checked={formData.colors.includes(color.id)}
+                        checked={formData.color_ids.includes(color.id)}
                         onCheckedChange={(checked) => handleColorChange(color.id, checked)}
                         disabled={isSubmitting}
-                      />
+                        className="data-[state=checked]:bg-transparent cursor-pointer data-[state=checked]:border-green-600 data-[state=checked]:text-green-600"
+                       />
                       <div className="flex items-center space-x-2 flex-1">
                         <div 
                           className="w-4 h-4 rounded border border-gray-300"
