@@ -155,7 +155,12 @@ h3 {
 
   /* Marquee Animation */
   .animate-marquee {
-    animation: marquee 5s linear infinite;
+    animation: marquee 20s linear infinite;
+    width: calc(200% + 2rem);
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
   }
 
   @keyframes marquee {
