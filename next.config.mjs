@@ -8,6 +8,12 @@ const nextConfig = {
         port: '',
         pathname: '/media/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'save-co.lumivancelabs.com',
+        port: '',
+        pathname: '/media/**',
+      },
     ],
   },
 };

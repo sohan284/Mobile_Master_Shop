@@ -9,6 +9,8 @@ import CTASection from '@/components/common/CTASection';
 import Image from 'next/image'; 
 import { CustomButton } from '@/components/ui/button';
 import { Award, Clock, ShieldCheck, Wrench } from 'lucide-react';
+import { apiFetcher } from '@/lib/api';
+import { useApiGet } from '@/hooks/useApi';
 
 
 export default function Repair() {
@@ -90,7 +92,11 @@ export default function Repair() {
       gradient: "from-purple-500 to-pink-500"
     }
   ];
-
+  const { data: brandsResponse, isLoading: brandsLoading, error: brandsError } = useApiGet(
+    ['brands'],
+    () => apiFetcher.get('/api/repair/brands/')
+  );
+  const brands = brandsResponse?.data || [];
     return (
         <div className="pt-16 relative overflow-hidden text-secondary">
 
@@ -210,28 +216,28 @@ export default function Repair() {
                         <p className="text-gray-300">We repair devices from all major manufacturers</p>
                     </div>
 
-                    <div className="relative overflow-hidden  backdrop-blur-sm rounded-lg py-8">
+                    <div className="relative overflow-hidden backdrop-blur-sm rounded-lg py-8">
                         <div className="flex animate-marquee">
                             {/* First set of logos */}
-                            {brandLogo.map((item, idx) => (
-                                <div key={`first-${item.id}`} className="flex-shrink-0 mx-8 group">
-                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 /10">
+                            {brands.map((item, idx) => (
+                                <div key={`first-${item.id}`} className="flex-shrink-0 mx-6 group">
+                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 bg-white/5">
                                         <img
-                                            src={item.src}
-                                            alt={item.alt}
-                                            className="w-20 h-20 object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                            src={item.icon}
+                                            alt={item.name}
+                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />
                                     </div>
                                 </div>
                             ))}
                             {/* Duplicate set for seamless loop */}
-                            {brandLogo.map((item, idx) => (
-                                <div key={`second-${item.id}`} className="flex-shrink-0 mx-8 group">
-                                    <div className="w-20 h-20 shadow rounded-md flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 /10">
+                            {brands.map((item, idx) => (
+                                <div key={`second-${item.id}`} className="flex-shrink-0 mx-6 group">
+                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 bg-white/5">
                                         <img
-                                            src={item.src}
-                                            alt={item.alt}
-                                            className="w-20 h-20 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+                                            src={item.icon}
+                                            alt={item.name}
+                                            className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />
                                     </div>
                                 </div>

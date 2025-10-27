@@ -1,10 +1,10 @@
 "use client";
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import MotionFade from '@/components/animations/MotionFade';
 import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from '@/components/ui/NotFound';
+import SafeImage from '@/components/ui/SafeImage';
 
 export default function GridSection({
   title,
@@ -24,6 +24,18 @@ export default function GridSection({
   primaryAction,
   secondaryAction
 }) {
+  // Helper function to get the correct image source
+  const getImageSrc = (item) => {
+    const imageSrc = item.image || item.logo || item.icon || '/Apple.png';
+    
+    // If it's a remote URL and starts with http, use it directly
+    if (imageSrc.startsWith('http')) {
+      return imageSrc;
+    }
+    
+    // If it's a local path, ensure it starts with /
+    return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
+  };
   const defaultRenderItem = (item, index) => (
     <Link 
       key={item.id || index} 
@@ -45,12 +57,13 @@ export default function GridSection({
         {/* Content */}
         <div className="relative z-10">
           <div className="flex justify-center mb-4">
-            <Image
-              src={item.image || item.logo || '/Apple.png'}
+            <SafeImage
+              src={getImageSrc(item)}
               alt={item.name || item.title}
               width={64}
               height={64}
               className="object-contain group-hover:scale-110 transition-transform duration-300"
+              fallbackSrc="/Apple.png"
             />
           </div>
           <h3 className="font-semibold text-accent group-hover:text-secondary transition-colors duration-300">

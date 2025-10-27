@@ -13,7 +13,35 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+
+  // Toggle mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.mobile-menu-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
 
   // ✅ Scroll hide/show header (keep as before)
   useEffect(() => {
@@ -45,16 +73,21 @@ export default function Header() {
   }, [lastScrollY]);
 
   return (
-    <header
-      className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
-        isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-      }`}
-    >
+    <>
+      <header
+        className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0 overflow-hidden ${
+          isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
+      >
       <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
         
         {/* ✅ Mobile Header: Hamburger + Logo + User */}
-        <div className="md:hidden flex justify-between items-center w-full">
-          <button className="text-white focus:outline-none">
+        <div className="md:hidden flex justify-between items-center w-full mobile-menu-container">
+          <button 
+            className="text-white focus:outline-none hover:text-gray-300 transition-colors"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle mobile menu"
+          >
             <Menu size={28} />
           </button>
 
@@ -134,7 +167,54 @@ export default function Header() {
             </div>
           </div>
         </div>
+
       </div>
-    </header>
+      </header>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed top-0 left-0 w-full h-screen bg-black/50 z-40 mobile-menu-container">
+          <div className="bg-primary border-t border-secondary/20 shadow-lg animate-in slide-in-from-top-2 duration-300">
+            <div className="container mx-auto px-4 py-6">
+              <div className="flex flex-col space-y-6">
+                {/* Navigation Links */}
+                <div className="flex flex-col space-y-4">
+                  <Link 
+                    href="/repair" 
+                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Repair
+                  </Link>
+                  <Link 
+                    href="/phones" 
+                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Phones
+                  </Link>
+                  <Link 
+                    href="/accessories" 
+                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Accessories
+                  </Link>
+                  <Link 
+                    href="#" 
+                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Contact
+                  </Link>
+                </div>
+
+            
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

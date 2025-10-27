@@ -13,13 +13,13 @@ import {
   Clock,
   Check
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
+import SafeImage from '@/components/ui/SafeImage';
 
 export default function PhoneIndividualPage({ params }) {
   const phoneId = use(params).phoneId;
@@ -32,6 +32,19 @@ export default function PhoneIndividualPage({ params }) {
   );
 
   const phone = phoneData?.data;
+
+  // Helper function to get the correct image source
+  const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
+    if (!imageSrc) return fallback;
+    
+    // If it's a remote URL and starts with http, use it directly
+    if (imageSrc.startsWith('http')) {
+      return imageSrc;
+    }
+    
+    // If it's a local path, ensure it starts with /
+    return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
+  };
 
   // Update the state to include pricing
   const [selectedOptions, setSelectedOptions] = useState({
@@ -236,9 +249,9 @@ export default function PhoneIndividualPage({ params }) {
           <MotionFade delay={0.2} immediate={true}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
               <div className="relative flex justify-center items-center">
-                <Image
-                  src={phone.icon || '/SAMSUNG_GalaxyS23Ultra.png'}
-                  alt={phone.name}
+                <SafeImage
+                  src={getImageSrc(phone?.icon)}
+                  alt={phone?.name || 'Phone'}
                   width={400}
                   height={400}
                   className="h-[350px] w-auto object-contain shadow-lg"
@@ -407,9 +420,9 @@ export default function PhoneIndividualPage({ params }) {
                 {relatedProducts.map((item, index) => (
                   <div key={index} className="bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-3 md:p-4 hover:shadow-lg transition-shadow duration-200">
                     <div className="relative aspect-square mb-3 md:mb-4">
-                      <Image
-                        src={phone.icon || '/SAMSUNG_GalaxyS23Ultra.png'}
-                        alt={item.fullName}
+                      <SafeImage
+                        src={getImageSrc(phone?.icon)}
+                        alt={item.fullName || 'Related Product'}
                         width={180}
                         height={180}
                         className="object-contain w-full h-full max-h-[180px] rounded-lg"

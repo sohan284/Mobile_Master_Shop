@@ -12,7 +12,7 @@ const NotFound = ({
   icon = null
 }) => {
   return (
-    <div className="text-center pb-12 relative overflow-hidden">
+    <div className="text-center py-12 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute top-10 left-1/4 w-20 h-20 bg-primary/5 rounded-full blur-xl animate-pulse"></div>
       <div className="absolute bottom-10 right-1/4 w-16 h-16 bg-secondary/5 rounded-full blur-lg animate-pulse" style={{animationDelay: '1s'}}></div>
@@ -45,7 +45,7 @@ const NotFound = ({
         </div>
         
         {/* Title */}
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>
+        <h3 className="text-xl font-semibold text-secondary mb-2">{title}</h3>
         
         {/* Description */}
         <p className="text-gray-600 mb-6 max-w-md mx-auto">

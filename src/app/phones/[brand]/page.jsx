@@ -12,6 +12,7 @@ import CTASection from '@/components/common/CTASection';
 import { useApiGet } from '@/hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { apiFetcher } from '@/lib/api';
+import NotFound from '@/components/ui/NotFound';
 
 
 
@@ -21,7 +22,7 @@ export default function BrandPage({ params }) {
   const brand = use(params).brand?.toLowerCase();
   const [sortOrder, setSortOrder] = useState('asc');
   const [filteredPhones, setFilteredPhones] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
   const [storage, setStorage] = useState('all');
   const [ram, setRam] = useState('all');
   const [availability, setAvailability] = useState('all');
@@ -149,12 +150,23 @@ export default function BrandPage({ params }) {
       <PageTransition>
         <div className="min-h-screen relative overflow-hidden bg-primary">
           <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-center min-h-[60vh]">
-              <div className="text-center space-y-4">
-                <h2 className="text-2xl font-bold text-accent">No Phones Found</h2>
-                <p className="text-accent/80">Sorry, we couldn't find any phones for the brand "{brand}".</p>
-              </div>
-            </div>
+            <NotFound
+              title="No Phones Found"
+              description={`Sorry, we couldn't find any phones for the brand "${brand}". Please try another brand or check back later.`}
+              showSearch={true}
+              searchTerm=""
+              onClearSearch={() => setSearchQuery('')}
+              primaryAction={{
+                text: "Browse All Brands",
+                href: "/phones",
+                onClick: () => {}
+              }}
+              secondaryAction={{
+                text: "Try Repair Services",
+                href: "/repair",
+                onClick: () => {}
+              }}
+            />
           </div>
         </div>
       </PageTransition>
@@ -266,7 +278,7 @@ export default function BrandPage({ params }) {
                       onClick={() => {
                         setSearchQuery('');
                         setSortOrder('asc');
-                        setPriceRange({ min: 0, max: 100000 });
+                        setPriceRange({ min: 0, max: 10000000 });
                         setStorage('all');
                         setRam('all');
                         setAvailability('all');
