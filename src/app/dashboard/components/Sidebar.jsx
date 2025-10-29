@@ -19,6 +19,7 @@ import {
   Percent,
   Palette,
   Users,
+  Package,
   X
 } from 'lucide-react';
 
@@ -47,6 +48,7 @@ const navigation = [
       { name: 'Colors', href: '/dashboard/new-phones/colors', icon: Palette },
     ]
   },
+  { name: 'Accessories', href: '/dashboard/accessories', icon: Package },
   { name: 'Global Discount', href: '/dashboard/global-discount', icon: Percent },
 ];
 

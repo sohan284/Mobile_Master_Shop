@@ -135,5 +135,12 @@ export const createProblem = (data) => apiFetcher.post('/api/repair/problems/', 
 export const updateProblem = (id, data) => apiFetcher.patch(`/api/repair/problems/${id}/`, data);
 export const deleteProblem = (id) => apiFetcher.delete(`/api/repair/problems/${id}/`);
 
+// Accessories API functions
+export const getAccessories = () => apiFetcher.get('/api/accessories/products/');
+export const getAccessoryById = (id) => apiFetcher.get(`/api/accessories/products/${id}/`);
+export const createAccessory = (data) => apiFetcher.post('/api/accessories/products/', data);
+export const updateAccessory = (id, data) => apiFetcher.patch(`/api/accessories/products/${id}/`, data);
+export const deleteAccessory = (id) => apiFetcher.delete(`/api/accessories/products/${id}/`);
+
 // Export the axios instance for custom requests
 export { apiClient };
