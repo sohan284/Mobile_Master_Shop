@@ -22,7 +22,7 @@ export default function BrandPage({ params }) {
   const brand = use(params).brand?.toLowerCase();
   const [sortOrder, setSortOrder] = useState('asc');
   const [filteredPhones, setFilteredPhones] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 2000 });
   const [storage, setStorage] = useState('all');
   const [ram, setRam] = useState('all');
   const [availability, setAvailability] = useState('all');
@@ -38,7 +38,7 @@ export default function BrandPage({ params }) {
 
   useEffect(() => {
     let phones = [...brandPhones];
-    
+
     // Apply search filter
     if (searchQuery && typeof searchQuery === 'string') {
       phones = phones.filter(phone =>
@@ -108,7 +108,7 @@ export default function BrandPage({ params }) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Grid Skeleton */}
               <div className="lg:w-3/4">
                 <div className="max-h-[80vh] overflow-y-auto pr-2 py-3">
@@ -159,12 +159,12 @@ export default function BrandPage({ params }) {
               primaryAction={{
                 text: "Browse All Brands",
                 href: "/phones",
-                onClick: () => {}
+                onClick: () => { }
               }}
               secondaryAction={{
                 text: "Try Repair Services",
                 href: "/repair",
-                onClick: () => {}
+                onClick: () => { }
               }}
             />
           </div>
@@ -177,9 +177,9 @@ export default function BrandPage({ params }) {
     <PageTransition>
       <div className="min-h-screen relative overflow-hidden bg-primary">
         <div className="container mx-auto px-4 py-8">
-  
+
           {/* Search Section */}
-        
+
 
           {/* Filter and Grid Section */}
           <div className="flex flex-col lg:flex-row gap-8 my-10">
@@ -189,36 +189,36 @@ export default function BrandPage({ params }) {
                 <div className=" rounded-xl p-6  border-accent/20 h-full overflow-y-auto scrollbar-hide">
                   <h3 className="text-xl font-bold text-secondary mb-6">Filters</h3>
 
-              {/* Price Sort */}
+                  {/* Price Sort */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">Sort by Price</label>
-                <select
+                    <select
                       className="w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
-                  value={sortOrder}
-                  onChange={(e) => setSortOrder(e.target.value)}
-                >
-                  <option value="asc">Price: Low to High</option>
-                  <option value="desc">Price: High to Low</option>
-                </select>
-              </div>
+                      value={sortOrder}
+                      onChange={(e) => setSortOrder(e.target.value)}
+                    >
+                      <option value="asc">Price: Low to High</option>
+                      <option value="desc">Price: High to Low</option>
+                    </select>
+                  </div>
 
-              {/* Price Range Filter */}
+                  {/* Price Range Filter */}
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">Price Range</label>
-                <input
-                  type="range"
-                  min="0"
-                      max="100000"
-                      step="1000"
-                  value={priceRange.max}
+                    <input
+                      type="range"
+                      min="0"
+                      max="2000"
+                      step="100"
+                      value={priceRange.max}
                       onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
                       className="w-full accent-secondary"
                     />
                     <div className="flex justify-between text-accent/80 text-sm mt-2">
                       <span>${priceRange.min.toLocaleString()}</span>
                       <span>${priceRange.max.toLocaleString()}</span>
-                </div>
-              </div>
+                    </div>
+                  </div>
 
                   {/* Storage Filter */}
                   <div className="mb-6">
@@ -278,7 +278,7 @@ export default function BrandPage({ params }) {
                       onClick={() => {
                         setSearchQuery('');
                         setSortOrder('asc');
-                        setPriceRange({ min: 0, max: 10000000 });
+                        setPriceRange({ min: 0, max: 2000 });
                         setStorage('all');
                         setRam('all');
                         setAvailability('all');
@@ -295,15 +295,15 @@ export default function BrandPage({ params }) {
 
             {/* Phones Grid - Scrollable */}
             <div className="lg:w-3/4">
-            <div className='flex justify-end'>
-            <SearchSection
-      className=''
-            placeholder="Search by model ..."
-            searchTerm={searchQuery}
-            onSearchChange={(e) => setSearchQuery(e.target.value)}
-          />
-            </div>
-              
+              <div className='flex justify-end'>
+                <SearchSection
+                  className=''
+                  placeholder="Search by model ..."
+                  searchTerm={searchQuery}
+                  onSearchChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
               <div className="max-h-[80vh] overflow-y-auto pr-2 " style={{
                 scrollbarWidth: 'none', /* Firefox */
                 msOverflowStyle: 'none', /* Internet Explorer 10+ */
@@ -323,43 +323,45 @@ export default function BrandPage({ params }) {
                         <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
                           <div className="p-6 text-center h-full flex flex-col">
                             <div className="mb-6 bg-white/5 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
-                        <Image
+                              <Image
                                 src={phone.icon || '/SAMSUNG_GalaxyS23Ultra.png'}
                                 alt={phone.name}
-                          width={160}
-                          height={160}
-                          className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
-                        />
-                      </div>
+                                width={160}
+                                height={160}
+                                className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
+                              />
+                            </div>
 
-                      <div className="flex-grow flex flex-col justify-between">
+                            <div className="flex-grow flex flex-col justify-between">
                               <h3 className="font-bold text-lg text-accent group-hover:text-secondary transition-colors duration-300 mb-3">
                                 {phone.name}
-                        </h3>
+                              </h3>
 
                               <div className="space-y-2">
                                 <p className="text-accent/80 text-sm">{phone.memory}GB - {phone.ram}GB RAM</p>
                                 <div className="space-y-1">
-                                  {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                                    <p className="text-sm text-accent/60 line-through">
-                                      ${parseFloat(phone.main_amount).toLocaleString()}
-                                    </p>
-                                  )}
-                          <p className="text-lg text-accent/80">
-                                    from <span className='font-bold text-secondary'>${parseFloat(phone.final_price).toLocaleString()}</span>
-                                  </p>
+
+                                  <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
                                   {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                                    <p className="text-xs text-secondary">
+                                    <span className="text-xs text-green-500">
                                       {parseFloat(phone.discount_percentage).toFixed(1)}% off
-                                    </p>
+                                    </span>
                                   )}
+                                    <span className='font-bold text-secondary'>${parseFloat(phone.final_price).toLocaleString()}</span>
+                                    {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
+                                      <span className="text-sm text-accent/60 line-through">
+                                        ${parseFloat(phone.main_amount).toLocaleString()}
+                                      </span>
+                                    )}
+                                  </p>
+                                 
                                 </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </MotionFade>
-              </Link>
+                      </MotionFade>
+                    </Link>
                   )}
                 />
               </div>
@@ -368,7 +370,7 @@ export default function BrandPage({ params }) {
 
 
           {/* CTA Section */}
-      
+
         </div>
       </div>
     </PageTransition>

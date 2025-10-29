@@ -304,9 +304,9 @@ export default function Refurbished() {
                           </p>
                         </div>
 
-                        <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
+                        {/* <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
                           {model.warranty} Month Warranty
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </CardContent>
@@ -317,7 +317,7 @@ export default function Refurbished() {
 
           {/* Custom Navigation */}
           <div className="absolute top-24 md:top-16 right-0 flex gap-2">
-            <button className="swiper-button-prev-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
+            <button className="swiper-button-prev-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
                 fill="none"
@@ -333,7 +333,7 @@ export default function Refurbished() {
               </svg>
             </button>
 
-            <button className="swiper-button-next-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 hover:scale-110 hover:bg-secondary group">
+            <button className="swiper-button-next-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
                 fill="none"
