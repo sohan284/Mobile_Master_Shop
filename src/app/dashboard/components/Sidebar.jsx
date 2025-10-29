@@ -18,11 +18,14 @@ import {
   Smartphone as PhoneIcon,
   Percent,
   Palette,
+  Users,
+  Package,
   X
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Users', href: '/dashboard/users', icon: Users },
   {
     name: 'Repair Services',
     href: '/dashboard/repair-services',
@@ -45,6 +48,7 @@ const navigation = [
       { name: 'Colors', href: '/dashboard/new-phones/colors', icon: Palette },
     ]
   },
+  { name: 'Accessories', href: '/dashboard/accessories', icon: Package },
   { name: 'Global Discount', href: '/dashboard/global-discount', icon: Percent },
 ];
 
@@ -78,7 +82,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden bg-white"
           onClick={() => setSidebarOpen(false)}
         >
           <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
@@ -88,15 +92,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       {/* Sidebar */}
       <div
         className={`
-          z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out bg-primary
+          z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out bg-secondary
           ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0' : '-translate-x-full fixed inset-y-0 left-0'}
           lg:translate-x-0 lg:relative lg:inset-auto
-          flex flex-col
+          flex flex-col 
         `}
       >
         {/* Top Section */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-secondary bg-primary flex-shrink-0">
-          <p className="text-lg font-semibold text-secondary">Admin Panel</p>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-secondary flex-shrink-0">
+          <p className="text-lg font-semibold text-primary">Admin Panel</p>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600"
@@ -202,10 +206,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-gray-200 bg-primary flex-shrink-0">
+        <div className="p-4 border-t border-gray-200  flex-shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"
+            className="w-full cursor-pointer flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"
           >
             <LogOut className="mr-3 h-5 w-5" />
             Logout

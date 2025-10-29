@@ -15,6 +15,8 @@ import FeaturesSection from '@/components/common/FeaturesSection';
 import CTASection from '@/components/common/CTASection';
 import Image from 'next/image';
 import { Shield, Smartphone, TrendingDown } from 'lucide-react';
+import { useApiGet } from '@/hooks/useApi';
+import { apiFetcher } from '@/lib/api';
 
 // Custom styles for swiper
 const swiperStyles = `
@@ -55,6 +57,12 @@ const swiperStyles = `
 `;
 
 export default function Refurbished() {
+  const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
+    ['new-phone-models'],
+    () => apiFetcher.get('/api/brandnew/models/')
+  );
+  const models = modelsResponse?.data || [];
+
   const images = [
     {
       id: 1,
@@ -249,19 +257,19 @@ export default function Refurbished() {
             }}
             className="relative overflow-visible"
           >
-            {images.map(({ id, path, name, price, brand, condition }) => (
-              <SwiperSlide key={id}>
+            {models.map((model) => (
+              <SwiperSlide key={model.id}>
                 <Card className="group bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
-                  <CardContent className="p-6 text-center h-full flex flex-col relative">
+                  <CardContent className="p-4 py-0 text-center h-full flex flex-col relative">
                     {/* Brand Badge */}
                     {/* <div className="absolute top-3 left-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
                                             {brand}
                                         </div> */}
 
                     {/* Condition Badge */}
-                    {/* <div className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
-                                            {condition}
-                                        </div> */}
+                    <div className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
+                                            New
+                                        </div>
 
                     <div className="mb-4 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
                       {/* Subtle background pattern */}
@@ -270,18 +278,20 @@ export default function Refurbished() {
                         <div className="absolute bottom-2 right-2 w-6 h-6 bg-primary rounded-full"></div>
                       </div>
                       <div className='flex justify-center items-center'>
-                        <Image
-                          src={path}
-                          alt={name}
-                          width={160}
-                          height={160}
-                        />
+                  
+                           <Image
+                                                width={400}
+                                                height={400}
+                                                src={model.icon}
+                                                alt={model.name}
+                                                className="w-full rounded-md object-contain group-hover:scale-110 transition-transform duration-500"
+                                            />
                       </div>
                     </div>
 
                     <div className="flex-grow flex flex-col justify-between">
                       <h3 className="font-bold text-lg text-white group-hover:text-secondary transition-colors duration-300">
-                        {name.replace('.png', '').replace(/[-_]/g, ' ')}
+                        {model.name.replace('.png', '').replace(/[-_]/g, ' ')}
                       </h3>
 
                       <div className="space-y-2">
@@ -290,12 +300,12 @@ export default function Refurbished() {
                             Starting from
                           </p>
                           <p className="font-bold text-3xl text-secondary mb-2">
-                            €{price}
+                              €{model.main_amount}
                           </p>
                         </div>
 
                         <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
-                          24 Month Warranty
+                          {model.warranty} Month Warranty
                         </div>
                       </div>
                     </div>

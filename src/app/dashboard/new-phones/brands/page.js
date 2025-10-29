@@ -34,7 +34,7 @@ export default function NewPhoneBrandsPage() {
             <Image 
               src={item.icon} 
               alt={item?.name}
-              className="h-8 w-8 object-contain"
+              className="h-10 w-10 object-contain bg-gray-400 p-1 rounded-md"
               width={32}
               height={32}
             />
