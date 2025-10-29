@@ -273,7 +273,7 @@ export default function DataTable({
                   variant={currentPage === page ? "default" : "outline"}
                   size="sm"
                   onClick={() => handlePageChange(page)}
-                  className="h-8 w-8 p-0 cursor-pointer"
+                  className={currentPage === page ? "h-8 w-8 p-0 cursor-pointer bg-primary text-white" : "h-8 w-8 p-0 cursor-pointer"}
                 >
                   {page}
                 </Button>

@@ -31,7 +31,7 @@ export default function BrandsPage() {
       render: (item) => (
         <div className="flex items-center">
           <Image
-            src={item?.icon}
+            src={item?.logo}
             alt={item?.name}
             className="h-8 w-8 object-contain"
             width={32}

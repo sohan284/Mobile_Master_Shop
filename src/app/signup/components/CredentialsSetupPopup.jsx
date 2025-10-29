@@ -13,7 +13,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const validateUsername = (username) => {
-    if (username.length < 3) {
+    if (username.length < 6) {
       return 'Username must be at least 3 characters long';
     }
     if (username.length > 20) {
