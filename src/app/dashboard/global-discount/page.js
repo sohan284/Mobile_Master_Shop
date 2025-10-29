@@ -50,10 +50,10 @@ export default function GlobalDiscountPage() {
         setDiscountSettings(prev => ({
           ...prev,
           repairServices: {
-            id: repairResponse[0].id,
-            percentage: repairResponse[0].percentage || '',
-            amount: repairResponse[0].amount || '',
-            is_active: repairResponse[0].is_active || true
+            id: repairResponse[0]?.id,
+            percentage: repairResponse[0]?.percentage || '',
+            amount: repairResponse[0]?.amount || '',
+            is_active: repairResponse[0]?.is_active || true
           }
         }));
       }
@@ -66,16 +66,16 @@ export default function GlobalDiscountPage() {
         setDiscountSettings(prev => ({
           ...prev,
           newPhones: {
-            id: newPhonesResponse?.data[0].id,
-            percentage: newPhonesResponse?.data[0].percentage || '',
-            amount: newPhonesResponse?.data[0].amount || '',
-            is_active: newPhonesResponse?.data[0].is_active
+            id: newPhonesResponse?.data[0]?.id,
+            percentage: newPhonesResponse?.data[0]?.percentage || '',
+            amount: newPhonesResponse?.data[0]?.amount || '',
+            is_active: newPhonesResponse?.data[0]?.is_active
           }
         }));
         console.log('Updated new phones state:', {
-          id: newPhonesResponse?.data[0].id,
-          percentage: newPhonesResponse?.data[0].percentage,
-          amount: newPhonesResponse?.data[0].amount
+          id: newPhonesResponse?.data[0]?.id,
+          percentage: newPhonesResponse?.data[0]?.percentage,
+          amount: newPhonesResponse?.data[0]?.amount
         });
       }
       setIsLoadingNewPhones(false);
@@ -92,8 +92,8 @@ export default function GlobalDiscountPage() {
   const handleUpdateRepairServices = async () => {
     setIsSavingRepairServices(true);
     try {
-      if (discountSettings.repairServices.id) {
-        await apiFetcher.patch(`/api/repair/discounts/${discountSettings.repairServices.id}/`, {
+      if (discountSettings.repairServices?.id) {
+        await apiFetcher.patch(`/api/repair/discounts/${discountSettings.repairServices?.id}/`, {
           percentage: discountSettings.repairServices.percentage,
           amount: discountSettings.repairServices.amount
         });
@@ -108,10 +108,11 @@ export default function GlobalDiscountPage() {
   };
 
   const handleUpdateNewPhones = async () => {
+    console.log('Updating new phones discount:', discountSettings.newPhones);
     setIsSavingNewPhones(true);
     try {
-      if (discountSettings.newPhones.id) {
-        await apiFetcher.patch(`/api/brandnew/discount/${discountSettings.newPhones.id}/`, {
+      if (discountSettings.newPhones?.id) {
+        await apiFetcher.patch(`/api/brandnew/discount/${discountSettings.newPhones?.id}/`, {
           percentage: discountSettings.newPhones.percentage,
           amount: discountSettings.newPhones.amount
         });

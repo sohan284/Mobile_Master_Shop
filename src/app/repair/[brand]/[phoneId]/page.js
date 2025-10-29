@@ -1,5 +1,5 @@
 'use client';   
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PageTransition from '@/components/animations/PageTransition';
@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from '@/components/ui/NotFound';
 
 export default function PhoneModelPage({ params }) {
-    const { brand, phoneId } = params;
+    const { brand, phoneId } = use(params);
     const [selectedServices, setSelectedServices] = useState([]);
     const [servicePartTypes, setServicePartTypes] = useState({}); // Store part type for each service
     const [searchTerm, setSearchTerm] = useState('');
