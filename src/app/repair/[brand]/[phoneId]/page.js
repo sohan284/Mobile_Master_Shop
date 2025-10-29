@@ -21,6 +21,8 @@ export default function PhoneModelPage({ params }) {
     const [servicePartTypes, setServicePartTypes] = useState({}); // Store part type for each service
     const [searchTerm, setSearchTerm] = useState('');
     const [phoneInfo, setPhoneInfo] = useState(null);
+
+    console.log("phoneInfo?.image", phoneInfo?.image);
     
       // Fetch services for this model
   const { data: servicesResponse, isLoading: servicesLoading, error: servicesError, refetch: refetchServices } = useApiGet(

@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import Image from 'next/image';
+import SafeImage from '@/components/ui/SafeImage';
 import Link from 'next/link';
 import MotionFade from '@/components/animations/MotionFade';
 import { CustomButton } from '@/components/ui/button';
@@ -19,21 +19,33 @@ export default function HeroSection({
   backButtonHref = "/repair",
   layout = "image-left" // "image-left" or "content-left"
 }) {
-  const VisualComponent = () => (
-    <MotionFade delay={0.06} immediate={true}>
-      <div className="relative">
-        <div className="relative z-10">
-          <Image
-            src={image}
-            alt={imageAlt}
-            width={320}
-            height={320}
-            className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] mx-auto drop-shadow hover:scale-105 transition-transform duration-500"
-          />
+  const VisualComponent = () => {
+    console.log('HeroSection - Image prop:', image);
+    console.log('HeroSection - ImageAlt prop:', imageAlt);
+    
+    return (
+      <MotionFade delay={0.06} immediate={true}>
+        <div className="relative">
+          <div className="relative z-10">
+            {image ? (
+              <SafeImage
+                src={image}
+                alt={imageAlt || 'Hero image'}
+                width={320}
+                height={320}
+                className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] mx-auto drop-shadow hover:scale-105 transition-transform duration-500 object-contain"
+                fallbackSrc="/Apple.png"
+              />
+            ) : (
+              <div className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] mx-auto bg-accent/20 rounded-lg flex items-center justify-center">
+                <span className="text-accent/60 text-lg">No Image</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </MotionFade>
-  );
+      </MotionFade>
+    );
+  };
 
   const ContentComponent = () => (
     <div className="space-y-8">

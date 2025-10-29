@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PageTransition from "@/components/animations/PageTransition";
@@ -23,8 +23,8 @@ export default function AccessoriesPage() {
     () => apiFetcher.get('/api/accessories/items/')
   );
   
-  // Fallback items if API fails
-  const fallbackItems = [
+  // Fallback items if API fails (memoized to prevent unnecessary re-renders)
+  const fallbackItems = useMemo(() => [
     {
       id: 101,
       name: "Clear Phone Case",
@@ -97,10 +97,22 @@ export default function AccessoriesPage() {
       inStock: true,
       category: "Audio & Camera"
     },
-  ];
+  ], []);
   
-  // Use API data or fallback, and randomize order
-  const allItems = (itemsResponse?.data || fallbackItems).slice().sort(() => Math.random() - 0.5);
+  // Use API data or fallback, and randomize order (with stable sorting to prevent remount issues)
+  const [randomizedItems, setRandomizedItems] = useState([]);
+  
+  useEffect(() => {
+    // Only randomize once when data is loaded
+    if (itemsResponse?.data || fallbackItems) {
+      const items = (itemsResponse?.data || fallbackItems);
+      // Use a stable random seed based on data length to prevent re-randomization
+      const shuffled = [...items].sort(() => Math.random() - 0.5);
+      setRandomizedItems(shuffled);
+    }
+  }, [itemsResponse?.data, fallbackItems]);
+  
+  const allItems = randomizedItems.length > 0 ? randomizedItems : (itemsResponse?.data || fallbackItems);
   
   // Filter items based on search term
   const filteredItems = allItems.filter(item =>

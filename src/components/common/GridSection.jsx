@@ -103,11 +103,19 @@ export default function GridSection({
       {!isLoading && items.length > 0 && (
         <MotionFade delay={0.2} immediate={true}>
           <div className={`grid ${gridCols} gap-6`}>
-            {items.map((item, index) => (
-              <MotionFade key={item.id || index} delay={0.25 + index * 0.1} immediate={true}>
-                {renderItem ? renderItem(item, index) : defaultRenderItem(item, index)}
-              </MotionFade>
-            ))}
+            {items.map((item, index) => {
+              const itemKey = item.id || `item-${index}`;
+              const itemContent = renderItem ? renderItem(item, index) : defaultRenderItem(item, index);
+              // Only wrap in MotionFade if delay is reasonable (avoid too many nested animations)
+              if (index < 12) {
+                return (
+                  <MotionFade key={itemKey} delay={0.25 + index * 0.05} immediate={true}>
+                    {itemContent}
+                  </MotionFade>
+                );
+              }
+              return <div key={itemKey}>{itemContent}</div>;
+            })}
           </div>
         </MotionFade>
       )}

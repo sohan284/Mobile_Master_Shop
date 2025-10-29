@@ -23,7 +23,7 @@ export default function SafeImage({
   };
 
   // If it's a remote URL, we need to handle it differently
-  const isRemoteUrl = imgSrc && imgSrc.startsWith('http');
+  const isRemoteUrl = imgSrc && typeof imgSrc === 'string' && imgSrc.startsWith('http');
   
   if (isRemoteUrl) {
     return (
