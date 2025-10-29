@@ -9,6 +9,9 @@ import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
+import Link from 'next/link';
+import Breadcrumb from '@/components/ui/Breadcrumb';
+import { Home, Wrench, Smartphone, Settings } from 'lucide-react';
 
 export default function PriceBreakdownPage({ params }) {
     const { brand, phoneId } = params;
@@ -187,20 +190,19 @@ export default function PriceBreakdownPage({ params }) {
                     <div className="container mx-auto px-4 py-8">
                         
                         {/* Hero Section Skeleton */}
-                        <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 mb-12">
-                            {/* Image Skeleton */}
+                        {/* <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 mb-12">
+                 
                             <div className="flex-shrink-0">
                                 <Skeleton className="w-[240px] sm:w-[280px] md:w-[320px] lg:w-[380px] h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] rounded-2xl bg-white/10" />
                             </div>
                             
-                            {/* Content Skeleton */}
                             <div className="flex-1 text-center lg:text-left">
                                 <Skeleton className="h-12 w-48 mx-auto lg:mx-0 mb-4 bg-white/10" />
                                 <Skeleton className="h-16 w-64 mx-auto lg:mx-0 mb-6 bg-white/10" />
                                 <Skeleton className="h-6 w-96 mx-auto lg:mx-0 mb-8 bg-white/10" />
                                 <Skeleton className="h-12 w-40 mx-auto lg:mx-0 bg-white/10" />
                             </div>
-                        </div>
+                        </div> */}  
 
                         {/* Price Breakdown Card Skeleton */}
                         <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
@@ -309,7 +311,7 @@ export default function PriceBreakdownPage({ params }) {
                 <div className="container mx-auto px-4 py-8">
                     
                     {/* Hero Section */}
-                    <HeroSection
+                    {/* <HeroSection
                         title="Price"
                         subtitle="Breakdown"
                         description={`Review your repair costs for ${phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1)}`}
@@ -320,7 +322,7 @@ export default function PriceBreakdownPage({ params }) {
                         backButtonText="← Back to Services"
                         backButtonHref={`/repair/${brand}/${phoneId}`}
                         layout="image-left"
-                    />
+                    /> */}
 
                     {/* Warning for fallback pricing */}
                     {error && priceData && (
@@ -341,6 +343,17 @@ export default function PriceBreakdownPage({ params }) {
                     {priceData && (
                         <MotionFade delay={0.2} immediate={true}>
                             <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+                                {/* Breadcrumb Navigation */}
+                                <Breadcrumb
+                                    items={[
+                                        { label: 'Home', href: '/', icon: Home },
+                                        { label: 'Repair', href: '/repair', icon: Wrench },
+                                        { label: brand.charAt(0).toUpperCase() + brand.slice(1), href: `/repair/${brand}`, icon: Smartphone },
+                                        { label: phoneInfo?.name || 'Phone Model', href: `/repair/${brand}/${phoneId}`, icon: Smartphone },
+                                        { label: 'Breakdown', icon: Settings }
+                                    ]}
+                                    className="mb-6"
+                                />
                                 <h2 className="text-2xl font-bold text-secondary mb-6">Repair Cost Breakdown</h2>
                                 
                                 {/* Device Info */}

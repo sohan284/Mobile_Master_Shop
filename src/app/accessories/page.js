@@ -1,106 +1,251 @@
-import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import PageTransition from '@/components/animations/PageTransition';
+"use client"
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import PageTransition from "@/components/animations/PageTransition";
+import MotionFade from "@/components/animations/MotionFade";
+import HeroSection from "@/components/common/HeroSection";
+import SearchSection from "@/components/common/SearchSection";
+import GridSection from "@/components/common/GridSection";
+import FeaturesSection from "@/components/common/FeaturesSection";
+import CTASection from "@/components/common/CTASection";
+import { useApiGet } from "@/hooks/useApi";
+import { apiFetcher } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
+import NotFound from "@/components/ui/NotFound";
 
 export default function AccessoriesPage() {
-    const accessories = [
-        {
-            category: 'Cases & Protection',
-            items: [
-                { name: 'Clear Phone Cases', price: '$15', image: '/hood.png' },
-                { name: 'Leather Cases', price: '$25', image: '/hood.png' },
-                { name: 'Screen Protectors', price: '$8', image: '/screen.png' },
-                { name: 'Tempered Glass', price: '$12', image: '/screen.png' }
-            ]
-        },
-        {
-            category: 'Charging & Power',
-            items: [
-                { name: 'Wireless Chargers', price: '$20', image: '/battery.png' },
-                { name: 'Fast Chargers', price: '$18', image: '/battery.png' },
-                { name: 'Power Banks', price: '$30', image: '/battery.png' },
-                { name: 'Cables & Adapters', price: '$10', image: '/battery.png' }
-            ]
-        },
-        {
-            category: 'Audio & Camera',
-            items: [
-                { name: 'Bluetooth Headphones', price: '$35', image: '/camera.png' },
-                { name: 'Phone Stands', price: '$12', image: '/camera.png' },
-                { name: 'Camera Lenses', price: '$25', image: '/camera.png' },
-                { name: 'Selfie Sticks', price: '$15', image: '/camera.png' }
-            ]
-        }
-    ];
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Fetch all accessories (no category grouping)
+  const { data: itemsResponse, isLoading, error } = useApiGet(
+    ['accessoriesAll'],
+    () => apiFetcher.get('/api/accessories/items/')
+  );
+  
+  // Fallback items if API fails
+  const fallbackItems = [
+    {
+      id: 101,
+      name: "Clear Phone Case",
+      description: "Shock-absorbent transparent TPU case",
+      price: "$15",
+      originalPrice: "$19",
+      image: "/hood.png",
+      rating: 4.5,
+      reviews: 128,
+      inStock: true,
+      category: "Cases & Protection"
+    },
+    {
+      id: 102,
+      name: "Tempered Glass",
+      description: "9H hardness, edge-to-edge protection",
+      price: "$12",
+      originalPrice: "$15",
+      image: "/screen.png",
+      rating: 4.6,
+      reviews: 93,
+      inStock: true,
+      category: "Screen Protectors"
+    },
+    {
+      id: 103,
+      name: "Fast Charger 20W",
+      description: "PD fast charging USB-C adapter",
+      price: "$18",
+      originalPrice: "$22",
+      image: "/charger two port.png",
+      rating: 4.7,
+      reviews: 210,
+      inStock: true,
+      category: "Charging & Power"
+    },
+    {
+      id: 104,
+      name: "USB-C Cable",
+      description: "1m braided cable, durable and fast",
+      price: "$10",
+      originalPrice: "$12",
+      image: "/c cable.png",
+      rating: 4.4,
+      reviews: 76,
+      inStock: true,
+      category: "Cables & Adapters"
+    },
+    {
+      id: 105,
+      name: "Power Bank 10,000mAh",
+      description: "Slim, lightweight with dual output",
+      price: "$30",
+      originalPrice: "$35",
+      image: "/battery.png",
+      rating: 4.6,
+      reviews: 164,
+      inStock: true,
+      category: "Charging & Power"
+    },
+    {
+      id: 106,
+      name: "Bluetooth Headphones",
+      description: "Over-ear, noise isolation, 20h battery",
+      price: "$35",
+      originalPrice: "$49",
+      image: "/camera.png",
+      rating: 4.3,
+      reviews: 58,
+      inStock: true,
+      category: "Audio & Camera"
+    },
+  ];
+  
+  // Use API data or fallback, and randomize order
+  const allItems = (itemsResponse?.data || fallbackItems).slice().sort(() => Math.random() - 0.5);
+  
+  // Filter items based on search term
+  const filteredItems = allItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.description || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    return (
-        <PageTransition>
-        <div className="min-h-screen bg-gray-50">
-            <div className="container mx-auto px-4 py-8">
-                <div className="max-w-6xl mx-auto">
-                    <h1 className="text-4xl font-bold text-primary mb-8 text-center">
-                        Phone Accessories
-                    </h1>
-                    
-                    <p className="text-center text-gray-600 mb-12 text-lg">
-                        Premium accessories to enhance and protect your mobile devices
-                    </p>
-                    
-                    {accessories.map((category, categoryIndex) => (
-                        <div key={categoryIndex} className="mb-12">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">{category.category}</h2>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                {category.items.map((item, itemIndex) => (
-                                    <div key={itemIndex} className="bg-white/10  p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="flex justify-center mb-3">
-                                            <img 
-                                                src={item.image} 
-                                                alt={item.name}
-                                                className="w-16 h-16 object-contain"
-                                            />
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-gray-800 mb-2 text-center">
-                                            {item.name}
-                                        </h3>
-                                        <div className="text-xl font-bold text-primary text-center">
-                                            {item.price}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                    
-                    <div className="bg-white/10  p-8 rounded-lg shadow-md">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Why Choose Our Accessories?</h2>
-                        <div className="grid md:grid-cols-3 gap-6">
-                            <div className="text-center">
-                                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">🛡️</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Premium Quality</h3>
-                                <p className="text-gray-600">High-quality materials and construction for durability.</p>
-                            </div>
-                            <div className="text-center">
-                                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">💰</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Great Value</h3>
-                                <p className="text-gray-600">Competitive prices without compromising on quality.</p>
-                            </div>
-                            <div className="text-center">
-                                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                                    <span className="text-2xl">🚚</span>
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Fast Shipping</h3>
-                                <p className="text-gray-600">Quick delivery to your doorstep.</p>
-                            </div>
-                        </div>
+  return (
+    <PageTransition>
+      <div className="min-h-screen relative overflow-hidden bg-primary text-secondary">
+
+        <div className="container mx-auto px-4 py-8">
+          
+          {/* Hero Section */}
+          {/* <HeroSection
+            title="Browse"
+            subtitle="Accessories"
+            description="Explore our premium collection of mobile accessories. Find cases, chargers, cables, audio gear and more."
+            image="/Accessories.png"
+            imageAlt="Phone Accessories"
+            badgeText="Premium Accessories"
+            backButtonText="← Back to Home"
+            showBackButton={true}
+            backButtonHref="/"
+          /> */}
+
+          {/* Search Section */}
+       <div className="flex justify-end">
+       <SearchSection
+            // title="Find Accessories"
+            // description="Search for accessories or browse the full collection below."
+            placeholder="Search accessories..."
+            searchTerm={searchTerm}
+            onSearchChange={(e) => setSearchTerm(e.target.value)}
+          />
+       </div>
+          
+          {/* Accessories Grid */}
+          <GridSection
+            title=""
+            description=""
+            items={filteredItems}
+            isLoading={isLoading}
+            loadingCount={8}
+            onItemClick={(item) => {
+              const categorySlug = (item.category || 'accessories').toLowerCase().replace(/\s+/g, '-');
+              const route = `/accessories/${categorySlug}/${item.id}`;
+              return route;
+            }}
+            onItemClickHandler={(item) => {
+              if (typeof window !== 'undefined') {
+                sessionStorage.setItem('selectedAccessory', JSON.stringify(item));
+              }
+            }}
+            gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            notFoundTitle="No Accessories Found"
+            notFoundDescription={`No accessories found matching "${searchTerm}". Try a different search term.`}
+            searchTerm={searchTerm}
+            onClearSearch={() => setSearchTerm('')}
+            primaryAction={{
+              text: "Clear Search",
+              href: "#",
+              onClick: () => setSearchTerm('')
+            }}
+            secondaryAction={{
+              text: "View All Accessories",
+              href: "/accessories",
+              onClick: () => setSearchTerm('')
+            }}
+            renderItem={(item) => (
+              <div className="group relative bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-4 hover:border-secondary/50 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                <div className="flex flex-col h-full">
+                  {/* Product Image */}
+                  <div className="flex justify-center mb-3">
+                    <div className="w-20 h-20 bg-white/10 rounded-lg flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                      <Image
+                        src={item.image || '/Accessories.png'}
+                        alt={item.name}
+                        width={60}
+                        height={60}
+                        className="object-contain"
+                      />
                     </div>
+                  </div>
+                  
+                  {/* Name */}
+                  <h3 className="text-sm font-semibold text-accent mb-2 group-hover:text-secondary transition-colors text-center line-clamp-2">
+                    {item.name}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-xs text-accent/80 mb-3 line-clamp-2 flex-grow text-center">
+                    {item.description}
+                  </p>
+                  
+                  {/* Price */}
+                  <div className="flex items-center justify-center mb-3">
+                    <div className="text-lg font-bold text-secondary">
+                      {item.price}
+                    </div>
+                    {item.originalPrice && item.originalPrice !== item.price && (
+                      <div className="text-sm text-accent/60 line-through ml-2">
+                        {item.originalPrice}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Stock + Rating */}
+                  <div className="flex items-center justify-center gap-3 text-xs text-accent/80">
+                    <span className={`px-2 py-1 rounded-full ${item.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {item.inStock ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                    <span>⭐ {item.rating || '4.5'}</span>
+                  </div>
                 </div>
-            </div>
+              </div>
+            )}
+          />
+          
+          {/* Error State */}
+          {error && (
+            <MotionFade delay={0.15}>
+              <div className="text-center py-12">
+                <div className="text-red-500 mb-4">
+                  Failed to load accessories. Using fallback data.
+                </div>
+              </div>
+            </MotionFade>
+          )}
+
+          {/* Features Section */}
+          <FeaturesSection
+            title="Why Choose Our Accessories?"
+            description="Premium accessories designed to enhance and protect your mobile devices with guaranteed quality."
+            features={[
+              { title: "Premium Quality", description: "High-quality materials and construction for durability", icon: "🛡️" },
+              { title: "Great Value", description: "Competitive prices without compromising on quality", icon: "💰" },
+              { title: "Fast Shipping", description: "Quick delivery to your doorstep worldwide", icon: "🚚" },
+              { title: "Warranty", description: "30-day warranty on all accessories", icon: "✅" }
+            ]}
+          />
+
+         
         </div>
-        </PageTransition>
-    );
+      </div>
+    </PageTransition>
+  );
 }
