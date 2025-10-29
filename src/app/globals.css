@@ -16,6 +16,88 @@ body > .skiptranslate,
   border: none !important;
 }
 
+/* Override Google Translate CSS that adds background colors on hover */
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q,
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q:hover,
+[class*="VIpgJd-yAWNEb-VIpgJd-fmcmS"],
+[class*="VIpgJd-yAWNEb-VIpgJd-fmcmS"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  position: static !important;
+  box-sizing: content-box !important;
+  -webkit-box-sizing: content-box !important;
+  -moz-box-sizing: content-box !important;
+}
+
+/* Override any Google Translate text highlighting */
+.goog-text-highlight,
+.goog-text-highlight:hover,
+[class*="goog-text-highlight"],
+[class*="goog-text-highlight"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Override Google Translate tooltip styles */
+.goog-tooltip,
+.goog-tooltip:hover,
+[class*="goog-tooltip"],
+[class*="goog-tooltip"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Prevent Google Translate from adding hover effects to text */
+font[class*="VIpgJd"],
+font[class*="goog-text"],
+span[class*="VIpgJd"],
+span[class*="goog-text"],
+div[class*="VIpgJd"],
+div[class*="goog-text"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+font[class*="VIpgJd"]:hover,
+font[class*="goog-text"]:hover,
+span[class*="VIpgJd"]:hover,
+span[class*="goog-text"]:hover,
+div[class*="VIpgJd"]:hover,
+div[class*="goog-text"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Additional Google Translate class overrides */
+[class*="VIpgJd"],
+[class*="VIpgJd"]:hover,
+[class*="goog-text"],
+[class*="goog-text"]:hover,
+[class*="goog-te"],
+[class*="goog-te"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  position: static !important;
+  box-sizing: content-box !important;
+  -webkit-box-sizing: content-box !important;
+  -moz-box-sizing: content-box !important;
+}
+
+/* Override any Google Translate injected styles */
+*[class*="VIpgJd"],
+*[class*="goog-text"],
+*[class*="goog-te"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+*[class*="VIpgJd"]:hover,
+*[class*="goog-text"]:hover,
+*[class*="goog-te"]:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
 /* Prevent Google from pushing your layout */
 body {
   top: 0px !important;
