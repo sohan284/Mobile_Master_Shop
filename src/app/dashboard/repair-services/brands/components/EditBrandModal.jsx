@@ -88,7 +88,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
       }
 
       // Make API call using apiFetcher
-      await apiFetcher.patch(`/api/repair/brands/${brand.id}/`, submitData, {
+      await apiFetcher.patch(`/api/repair/brands/${brand.slug}/`, submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

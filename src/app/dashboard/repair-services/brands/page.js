@@ -80,7 +80,9 @@ export default function BrandsPage() {
   };
 
   const handleEdit = (brand) => {
-    setSelectedBrand(brand);
+    setSelecte
+    
+    dBrand(brand);
     setIsEditModalOpen(true);
   };
 
