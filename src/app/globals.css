@@ -26,6 +26,19 @@ body {
 .notranslate {
   translate: no !important;
 }
+body.translated * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: default !important;
+}
+
+/* Allow normal behavior in input fields */
+body.translated input,
+body.translated textarea {
+  user-select: text !important;
+  cursor: text !important;
+}
+
 body {
   font-family: var(--font-roboto), sans-serif;
   background-color: var(--primary);

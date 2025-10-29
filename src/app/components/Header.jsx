@@ -140,7 +140,7 @@ export default function Header() {
             <Link href="/accessories" className="hover:underline hover:text-white transition">
               Accessories
             </Link>
-            <Link href="#" className="hover:underline hover:text-white transition">
+            <Link href="/contact" className="hover:underline hover:text-white transition">
               Contact
             </Link>
             <div className="flex items-center space-x-4 relative">
@@ -201,7 +201,7 @@ export default function Header() {
                     Accessories
                   </Link>
                   <Link 
-                    href="#" 
+                    href="/contact" 
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
