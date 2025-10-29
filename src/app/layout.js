@@ -4,6 +4,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from 'react-hot-toast';
 import ClientLayout from "./components/ClientLayout";
+import Script from "next/script";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -26,9 +27,32 @@ export default function RootLayout({ children }) {
       <body
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
+        <head>
+        {/* Google Translate Initialization Script */}
+        <Script id="google-translate-init" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'fr',
+                includedLanguages: 'fr,en', // English and French
+                autoDisplay: false
+              }, 'google_translate_element');
+            }
+          `}
+        </Script>
+        <Script
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        ></Script>
+        <meta
+          name="google-site-verification"
+          content="1Np9pV4J01wsJbl-xNC00R74DY6io1LaT5hmniVruQk"
+        />
+      </head>
         <QueryProvider>
           <AuthProvider>
             <ClientLayout>
+            <div id="google_translate_element" style={{ position: "absolute", top: "-9999px", left: "-9999px" }}></div>
               {children}
             </ClientLayout>
             <Toaster

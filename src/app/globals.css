@@ -2,7 +2,30 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+.goog-te-banner-frame.skiptranslate,
+body > .skiptranslate,
+.goog-te-gadget-icon,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight,
+.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  border: none !important;
+}
 
+/* Prevent Google from pushing your layout */
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+/* Prevent translation of specific elements */
+.notranslate {
+  translate: no !important;
+}
 body {
   font-family: var(--font-roboto), sans-serif;
   background-color: var(--primary);
