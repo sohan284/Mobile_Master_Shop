@@ -123,6 +123,19 @@ h3 {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Customize text selection colors globally */
+::selection {
+  background-color: var(--accent);
+  
+  color: var(--accent-foreground);
+  
+}
+
+.dark ::selection {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -130,7 +143,7 @@ h3 {
 
   body {
     @apply bg-background text-foreground;
-   
+
   }
 }
 
@@ -151,7 +164,7 @@ h3 {
 
   .dark-blue-vignette {
     background: #0a1525;
-      
+
   }
 
   /* Marquee Animation */
@@ -168,6 +181,7 @@ h3 {
     0% {
       transform: translateX(0%);
     }
+
     100% {
       transform: translateX(-50%);
     }
