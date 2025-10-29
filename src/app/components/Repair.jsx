@@ -14,14 +14,7 @@ import { useApiGet } from '@/hooks/useApi';
 
 
 export default function Repair() {
-    const brandLogo = [
-        { id: 1, src: "/Apple.png", alt: "Apple logo" },
-        { id: 2, src: "/Samsung.png", alt: "Samsung logo" },
-        { id: 3, src: "/Xiaomi.png", alt: "Xiaomi logo" },
-        { id: 4, src: "/Huawei.png", alt: "Huawei logo" },
-        { id: 5, src: "/Honor.png", alt: "Honor logo" },
-        { id: 6, src: "/Oppo.png", alt: "Oppo logo" },
-    ];
+
 
     const repairServices = [
         {
@@ -152,30 +145,25 @@ export default function Repair() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {repairServices.map((service, idx) => (
-                            <motion.div
-                                key={service.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 1.1 + idx * 0.1 }}
-                                className="group relative"
-                            >
-                                <div className="bg-white/10 /10 backdrop-blur-sm rounded-md p-2 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                         <motion.div
+                         key={service.id}
+                         initial={{ opacity: 0, y: 20 }}
+                         animate={{ opacity: 1, y: 0 }}
+                         transition={{ duration: 0.5, delay: 1.1 + idx * 0.1 }}
+                         className="group relative"
+                     >       <div className="bg-white/10 /10 backdrop-blur-sm rounded-md p-2 shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                                     {/* Popular Badge */}
-                                    {service.popular && (
-                                        <div className="absolute top-2 -right-2 bg-secondary text-primary text-xs font-bold px-3 py-1 rounded-full z-50">
-                                            Most Popular
-                                        </div>
-                                    )}
+                                 
 
                                     <div className="text-center h-full flex flex-col">
                                         {/* Service Icon */}
-                                        <div className="mb-6 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-6 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
+                                        <div className="mb-6 bg-gradient-to-br p-3 from-white/10 to-white/5 rounded-md group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
                                             <Image
-                                                width={100}
-                                                height={100}
+                                                width={400}
+                                                height={400}
                                                 src={service.src}
                                                 alt={service.alt}
-                                                className="w-full h-40 object-contain group-hover:scale-110 transition-transform duration-500"
+                                                className="w-full rounded-md object-contain group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
 
@@ -188,14 +176,6 @@ export default function Repair() {
                                             </div>
 
                                             <div className="space-y-3">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-2xl font-bold text-secondary">{service.price}</span>
-                                                    <span className="text-sm text-gray-300">{service.time}</span>
-                                                </div>
-
-                                                <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
-                                                    12 Month Warranty
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -221,9 +201,9 @@ export default function Repair() {
                             {/* First set of logos */}
                             {brands.map((item, idx) => (
                                 <div key={`first-${item.id}`} className="flex-shrink-0 mx-6 group">
-                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 bg-white/5">
+                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/5 bg-white/3">
                                         <img
-                                            src={item.icon}
+                                            src={item.logo}
                                             alt={item.name}
                                             className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />
@@ -233,9 +213,9 @@ export default function Repair() {
                             {/* Duplicate set for seamless loop */}
                             {brands.map((item, idx) => (
                                 <div key={`second-${item.id}`} className="flex-shrink-0 mx-6 group">
-                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/10 bg-white/5">
+                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-white/5 bg-white/3">
                                         <img
-                                            src={item.icon}
+                                            src={item.logo}
                                             alt={item.name}
                                             className="w-12 h-12 object-contain opacity-70 group-hover:opacity-100 transition-opacity duration-300"
                                         />

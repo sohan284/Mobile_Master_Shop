@@ -11,8 +11,8 @@ import accessories from "../../../public/Accessories.png";
 
 export default function Banner() {
   return (
-    <div className="relative bg-[#0a1525] text-white pb-20 pt-3 overflow-hidden min-h-screen">
-      <div className="container mx-auto px-4 z-10 relative">
+    <div className="relative  text-white pb-20 pt-3 overflow-hidden min-h-screen">
+      <div className="container mx-auto px-4 z-10 relative ">
         {/* Text Section */}
         <div className="text-center mt-8 md:mt-12">
           <motion.h1
@@ -91,7 +91,7 @@ export default function Banner() {
                 alt="iPhone 14 Pro Max"
                 width={380}
                 height={380}
-                className="object-contain drop-shadow-[0_35px_55px_rgba(0,0,0,0.5)]"
+                className="object-contain "
               />
             </motion.div>
           </Link>
