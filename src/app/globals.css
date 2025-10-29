@@ -125,7 +125,7 @@ h3 {
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: #E2E8F0;
+  --accent: #000000;
   --accent-foreground: #0a1525;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -146,6 +146,19 @@ h3 {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Customize text selection colors globally */
+::selection {
+  background-color: var(--accent);
+  
+  color: var(--accent-foreground);
+  
+}
+
+.dark ::selection {
+  background-color: var(--primary);
+  color: var(--secondary);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -153,7 +166,7 @@ h3 {
 
   body {
     @apply bg-background text-foreground;
-   
+
   }
 }
 
@@ -174,7 +187,7 @@ h3 {
 
   .dark-blue-vignette {
     background: #0a1525;
-      
+
   }
 
   /* Marquee Animation */
@@ -191,6 +204,7 @@ h3 {
     0% {
       transform: translateX(0%);
     }
+
     100% {
       transform: translateX(-50%);
     }
