@@ -130,6 +130,7 @@ h3 {
 
   body {
     @apply bg-background text-foreground;
+   
   }
 }
 

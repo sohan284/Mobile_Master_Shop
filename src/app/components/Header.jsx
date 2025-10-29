@@ -9,6 +9,7 @@ import {
 import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
 import { useAuth } from "@/contexts/AuthContext";
+import CartIcon from "@/components/accessories/CartIcon";
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -100,29 +101,34 @@ export default function Header() {
           </div>
           </Link>
 
-          {isAuthenticated() ? (
-            <button
-              onClick={logout}
-              className="text-white focus:outline-none hover:text-gray-300"
-              title="Logout"
-            >
-              <LogOut size={22} />
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              className="text-white focus:outline-none hover:text-gray-300"
-            >
-              <User size={22} />
-            </Link>
-          )}
+          <div className="flex items-center space-x-3">
+            <CartIcon />
+            {isAuthenticated() ? (
+              <button
+                onClick={logout}
+                className="text-white focus:outline-none hover:text-gray-300"
+                title="Logout"
+              >
+                <LogOut size={22} />
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="text-white focus:outline-none hover:text-gray-300"
+              >
+                <User size={22} />
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* ✅ Desktop Header (md and up) */}
         <div className="hidden md:flex flex-col w-full items-center space-y-4">
           {/* Logo */}
           <div className="text-2xl font-bold text-center">
+           <Link href="/">
            <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
+           </Link>
           </div>
 
           {/* Navigation */}
@@ -140,8 +146,9 @@ export default function Header() {
               Contact
             </Link>
 
-            {/* User */}
-            <div className="flex items-center space-x-3">
+            {/* Cart and User */}
+            <div className="flex items-center space-x-4">
+              <CartIcon />
               {isAuthenticated() ? (
                 <>
                   <Link href="/dashboard" className="hover:text-gray-300 flex items-center space-x-2">
