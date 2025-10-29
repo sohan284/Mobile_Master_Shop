@@ -17,10 +17,10 @@ export default function DashboardLayout({ children }) {
         {/* Main content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top bar */}
-          <div className="bg-primary  shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
+          <div className="bg-secondary  shadow-sm border-b border-gray-200 p-4 flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-md text-secondary hover:text-gray-900 hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-md text-primary hover:text-primary hover:bg-gray-100"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />

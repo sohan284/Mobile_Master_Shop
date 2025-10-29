@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
-import logo from "@/assets/mlkLogo.png";
+import logo from "@/assets/logoMlk.png";
 import OTPVerificationPopup from './components/OTPVerificationPopup';
 import CredentialsSetupPopup from './components/CredentialsSetupPopup';
 import { sendOTP } from '@/lib/api.js';

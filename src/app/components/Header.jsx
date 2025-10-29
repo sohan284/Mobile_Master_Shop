@@ -102,7 +102,7 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center space-x-3">
-            <CartIcon />
+            {/* <CartIcon /> */}
             {isAuthenticated() ? (
               <button
                 onClick={logout}
@@ -148,7 +148,7 @@ export default function Header() {
 
             {/* Cart and User */}
             <div className="flex items-center space-x-4">
-              <CartIcon />
+              {/* <CartIcon /> */}
               {isAuthenticated() ? (
                 <>
                   <Link href="/dashboard" className="hover:text-gray-300 flex items-center space-x-2">
