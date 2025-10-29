@@ -30,8 +30,8 @@ export default function BrandsPage() {
       accessor: 'logo',
       render: (item) => (
         <div className="flex items-center">
-          <Image 
-            src={item?.logo || '/Apple.png'} 
+          <Image
+            src={item?.icon}
             alt={item?.name}
             className="h-8 w-8 object-contain"
             width={32}
@@ -45,7 +45,7 @@ export default function BrandsPage() {
       accessor: 'name',
       sortable: true
     },
-   
+
     {
       header: 'Created At',
       accessor: 'created_at',
@@ -53,7 +53,7 @@ export default function BrandsPage() {
         <div className="text-sm text-gray-500">
           {new Date(item.created_at).toLocaleDateString()}
         </div>
-      ),  
+      ),
       sortable: true
     }
   ];
@@ -80,9 +80,7 @@ export default function BrandsPage() {
   };
 
   const handleEdit = (brand) => {
-    setSelecte
-    
-    dBrand(brand);
+    setSelectedBrand(brand);
     setIsEditModalOpen(true);
   };
 
