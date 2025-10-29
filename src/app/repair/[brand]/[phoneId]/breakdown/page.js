@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
@@ -14,7 +14,7 @@ import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Home, Wrench, Smartphone, Settings } from 'lucide-react';
 
 export default function PriceBreakdownPage({ params }) {
-    const { brand, phoneId } = params;
+    const { brand, phoneId } = use(params);
     const router = useRouter();
     const { isAuthenticated } = useAuth();
     const [phoneInfo, setPhoneInfo] = useState(null);
