@@ -7,6 +7,7 @@ import HeroSection from '@/components/common/HeroSection';
 import { CustomButton } from '@/components/ui/button';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { encryptBkp } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import Link from 'next/link';
@@ -16,7 +17,7 @@ import { Home, Wrench, Smartphone, Settings } from 'lucide-react';
 export default function PriceBreakdownPage({ params }) {
     const { brand, phoneId } = use(params);
     const router = useRouter();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [phoneInfo, setPhoneInfo] = useState(null);
     const [selectedServices, setSelectedServices] = useState([]);
     const [servicePartTypes, setServicePartTypes] = useState({});
@@ -68,7 +69,6 @@ export default function PriceBreakdownPage({ params }) {
 
             setIsLoading(true);
             setError(null);
-
             try {
                 const requestBody = {
                     phone_model_id: parseInt(phoneId),
@@ -158,29 +158,67 @@ export default function PriceBreakdownPage({ params }) {
         router.back();
     };
 
-    const handleProceedToBooking = () => {
+    const handleProceedToBooking = async () => {
         // Check if user is authenticated
         if (!isAuthenticated()) {
             setShowAuthModal(true);
             return;
         }
-        
-        // Store price data for booking page
-        if (typeof window !== 'undefined' && priceData) {
-            sessionStorage.setItem('priceBreakdown', JSON.stringify(priceData));
+        try {
+            // Build order body for backend
+            const orderBody = {
+                phone_model_id: parseInt(phoneId),
+                customer_name: user?.name || user?.username || 'Customer',
+                customer_email: user?.email || '',
+                customer_phone: user?.phone || '01788175088',
+                items: selectedServices.map((serviceId) => ({
+                    problem_id: serviceId,
+                    part_type: servicePartTypes[serviceId] || 'original'
+                })),
+                notes: ''
+            };
+
+            const response = await apiFetcher.post('/api/repair/orders/', orderBody);
+            const order = response?.data || response;
+
+            // Store shared booking payload (encrypted) under 'bkp'
+            if (typeof window !== 'undefined' && priceData) {
+                const bookingPayload = {
+                    type: 'repair',
+                    amount: parseFloat(priceData.total_amount || '0'),
+                    currency: 'EUR',
+                    context: { brand, phoneId },
+                    items: priceData.items || [],
+                    orderId: order?.order?.id,
+                    payment_intent_id: order?.payment?.payment_intent_id || order?.payment_intent || null,
+                    client_secret: order?.payment?.client_secret || order?.payment_intent_client_secret || null,
+                    summary: {
+                        subtotal: parseFloat(priceData.subtotal || '0'),
+                        itemDiscount: parseFloat(priceData.item_discount || '0'),
+                        priceAfterItemDiscount: parseFloat(priceData.price_after_item_discount || '0'),
+                        websiteDiscount: parseFloat(priceData.website_discount || '0'),
+                        totalDiscount: parseFloat(priceData.total_discount || '0')
+                    },
+                    display: {
+                        phone_model: priceData.phone_model,
+                        brand: priceData.brand
+                    }
+                };
+                const enc = encryptBkp(bookingPayload);
+                if (enc) sessionStorage.setItem('bkp', enc);
+            }
+
+            // Navigate to shared booking page (Stripe confirmation happens there)
+            router.push(`/booking`);
+        } catch (e) {
+            console.error('Order creation failed:', e);
+            setError('Failed to create order. Please try again.');
         }
-        // Navigate to booking page (you can create this later)
-        router.push(`/repair/${brand}/${phoneId}/booking`);
     };
 
-    const handleAuthSuccess = (user) => {
+    const handleAuthSuccess = async (user) => {
         setShowAuthModal(false);
-        // Store price data for booking page
-        if (typeof window !== 'undefined' && priceData) {
-            sessionStorage.setItem('priceBreakdown', JSON.stringify(priceData));
-        }
-        // Navigate to booking page
-        router.push(`/repair/${brand}/${phoneId}/booking`);
+        await handleProceedToBooking();
     };
 
     if (isLoading) {
@@ -422,6 +460,12 @@ export default function PriceBreakdownPage({ params }) {
                                                 <span>-{parseFloat(priceData.website_discount).toFixed(2)}</span>
                                             </div>
                                         )}
+                                        {parseFloat(priceData.website_discount_amount) > 0 && (
+                                            <div className="flex justify-between text-secondary">
+                                                <span>Website Discount Amount:</span>
+                                                <span>-{parseFloat(priceData.website_discount_amount).toFixed(2)}</span>
+                                            </div>
+                                        )}
                                         
                                         <div className="border-t border-accent/20 pt-3">
                                             <div className="flex justify-between text-lg font-bold">
@@ -467,7 +511,7 @@ export default function PriceBreakdownPage({ params }) {
                 isOpen={showAuthModal}
                 onClose={() => setShowAuthModal(false)}
                 onSuccess={handleAuthSuccess}
-                redirectPath={`/repair/${brand}/${phoneId}/booking`}
+                redirectPath={`/booking`}
             />
         </PageTransition>
     );

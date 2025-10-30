@@ -18,7 +18,7 @@ import NotFound from '@/components/ui/NotFound';
 export default function PhoneModelPage({ params }) {
     const { brand, phoneId } = use(params);
     const [selectedServices, setSelectedServices] = useState([]);
-    const [servicePartTypes, setServicePartTypes] = useState({}); // Store part type for each service
+    const [servicePartTypes, setServicePartTypes] = useState({"1":"original"}); // Store part type for each service
     const [searchTerm, setSearchTerm] = useState('');
     const [phoneInfo, setPhoneInfo] = useState(null);
 
