@@ -259,7 +259,8 @@ export default function Refurbished() {
           >
             {models.map((model) => (
               <SwiperSlide key={model.id}>
-                <Card className="group bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                <Link className='cursor-pointer' href={`/phones/${model.brand}/${model.id}`}>
+                <Card className="group cursor-pointer bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                   <CardContent className="p-4 py-0 text-center h-full flex flex-col relative">
                     {/* Brand Badge */}
                     {/* <div className="absolute top-3 left-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
@@ -311,6 +312,7 @@ export default function Refurbished() {
                     </div>
                   </CardContent>
                 </Card>
+                </Link>
               </SwiperSlide>
             ))}
           </Swiper>
