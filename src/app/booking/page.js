@@ -169,9 +169,17 @@ export default function BookingPage() {
                                                             {item.part_type && (
                                                                 <div className="text-xs text-accent/70">Part Type: {item.part_type}</div>
                                                             )}
+                                                            {item.quantity && item.price && (
+                                                                <div className="text-xs text-accent/70">{currency} {parseFloat(item.price).toFixed(2)} × {parseInt(item.quantity)}</div>
+                                                            )}
                                                         </div>
                                                         <div className="text-secondary font-semibold">
-                                                            {(parseFloat(item.final_price || item.price || 0)).toFixed(2)}
+                                                            {(() => {
+                                                                const unit = parseFloat(item.price || item.final_price || 0);
+                                                                const qty = parseInt(item.quantity || 1);
+                                                                const line = item.final_price ? parseFloat(item.final_price) : unit * qty;
+                                                                return `${currency} ${line.toFixed(2)}`;
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 ))}

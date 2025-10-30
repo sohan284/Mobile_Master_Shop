@@ -460,6 +460,12 @@ export default function PriceBreakdownPage({ params }) {
                                                 <span>-{parseFloat(priceData.website_discount).toFixed(2)}</span>
                                             </div>
                                         )}
+                                        {parseFloat(priceData.website_discount_amount) > 0 && (
+                                            <div className="flex justify-between text-secondary">
+                                                <span>Website Discount Amount:</span>
+                                                <span>-{parseFloat(priceData.website_discount_amount).toFixed(2)}</span>
+                                            </div>
+                                        )}
                                         
                                         <div className="border-t border-accent/20 pt-3">
                                             <div className="flex justify-between text-lg font-bold">
