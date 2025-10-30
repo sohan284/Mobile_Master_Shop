@@ -18,6 +18,17 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor with no SSR
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="p-4 text-gray-400">Loading editor...</div>
+    </div>
+  ),
+});
 
 export default function EditModelModal({ isOpen, onClose, onSuccess, model, brands, colors }) {
   const [formData, setFormData] = useState({
@@ -218,10 +229,8 @@ console.log(formData);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent 
-        style={{ maxWidth: '700px', width: '90vw' }}
-      >
-        <DialogHeader>
+    <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
           <DialogTitle>Edit Model</DialogTitle>
         </DialogHeader>
 
@@ -382,11 +391,7 @@ console.log(formData);
 
          
 
-          {/* Description - Full Width */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-          
-          </div>
+      
 
           {/* Color Selection */}
           <div className="space-y-2">
@@ -499,6 +504,15 @@ console.log(formData);
                 </label>
               </div>
             )}
+                {/* Description - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <RichTextEditor
+              content={formData.description}
+              onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
+              disabled={isSubmitting}
+            />
+          </div>
           </div>
 
 

@@ -92,6 +92,8 @@ export default function Banner() {
                 width={380}
                 height={380}
                 className="object-contain "
+                loading="eager"
+                style={{ height: 'auto' }}
               />
             </motion.div>
           </Link>
@@ -134,6 +136,8 @@ export default function Banner() {
                 width={320}
                 height={320}
                 className="object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,0.5)]"
+                loading="eager"
+                style={{ height: 'auto' }}
               />
             </motion.div>
           </Link>
