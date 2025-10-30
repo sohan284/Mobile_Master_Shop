@@ -263,122 +263,121 @@ export default function PhoneIndividualPage({ params }) {
           <MotionFade delay={0.2} immediate={true}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
               {/* Left: Image */}
-            <div>
-            <div className="relative flex justify-center items-start lg:sticky lg:top-24">
-                <SafeImage
-                  src={getImageSrc(phone?.icon)}
-                  alt={phone?.name || 'Phone'}
-                  width={480}
-                  height={480}
-                  className="w-full max-w-md h-auto object-contain rounded-xl p-4"
-                />
-              </div>
-
-              <div className="space-y-6">
-                <h1 className="text-3xl font-bold text-accent">{phone.name}</h1>
-                <p className="text-accent/80 text-lg">{phone.brand_name}</p>
-
-                {/* Features */}
-                <div className="flex gap-4">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      {feature.text === "Guarantee" ? (
-                        <Shield className="w-5 h-5 text-secondary" />
-                      ) : (
-                        <CreditCard className="w-5 h-5 text-secondary" />
-                      )}
-                      <span className="text-accent">{feature.text}: {feature.value}</span>
-                    </div>
-                  ))}
+              <div>
+                <div className="relative flex justify-center items-start lg:sticky lg:top-24">
+                  <SafeImage
+                    src={getImageSrc(phone?.icon)}
+                    alt={phone?.name || 'Phone'}
+                    width={480}
+                    height={480}
+                    className="w-full max-w-md h-auto object-contain rounded-xl p-4"
+                  />
                 </div>
-              </div>
-              {/* Phone Specifications */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-accent/80">Storage:</span>
-                    <span className="text-accent ml-2">{phone.memory}GB</span>
-                  </div>
-                  <div>
-                    <span className="text-accent/80">RAM:</span>
-                    <span className="text-accent ml-2">{phone.ram}GB</span>
-                  </div>
-                  <div>
-                    <span className="text-accent/80">Stock:</span>
-                    <span className="text-accent ml-2">{phone.stock_quantity} units</span>
-                  </div>
-                  <div>
-                    <span className="text-accent/80">Status:</span>
-                    <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
-                      {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                    </span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Selections */}
-              {Object.entries(selections).map(([key, selection]) => (
-                <div key={key} className="space-y-2">
-                  <h3 className="font-semibold text-accent">{selection.title}</h3>
-                  <div className="flex gap-2">
-                    {selection.options.map((option) => (
-                      <button
-                        key={typeof option === 'string' ? option : option.name}
-                        onClick={() => handleOptionSelect(key, option)}
-                        className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 cursor-pointer ${option === selectedOptions[key]
-                            ? 'bg-secondary text-primary border-secondary hover:shadow-md'
-                            : 'border-accent/30 text-accent hover:shadow-md'
-                          }`}
-                      >
-                        {typeof option === 'string' ? option : option.name}
-                      </button>
+                <div className="space-y-6">
+                  <h1 className="text-3xl font-bold text-accent">{phone.name}</h1>
+                  <p className="text-accent/80 text-lg">{phone.brand_name}</p>
+
+                  {/* Features */}
+                  <div className="flex gap-4">
+                    {features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        {feature.text === "Guarantee" ? (
+                          <Shield className="w-5 h-5 text-secondary" />
+                        ) : (
+                          <CreditCard className="w-5 h-5 text-secondary" />
+                        )}
+                        <span className="text-accent">{feature.text}: {feature.value}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
-              ))}
-
-              {/* Pricing */}
-              <div className="border-t border-accent/20 pt-6">
-                <div className="text-3xl font-bold text-secondary">
-                  ${parseFloat(phone.final_price).toLocaleString()}
+                {/* Phone Specifications */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
+                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-accent/80">Storage:</span>
+                      <span className="text-accent ml-2">{phone.memory}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">RAM:</span>
+                      <span className="text-accent ml-2">{phone.ram}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Stock:</span>
+                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Status:</span>
+                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
+                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                  <div className="text-accent/60 line-through text-lg">
-                    ${parseFloat(phone.main_amount).toLocaleString()}
-                  </div>
-                )}
-                {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                  <div className="text-secondary text-sm">
-                    {parseFloat(phone.discount_percentage).toFixed(1)}% off
-                  </div>
-                )}
-              </div>
 
-              {/* Availability */}
-              <div className="border-t border-accent/20 pt-6">
-                <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
-                <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
-                  <div className="flex-1">
-                    <div className="font-medium flex items-center gap-2 text-accent">
-                      <Save className="w-5 h-5 text-secondary" />
-                      {availability.store.name}
-                    </div>
-                    <div className="text-accent/80 flex items-center gap-2">
-                      <MapPin className="w-5 h-5 text-accent/60" />
-                      {availability.store.location.address}
+                {/* Selections */}
+                {Object.entries(selections).map(([key, selection]) => (
+                  <div key={key} className="space-y-2">
+                    <h3 className="font-semibold text-accent">{selection.title}</h3>
+                    <div className="flex gap-2">
+                      {selection.options.map((option) => (
+                        <button
+                          key={typeof option === 'string' ? option : option.name}
+                          onClick={() => handleOptionSelect(key, option)}
+                          className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 cursor-pointer ${option === selectedOptions[key]
+                            ? 'bg-secondary text-primary border-secondary hover:shadow-md'
+                            : 'border-accent/30 text-accent hover:shadow-md'
+                            }`}
+                        >
+                          {typeof option === 'string' ? option : option.name}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer">
-                    <Calendar className="w-5 h-5" />
-                    Buy Now
-                  </button>
+                ))}
+
+                {/* Pricing */}
+                <div className="border-t border-accent/20 pt-6">
+                  <div className="text-3xl font-bold text-secondary">
+                    ${parseFloat(phone.final_price).toLocaleString()}
+                  </div>
+                  {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
+                    <div className="text-accent/60 line-through text-lg">
+                      ${parseFloat(phone.main_amount).toLocaleString()}
+                    </div>
+                  )}
+                  {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                    <div className="text-secondary text-sm">
+                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                    </div>
+                  )}
+                </div>
+
+                {/* Availability */}
+                <div className="border-t border-accent/20 pt-6">
+                  <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
+                  <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
+                    <div className="flex-1">
+                      <div className="font-medium flex items-center gap-2 text-accent">
+                        <Save className="w-5 h-5 text-secondary" />
+                        {availability.store.name}
+                      </div>
+                      <div className="text-accent/80 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-accent/60" />
+                        {availability.store.location.address}
+                      </div>
+                    </div>
+                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer">
+                      <Calendar className="w-5 h-5" />
+                      Buy Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-
           </MotionFade>
-
           {/* Refurbishment Process */}
           <MotionFade delay={0.3} immediate={true}>
             <section className="my-16">
@@ -453,7 +452,7 @@ export default function PhoneIndividualPage({ params }) {
           </MotionFade> */}
         </div>
       </div>
-    </PageTransition>
+    </PageTransition >
 
 
   )
