@@ -16,7 +16,7 @@ import NotFound from "@/components/ui/NotFound";
 
 export default function AccessoriesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Fetch all accessories (no category grouping)
   const { data: accessoriesResponse, isLoading, error, refetch } = useApiGet(
     ['accessories'],
@@ -24,7 +24,7 @@ export default function AccessoriesPage() {
   );
   const accessories = useMemo(() => accessoriesResponse?.data || [], [accessoriesResponse?.data]);
 
-  
+
   // Fallback items if API fails (memoized to prevent unnecessary re-renders)
   const fallbackItems = useMemo(() => [
     {
@@ -100,10 +100,10 @@ export default function AccessoriesPage() {
       category: "Audio & Camera"
     },
   ], []);
-  
+
   // Use API data or fallback, and randomize order (with stable sorting to prevent remount issues)
   const [randomizedItems, setRandomizedItems] = useState([]);
-  
+
   useEffect(() => {
     // Only randomize once when data is loaded
     if (accessories || fallbackItems) {
@@ -113,9 +113,9 @@ export default function AccessoriesPage() {
       setRandomizedItems(shuffled);
     }
   }, [accessories, fallbackItems]);
-  
+
   const allItems = randomizedItems.length > 0 ? randomizedItems : (accessories || fallbackItems);
-  
+
   // Filter items based on search term
   const filteredItems = allItems.filter(item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -124,34 +124,33 @@ export default function AccessoriesPage() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen relative overflow-hidden bg-primary text-secondary">
+      <div className="min-h-screen relative overflow-hidden p-10 md:p-20">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(0_0_0/0.03)_1px,transparent_0)] bg-[length:24px_24px] pointer-events-none"></div>
 
-        <div className="container mx-auto px-4 py-8">
-          
-          {/* Hero Section */}
-          {/* <HeroSection
-            title="Browse"
-            subtitle="Accessories"
-            description="Explore our premium collection of mobile accessories. Find cases, chargers, cables, audio gear and more."
-            image="/Accessories.png"
-            imageAlt="Phone Accessories"
-            badgeText="Premium Accessories"
-            backButtonText="← Back to Home"
-            showBackButton={true}
-            backButtonHref="/"
-          /> */}
+        <div className="container mx-auto px-4 py-8 relative z-10">
 
-          {/* Search Section */}
-       <div className="flex justify-end">
-       <SearchSection
-            // title="Find Accessories"
-            // description="Search for accessories or browse the full collection below."
-            placeholder="Search accessories..."
-            searchTerm={searchTerm}
-            onSearchChange={(e) => setSearchTerm(e.target.value)}
-          />
-       </div>
-          
+          {/* Search Section with gradient header */}
+          <div className="mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                  Premium Accessories
+                </h1>
+                <p className="text-lg text-white">
+                  Discover high-quality accessories for your devices
+                </p>
+              </div>
+              <div className="md:w-96">
+                <SearchSection
+                  placeholder="Search accessories..."
+                  searchTerm={searchTerm}
+                  onSearchChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Accessories Grid */}
           <GridSection
             title=""
@@ -168,7 +167,7 @@ export default function AccessoriesPage() {
                 sessionStorage.setItem('selectedAccessory', JSON.stringify(item));
               }
             }}
-            gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+            gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             notFoundTitle="No Accessories Found"
             notFoundDescription={`No accessories found matching "${searchTerm}". Try a different search term.`}
             searchTerm={searchTerm}
@@ -184,78 +183,114 @@ export default function AccessoriesPage() {
               onClick: () => setSearchTerm('')
             }}
             renderItem={(item) => (
-              <Link href={`/accessories/${item.id}`}>
-                <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
-                  <div className=" p-8 text-center h-full flex flex-col">
-                    <div className="mb-6 bg-white/5 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
+              <Link href={`/accessories/${item.id}`} className="group h-full block">
+                <div className="relative rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200 hover:border-slate-300 h-full overflow-hidden transform hover:-translate-y-2">
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500 pointer-events-none"></div>
+
+                  {/* Discount badge */}
+                  {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
+                    <div className="absolute top-4 right-4 z-10">
+                      <div className="bg-gradient-to-r from-red-500 to-pink text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        {parseFloat(item.discount_percentage).toFixed(0)}% OFF
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Stock badge */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <div className={`text-xs font-semibold px-3 py-1.5 rounded-full shadow-md ${item.is_in_stock
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-rose-100 text-rose-700'
+                      }`}>
+                      {item.is_in_stock ? '✓ In Stock' : '✕ Out of Stock'}
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Image container with premium styling */}
+                    <div className="relative mb-6  rounded-xl p-8 overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <Image
                         src={item.picture || '/Accessories.png'}
                         alt={item.title}
-                        width={360}
-                        height={360}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
+                        width={300}
+                        height={300}
+                        className="w-full h-48 object-contain group-hover:scale-110 transition-transform duration-500 relative z-10"
                       />
                     </div>
-                    <div className="flex-grow flex flex-col justify-between">
-                      <h3 className="font-bold text-lg text-accent group-hover:text-secondary transition-colors duration-300 mb-3">
+
+                    {/* Content */}
+                    <div className="space-y-3">
+                      <h3 className="font-bold text-lg text-white group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 min-h-[3.5rem]">
                         {item.title}
                       </h3>
-                      <div className="space-y-2">
-                        {item.subtitle && (
-                          <p className="text-accent/80 text-sm">{item.subtitle}</p>
-                        )}
-                        <div className="space-y-1">
-                          <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
-                            {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
-                              <span className="text-xs text-green-500">
-                                {parseFloat(item.discount_percentage).toFixed(1)}% off
-                              </span>
-                            )}
-                            <span className='font-bold text-secondary'>${parseFloat(item.final_price).toLocaleString()}</span>
+
+                      {item.subtitle && (
+                        <p className="text-white text-sm line-clamp-2 min-h-[2.5rem]">
+                          {item.subtitle}
+                        </p>
+                      )}
+
+                      {/* Pricing section */}
+                      <div className="pt-4 border-t border-white">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">
+                              ${parseFloat(item.final_price).toLocaleString()}
+                            </span>
                             {item.discounted_amount && item.discounted_amount !== item.main_amount && (
-                              <span className="text-sm text-accent/60 line-through">
+                              <span className="text-sm text-slate-500 line-through">
                                 ${parseFloat(item.main_amount).toLocaleString()}
                               </span>
                             )}
-                          </p>
+                          </div>
+                          {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
+                            <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                              Save ${(parseFloat(item.main_amount) - parseFloat(item.final_price)).toFixed(2)}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div className="mt-3 flex items-center justify-center gap-3 text-xs text-accent/80">
-                        <span className={`px-2 py-1 rounded-full ${item.is_in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {item.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                        </span>
-                      </div>
+
+                      {/* Call to action */}
+                      <button className="cursor-pointer w-full mt-4 bg-gradient-to-r from-slate-900 to-slate-700 text-white font-semibold py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 transform group-hover:scale-[1.02] transition-all duration-300 shadow-md hover:shadow-xl">
+                        View Details
+                      </button>
                     </div>
                   </div>
                 </div>
               </Link>
             )}
           />
-          
+
           {/* Error State */}
           {error && (
             <MotionFade delay={0.15}>
               <div className="text-center py-12">
-                <div className="text-red-500 mb-4">
+                <div className="inline-flex items-center gap-2 bg-red-50 text-red-600 px-6 py-3 rounded-lg border border-red-200">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
                   Failed to load accessories. Using fallback data.
                 </div>
               </div>
             </MotionFade>
           )}
 
-          {/* Features Section */}
-          <FeaturesSection
-            title="Why Choose Our Accessories?"
-            description="Premium accessories designed to enhance and protect your mobile devices with guaranteed quality."
-            features={[
-              { title: "Premium Quality", description: "High-quality materials and construction for durability", icon: "🛡️" },
-              { title: "Great Value", description: "Competitive prices without compromising on quality", icon: "💰" },
-              { title: "Fast Shipping", description: "Quick delivery to your doorstep worldwide", icon: "🚚" },
-              { title: "Warranty", description: "30-day warranty on all accessories", icon: "✅" }
-            ]}
-          />
-
-         
+          {/* Features Section with modern cards */}
+          <div className="mt-20">
+            <FeaturesSection
+              title="Why Choose Our Accessories?"
+              description="Premium accessories designed to enhance and protect your mobile devices with guaranteed quality."
+              features={[
+                { title: "Premium Quality", description: "High-quality materials and construction for durability", icon: "🛡️" },
+                { title: "Great Value", description: "Competitive prices without compromising on quality", icon: "💰" },
+                { title: "Fast Shipping", description: "Quick delivery to your doorstep worldwide", icon: "🚚" },
+                { title: "Warranty", description: "30-day warranty on all accessories", icon: "✅" }
+              ]}
+            />
+          </div>
         </div>
       </div>
     </PageTransition>
