@@ -38,7 +38,6 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
-    description: '',
     image: null,
     imagePreview: null
   });
@@ -51,7 +50,6 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       setFormData({
         name: model.name || '',
         brand: model.brand || '',
-        description: model.description || '',
         image: null,
         imagePreview: model.image || null
       });
@@ -132,9 +130,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       const submitData = new FormData();
       submitData.append('name', formData.name.trim());
       submitData.append('brand', formData.brand);
-      if (formData.description !== undefined) {
-        submitData.append('description', formData.description || '');
-      }
+    
       
       // Only append image if a new one was selected
       if (formData.image) {
@@ -155,7 +151,6 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       setFormData({
         name: '',
         brand: '',
-        description: '',
         image: null,
         imagePreview: null
       });
@@ -314,15 +309,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
               </div>
             )}
           </div>
-          {/* Description */}
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <RichTextEditor
-              content={formData.description}
-              onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
-              disabled={isSubmitting}
-            />
-          </div>
+      
 
 
          

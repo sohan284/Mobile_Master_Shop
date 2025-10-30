@@ -38,7 +38,6 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
-    description: '',
     image: null,
     imagePreview: null
   });
@@ -114,9 +113,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       submitData.append('name', formData.name.trim());
       submitData.append('brand', formData.brand);
       submitData.append('image', formData.image);
-      if (formData.description) {
-        submitData.append('description', formData.description);
-      }
+    
 
       // Make API call using apiFetcher
       await apiFetcher.post('/api/repair/models/', submitData, {
@@ -132,7 +129,6 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       setFormData({
         name: '',
         brand: '',
-        description: '',
         image: null,
         imagePreview: null
       });
@@ -271,15 +267,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
               </div>
             )}
           </div>
-        {/* Description */}
-        <div className="space-y-2">
-          <Label>Description</Label>
-          <RichTextEditor
-            content={formData.description}
-            onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
-            disabled={isSubmitting}
-          />
-        </div>
+      
 
           
 
