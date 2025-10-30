@@ -36,12 +36,12 @@ export default function PhoneIndividualPage({ params }) {
   // Helper function to get the correct image source
   const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
     if (!imageSrc) return fallback;
-    
+
     // If it's a remote URL and starts with http, use it directly
     if (imageSrc.startsWith('http')) {
       return imageSrc;
     }
-    
+
     // If it's a local path, ensure it starts with /
     return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
   };
@@ -218,17 +218,17 @@ export default function PhoneIndividualPage({ params }) {
       {
         quote: `I'm impressed with the quality of my refurbished ${phone.name}. It looks and works like new, and the price was unbeatable. The staff at Save were very helpful with the setup!`,
         author: "Thomas",
-        product: `Refurbished ${phone.name}`
+        product: `${phone.name}`
       },
       {
         quote: `Great experience buying from Save. My ${phone.brand_name} phone arrived in perfect condition, and the 2-year warranty gives me complete peace of mind. Will definitely recommend to friends!`,
         author: "Sophie L.",
-        product: `Refurbished ${phone.name}`
+        product: `${phone.name}`
       },
       {
         quote: `Fast service and excellent quality. My refurbished ${phone.name} works flawlessly, and the battery life is amazing. Much better value than buying new!`,
         author: "Marc D.",
-        product: `Refurbished ${phone.name}`
+        product: `${phone.name}`
       }
     ]
   };
@@ -278,94 +278,93 @@ export default function PhoneIndividualPage({ params }) {
                     </div>
                   ))}
                 </div>
-</div>
-                {/* Phone Specifications */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-accent/80">Storage:</span>
-                      <span className="text-accent ml-2">{phone.memory}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">RAM:</span>
-                      <span className="text-accent ml-2">{phone.ram}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Stock:</span>
-                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Status:</span>
-                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
-                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                      </span>
-                    </div>
+              </div>
+              {/* Phone Specifications */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
+                <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-accent/80">Storage:</span>
+                    <span className="text-accent ml-2">{phone.memory}GB</span>
                   </div>
-                </div>
-
-                {/* Selections */}
-                {Object.entries(selections).map(([key, selection]) => (
-                  <div key={key} className="space-y-2">
-                    <h3 className="font-semibold text-accent">{selection.title}</h3>
-                    <div className="flex gap-2">
-                      {selection.options.map((option) => (
-                        <button
-                          key={typeof option === 'string' ? option : option.name}
-                          onClick={() => handleOptionSelect(key, option)}
-                          className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 ${
-                            option === selectedOptions[key]
-                              ? 'bg-secondary text-primary border-secondary hover:shadow-md'
-                              : 'border-accent/30 text-accent hover:shadow-md'
-                          }`}
-                        >
-                          {typeof option === 'string' ? option : option.name}
-                        </button>
-                      ))}
-                    </div>
+                  <div>
+                    <span className="text-accent/80">RAM:</span>
+                    <span className="text-accent ml-2">{phone.ram}GB</span>
                   </div>
-                ))}
-
-                {/* Pricing */}
-                <div className="border-t border-accent/20 pt-6">
-                  <div className="text-3xl font-bold text-secondary">
-                    ${parseFloat(phone.final_price).toLocaleString()}
+                  <div>
+                    <span className="text-accent/80">Stock:</span>
+                    <span className="text-accent ml-2">{phone.stock_quantity} units</span>
                   </div>
-                  {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                    <div className="text-accent/60 line-through text-lg">
-                      ${parseFloat(phone.main_amount).toLocaleString()}
-                    </div>
-                  )}
-                  {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                    <div className="text-secondary text-sm">
-                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
-                    </div>
-                  )}
-                </div>
-
-                {/* Availability */}
-                <div className="border-t border-accent/20 pt-6">
-                  <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
-                  <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
-                    <div className="flex-1">
-                      <div className="font-medium flex items-center gap-2 text-accent">
-                        <Save className="w-5 h-5 text-secondary" />
-                        {availability.store.name}
-                      </div>
-                      <div className="text-accent/80 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-accent/60" />
-                        {availability.store.location.address}
-                      </div>
-                    </div>
-                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors">
-                      <Calendar className="w-5 h-5" />
-                      Buy Now
-                    </button>
+                  <div>
+                    <span className="text-accent/80">Status:</span>
+                    <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
+                      {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                    </span>
                   </div>
                 </div>
               </div>
-            
-            </MotionFade>
+
+              {/* Selections */}
+              {Object.entries(selections).map(([key, selection]) => (
+                <div key={key} className="space-y-2">
+                  <h3 className="font-semibold text-accent">{selection.title}</h3>
+                  <div className="flex gap-2">
+                    {selection.options.map((option) => (
+                      <button
+                        key={typeof option === 'string' ? option : option.name}
+                        onClick={() => handleOptionSelect(key, option)}
+                        className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 cursor-pointer ${option === selectedOptions[key]
+                            ? 'bg-secondary text-primary border-secondary hover:shadow-md'
+                            : 'border-accent/30 text-accent hover:shadow-md'
+                          }`}
+                      >
+                        {typeof option === 'string' ? option : option.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Pricing */}
+              <div className="border-t border-accent/20 pt-6">
+                <div className="text-3xl font-bold text-secondary">
+                  ${parseFloat(phone.final_price).toLocaleString()}
+                </div>
+                {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
+                  <div className="text-accent/60 line-through text-lg">
+                    ${parseFloat(phone.main_amount).toLocaleString()}
+                  </div>
+                )}
+                {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                  <div className="text-secondary text-sm">
+                    {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                  </div>
+                )}
+              </div>
+
+              {/* Availability */}
+              <div className="border-t border-accent/20 pt-6">
+                <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
+                <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
+                  <div className="flex-1">
+                    <div className="font-medium flex items-center gap-2 text-accent">
+                      <Save className="w-5 h-5 text-secondary" />
+                      {availability.store.name}
+                    </div>
+                    <div className="text-accent/80 flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-accent/60" />
+                      {availability.store.location.address}
+                    </div>
+                  </div>
+                  <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer">
+                    <Calendar className="w-5 h-5" />
+                    Buy Now
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </MotionFade>
 
           {/* Refurbishment Process */}
           <MotionFade delay={0.3} immediate={true}>
@@ -390,7 +389,7 @@ export default function PhoneIndividualPage({ params }) {
                     )}
                   </div>
                 ))}
-        </div>
+              </div>
             </section>
           </MotionFade>
 
@@ -442,7 +441,7 @@ export default function PhoneIndividualPage({ params }) {
         </div>
       </div>
     </PageTransition>
-  
+
 
   )
 }
