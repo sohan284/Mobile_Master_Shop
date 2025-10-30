@@ -95,7 +95,7 @@ export default function Header() {
 
           <Link href="/" className="group relative">
              <div className="flex items-center gap-2">
-              <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
+              <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
           </div>
           </Link>
 
@@ -125,7 +125,7 @@ export default function Header() {
           {/* Logo */}
           <div className="text-2xl font-bold text-center">
            <Link href="/">
-           <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
+           <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
            </Link>
           </div>
 

@@ -57,6 +57,13 @@ export default function PhoneIndividualPage({ params }) {
     }
   });
 
+  // Ensure initial selected color is first available color (must be before any early returns)
+  useEffect(() => {
+    if (phone?.colors?.length && !selectedOptions.color) {
+      setSelectedOptions(prev => ({ ...prev, color: phone.colors[0].name }));
+    }
+  }, [phone?.colors, selectedOptions.color]);
+
   // Handler for option selection
   const handleOptionSelect = (category, option) => {
     setSelectedOptions(prev => {
@@ -171,6 +178,7 @@ export default function PhoneIndividualPage({ params }) {
     }
   };
 
+
   const refurbishmentProcess = {
     title: `At Save, every ${phone.name} goes through a meticulous process to ensure optimal quality and performance.`,
     steps: [
@@ -233,6 +241,12 @@ export default function PhoneIndividualPage({ params }) {
     ]
   };
 
+  // Determine if description has actual content (not just empty tags)
+  const hasDescription = Boolean(
+    phone?.description &&
+    phone.description.replace(/<[^>]*>/g, '').trim().length > 0
+  );
+
   return (
     <PageTransition>
       <div className="min-h-screen relative overflow-hidden bg-primary">
@@ -245,89 +259,23 @@ export default function PhoneIndividualPage({ params }) {
             </Link>
           </MotionFade>
 
-          {/* Hero Section */}
+          {/* Details Section */}
           <MotionFade delay={0.2} immediate={true}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div className="relative flex justify-center items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
+              {/* Left: Image */}
+            <div>
+            <div className="relative flex justify-center items-start lg:sticky lg:top-24">
                 <SafeImage
                   src={getImageSrc(phone?.icon)}
                   alt={phone?.name || 'Phone'}
-                  width={400}
-                  height={400}
-                  className="h-[350px] w-auto object-contain shadow-lg"
+                  width={480}
+                  height={480}
+                  className="w-full max-w-md h-auto object-contain rounded-xl p-4"
                 />
-                <span className="absolute bottom-9 md:bottom-56 right-10 md:right-28 bg-secondary text-primary px-3 py-1 rounded-full text-sm font-medium">
-                  Refurbished
-                </span>
               </div>
-
-              <div className="space-y-6">
-                <h1 className="text-3xl font-bold text-accent">{phone.name}</h1>
-                <p className="text-accent/80 text-lg">{phone.brand_name}</p>
-
-                {/* Features */}
-                <div className="flex gap-4">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      {feature.text === "Guarantee" ? (
-                        <Shield className="w-5 h-5 text-secondary" />
-                      ) : (
-                        <CreditCard className="w-5 h-5 text-secondary" />
-                      )}
-                      <span className="text-accent">{feature.text}: {feature.value}</span>
-                    </div>
-                  ))}
-                </div>
-</div>
-                {/* Phone Specifications */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-accent/80">Storage:</span>
-                      <span className="text-accent ml-2">{phone.memory}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">RAM:</span>
-                      <span className="text-accent ml-2">{phone.ram}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Stock:</span>
-                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Status:</span>
-                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
-                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selections */}
-                {Object.entries(selections).map(([key, selection]) => (
-                  <div key={key} className="space-y-2">
-                    <h3 className="font-semibold text-accent">{selection.title}</h3>
-                    <div className="flex gap-2">
-                      {selection.options.map((option) => (
-                        <button
-                          key={typeof option === 'string' ? option : option.name}
-                          onClick={() => handleOptionSelect(key, option)}
-                          className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 ${
-                            option === selectedOptions[key]
-                              ? 'bg-secondary text-primary border-secondary hover:shadow-md'
-                              : 'border-accent/30 text-accent hover:shadow-md'
-                          }`}
-                        >
-                          {typeof option === 'string' ? option : option.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Pricing */}
-                <div className="border-t border-accent/20 pt-6">
+              <div className='flex flex-col gap-4 pt-12'>
+                 {/* Pricing */}
+                 <div className="">
                   <div className="text-3xl font-bold text-secondary">
                     ${parseFloat(phone.final_price).toLocaleString()}
                   </div>
@@ -363,8 +311,102 @@ export default function PhoneIndividualPage({ params }) {
                     </button>
                   </div>
                 </div>
+          </div>
+            </div>
+
+              {/* Right: Content */}
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-secondary tracking-tight">{phone.name}</h1>
+                  <p className="text-accent/80 text-base md:text-lg mt-1">{phone.brand_name}</p>
+                </div>
+
+                {/* Storage (fixed) and Colors (selectable) */}
+                <div className="space-y-5">
+                  {/* Storage */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">RAM</h3>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
+                        {phone?.ram}GB
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">Storage capacity</h3>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
+                        {phone?.memory}GB
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Colors */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">Choose the color</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {(phone.colors || []).map((color) => {
+                        const isSelected = (selectedOptions.color || phone.colors?.[0]?.name) === color.name;
+                        return (
+                          <button
+                            key={color.name}
+                            onClick={() => setSelectedOptions(prev => ({ ...prev, color: color.name }))}
+                            className={`px-3 py-2 rounded-full border transition-all duration-200 flex items-center gap-2 ${
+                              isSelected
+                                ? 'bg-secondary text-primary border-secondary hover:shadow-md'
+                                : 'border-accent/30 text-accent hover:shadow-md'
+                            }`}
+                          >
+                            <span
+                              className="inline-block w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: color.hex_code || '#ccc' }}
+                            />
+                            <span>{color.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Phone Specifications */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
+                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-1">
+                    <div>
+                      <span className="text-accent/80">Storage:</span>
+                      <span className="text-accent ml-2">{phone.memory}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">RAM:</span>
+                      <span className="text-accent ml-2">{phone.ram}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Stock:</span>
+                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Status:</span>
+                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
+                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                {hasDescription && (
+                  <div className="bg-white/10 rounded-xl border border-accent/20 p-6">
+                    <h3 className="text-lg font-semibold text-secondary mb-3">Description</h3>
+                    <div className="prose  prose-sm max-w-none text-secondary" dangerouslySetInnerHTML={{ __html: phone.description }} />
+                  </div>
+                )}
+
+        
+
+               
               </div>
-            
+      
+            </div>
             </MotionFade>
 
           {/* Refurbishment Process */}

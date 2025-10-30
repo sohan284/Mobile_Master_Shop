@@ -22,6 +22,17 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor with no SSR
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="p-4 text-gray-400">Loading editor...</div>
+    </div>
+  ),
+});
 
 export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
   const [formData, setFormData] = useState({
@@ -102,6 +113,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       submitData.append('name', formData.name.trim());
       submitData.append('brand', formData.brand);
       submitData.append('image', formData.image);
+    
 
       // Make API call using apiFetcher
       await apiFetcher.post('/api/repair/models/', submitData, {
@@ -147,14 +159,15 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+       <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+       <DialogHeader>
           <DialogTitle>Add New Model</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Brand Selection */}
-          <div className="space-y-2">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           {/* Brand Selection */}
+           <div className="space-y-2">
             <Label htmlFor="brand">Brand *</Label>
             <Select
               value={formData.brand}
@@ -188,11 +201,9 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
             />
           </div>
 
-          
-
-
-          {/* Image Upload */}
-          <div className="space-y-2">
+         </div>
+{/* Image Upload */}
+<div className="space-y-2">
             <Label htmlFor="image">Model Image *</Label>
             
             {/* Image Preview */}
@@ -256,6 +267,9 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
               </div>
             )}
           </div>
+      
+
+          
 
           {/* Form Actions */}
           <DialogFooter>

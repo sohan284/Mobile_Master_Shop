@@ -16,6 +16,7 @@ export default function AccessoryDetailsPage() {
   const id = params?.id;
 
   const [sessionItem, setSessionItem] = useState(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -25,6 +26,7 @@ export default function AccessoryDetailsPage() {
           const parsed = JSON.parse(raw);
           if (parsed && String(parsed.id) === String(id)) {
             setSessionItem(parsed);
+            if (parsed.quantity && parsed.quantity > 0) setQuantity(parsed.quantity);
           }
         } catch {}
       }
@@ -40,6 +42,21 @@ export default function AccessoryDetailsPage() {
   const accessory = useMemo(() => {
     return sessionItem || apiResponse?.data || null;
   }, [sessionItem, apiResponse?.data]);
+
+  const maxQty = typeof accessory?.stock_quantity === 'number' && accessory.stock_quantity > 0
+    ? accessory.stock_quantity
+    : 99;
+
+  const inc = () => setQuantity((q) => Math.min(maxQty, q + 1));
+  const dec = () => setQuantity((q) => Math.max(1, q - 1));
+
+  useEffect(() => {
+    if (!accessory) return;
+    try {
+      const payload = { ...(accessory || {}), quantity };
+      sessionStorage.setItem('selectedAccessory', JSON.stringify(payload));
+    } catch {}
+  }, [quantity, accessory]);
 
   return (
     <PageTransition>
@@ -108,6 +125,9 @@ export default function AccessoryDetailsPage() {
                         </span>
                       )}
                     </p>
+                    <div className="text-accent/80 text-sm mt-1">
+                      Total: <span className="font-semibold text-secondary">${(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
@@ -119,16 +139,42 @@ export default function AccessoryDetailsPage() {
                     )}
                   </div>
 
-                  {accessory.slug && (
-                    <div className="mt-2 text-sm text-accent/70">Slug: {accessory.slug}</div>
+                 
+
+                  {accessory.description && (
+                    <div
+                      className="mt-4 text-accent/90 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: accessory.description }}
+                    />
                   )}
 
-                  <div className="mt-6 flex gap-3">
-                    
-                    <CustomButton className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3">
-                       Proceed to Checkout
+                  <div className="mt-6 flex flex-col gap-3">
+                    <div className="inline-flex items-center gap-3">
+                      <button
+                        aria-label="Decrease quantity"
+                        onClick={dec}
+                        className="w-10 h-10 cursor-pointer rounded-full bg-white/10 hover:bg-white/15 text-secondary text-lg"
+                      >
+                        −
+                      </button>
+                      <div className="min-w-12 text-center text-secondary font-semibold">
+                        {quantity}
+                      </div>
+                      <button
+                        aria-label="Increase quantity"
+                        onClick={inc}
+                        className="w-10 h-10 cursor-pointer rounded-full bg-white/10 hover:bg-white/15 text-secondary text-lg"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <CustomButton
+                      onClick={() => router.push(`/accessories/${id}/breakdown`)}
+                      className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
+                    >
+                      Proceed to Checkout
                     </CustomButton>
-                   
                   </div>
                 </div>
               </div>
