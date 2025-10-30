@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { apiFetcher } from '@/lib/api';
+import { decryptBkp } from '@/lib/utils';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -46,6 +47,7 @@ function CheckoutForm({ clientSecret, orderId, amount, currency, paymentIntentId
                     payment_intent_id: confirmedIntentId
                 });
                 setMessage('Payment confirmed successfully.');
+                sessionStorage.removeItem('bkp');
                 router.push('/orders');
             } else {
                 setMessage('Missing order ID or payment intent ID.');
@@ -76,11 +78,22 @@ export default function BookingPage() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
         try {
-            const stored = localStorage.getItem('bookingPayment') || sessionStorage.getItem('bookingPayment');
-            if (stored) {
-                const parsed = JSON.parse(stored);
-                setBookingPayment(parsed);
-                setClientSecret(parsed.client_secret || null);
+            // Prefer encrypted 'bkp'
+            const enc = sessionStorage.getItem('bkp') || localStorage.getItem('bkp');
+            if (enc) {
+                const parsed = decryptBkp(enc);
+                if (parsed) {
+                    setBookingPayment(parsed);
+                    setClientSecret(parsed.client_secret || null);
+                }
+            } else {
+                // Backward compat
+                const stored = localStorage.getItem('bookingPayment') || sessionStorage.getItem('bookingPayment');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    setBookingPayment(parsed);
+                    setClientSecret(parsed.client_secret || null);
+                }
             }
         } catch {}
         setIsLoading(false);

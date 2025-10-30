@@ -7,6 +7,7 @@ import HeroSection from '@/components/common/HeroSection';
 import { CustomButton } from '@/components/ui/button';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { encryptBkp } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import Link from 'next/link';
@@ -68,8 +69,6 @@ export default function PriceBreakdownPage({ params }) {
 
             setIsLoading(true);
             setError(null);
-console.log("servicePartTypes", servicePartTypes);
-console.log("selectedServices", selectedServices);
             try {
                 const requestBody = {
                     phone_model_id: parseInt(phoneId),
@@ -182,7 +181,7 @@ console.log("selectedServices", selectedServices);
             const response = await apiFetcher.post('/api/repair/orders/', orderBody);
             const order = response?.data || response;
 
-            // Store shared booking payload (for unified booking page)
+            // Store shared booking payload (encrypted) under 'bkp'
             if (typeof window !== 'undefined' && priceData) {
                 const bookingPayload = {
                     type: 'repair',
@@ -205,7 +204,8 @@ console.log("selectedServices", selectedServices);
                         brand: priceData.brand
                     }
                 };
-                sessionStorage.setItem('bookingPayment', JSON.stringify(bookingPayload));
+                const enc = encryptBkp(bookingPayload);
+                if (enc) sessionStorage.setItem('bkp', enc);
             }
 
             // Navigate to shared booking page (Stripe confirmation happens there)
