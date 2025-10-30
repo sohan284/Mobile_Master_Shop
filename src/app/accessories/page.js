@@ -18,10 +18,12 @@ export default function AccessoriesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   
   // Fetch all accessories (no category grouping)
-  const { data: itemsResponse, isLoading, error } = useApiGet(
-    ['accessoriesAll'],
-    () => apiFetcher.get('/api/accessories/items/')
+  const { data: accessoriesResponse, isLoading, error, refetch } = useApiGet(
+    ['accessories'],
+    () => apiFetcher.get('/api/accessories/products/')
   );
+  const accessories = useMemo(() => accessoriesResponse?.data || [], [accessoriesResponse?.data]);
+
   
   // Fallback items if API fails (memoized to prevent unnecessary re-renders)
   const fallbackItems = useMemo(() => [
@@ -104,20 +106,20 @@ export default function AccessoriesPage() {
   
   useEffect(() => {
     // Only randomize once when data is loaded
-    if (itemsResponse?.data || fallbackItems) {
-      const items = (itemsResponse?.data || fallbackItems);
+    if (accessories || fallbackItems) {
+      const items = (accessories || fallbackItems);
       // Use a stable random seed based on data length to prevent re-randomization
       const shuffled = [...items].sort(() => Math.random() - 0.5);
       setRandomizedItems(shuffled);
     }
-  }, [itemsResponse?.data, fallbackItems]);
+  }, [accessories, fallbackItems]);
   
-  const allItems = randomizedItems.length > 0 ? randomizedItems : (itemsResponse?.data || fallbackItems);
+  const allItems = randomizedItems.length > 0 ? randomizedItems : (accessories || fallbackItems);
   
   // Filter items based on search term
   const filteredItems = allItems.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (item.description || "").toLowerCase().includes(searchTerm.toLowerCase())
+    item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (item.subtitle || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -158,8 +160,7 @@ export default function AccessoriesPage() {
             isLoading={isLoading}
             loadingCount={8}
             onItemClick={(item) => {
-              const categorySlug = (item.category || 'accessories').toLowerCase().replace(/\s+/g, '-');
-              const route = `/accessories/${categorySlug}/${item.id}`;
+              const route = `/accessories/${item.slug || 'accessories'}/${item.id}`;
               return route;
             }}
             onItemClickHandler={(item) => {
@@ -183,52 +184,51 @@ export default function AccessoriesPage() {
               onClick: () => setSearchTerm('')
             }}
             renderItem={(item) => (
-              <div className="group relative bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-4 hover:border-secondary/50 hover:shadow-lg transition-all duration-300 cursor-pointer">
-                <div className="flex flex-col h-full">
-                  {/* Product Image */}
-                  <div className="flex justify-center mb-3">
-                    <div className="w-20 h-20 bg-white/10 rounded-lg flex items-center justify-center group-hover:bg-white/20 transition-colors">
+              <Link href={`/accessories/${item.id}`}>
+                <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
+                  <div className=" p-8 text-center h-full flex flex-col">
+                    <div className="mb-6 bg-white/5 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
                       <Image
-                        src={item.image || '/Accessories.png'}
-                        alt={item.name}
-                        width={60}
-                        height={60}
-                        className="object-contain"
+                        src={item.picture || '/Accessories.png'}
+                        alt={item.title}
+                        width={360}
+                        height={360}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
                       />
                     </div>
-                  </div>
-                  
-                  {/* Name */}
-                  <h3 className="text-sm font-semibold text-accent mb-2 group-hover:text-secondary transition-colors text-center line-clamp-2">
-                    {item.name}
-                  </h3>
-                  
-                  {/* Description */}
-                  <p className="text-xs text-accent/80 mb-3 line-clamp-2 flex-grow text-center">
-                    {item.description}
-                  </p>
-                  
-                  {/* Price */}
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="text-lg font-bold text-secondary">
-                      {item.price}
-                    </div>
-                    {item.originalPrice && item.originalPrice !== item.price && (
-                      <div className="text-sm text-accent/60 line-through ml-2">
-                        {item.originalPrice}
+                    <div className="flex-grow flex flex-col justify-between">
+                      <h3 className="font-bold text-lg text-accent group-hover:text-secondary transition-colors duration-300 mb-3">
+                        {item.title}
+                      </h3>
+                      <div className="space-y-2">
+                        {item.subtitle && (
+                          <p className="text-accent/80 text-sm">{item.subtitle}</p>
+                        )}
+                        <div className="space-y-1">
+                          <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
+                            {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
+                              <span className="text-xs text-green-500">
+                                {parseFloat(item.discount_percentage).toFixed(1)}% off
+                              </span>
+                            )}
+                            <span className='font-bold text-secondary'>${parseFloat(item.final_price).toLocaleString()}</span>
+                            {item.discounted_amount && item.discounted_amount !== item.main_amount && (
+                              <span className="text-sm text-accent/60 line-through">
+                                ${parseFloat(item.main_amount).toLocaleString()}
+                              </span>
+                            )}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Stock + Rating */}
-                  <div className="flex items-center justify-center gap-3 text-xs text-accent/80">
-                    <span className={`px-2 py-1 rounded-full ${item.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {item.inStock ? 'In Stock' : 'Out of Stock'}
-                    </span>
-                    <span>⭐ {item.rating || '4.5'}</span>
+                      <div className="mt-3 flex items-center justify-center gap-3 text-xs text-accent/80">
+                        <span className={`px-2 py-1 rounded-full ${item.is_in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {item.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             )}
           />
           
