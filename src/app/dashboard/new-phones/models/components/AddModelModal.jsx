@@ -47,6 +47,10 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Preset options for RAM and ROM (memory)
+  const ramOptions = ['2', '4', '6', '8', '12', '16'];
+  const memoryOptions = ['16', '32', '64', '128', '256', '512', '1024'];
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -269,29 +273,45 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             {/* RAM */}
             <div className="space-y-2">
               <Label htmlFor="ram">RAM</Label>
-              <Input
-                id="ram"
-                name="ram"
-                type="text"
-                value={formData.ram}
-                onChange={handleInputChange}
-                placeholder="e.g., 16GB"
-                disabled={isSubmitting}
-              />
+              <div className="flex flex-wrap gap-2">
+                {ramOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, ram: opt }))}
+                    className={`px-3 py-1 cursor-pointer rounded-full border text-sm transition ${
+                      formData.ram === opt
+                     ? ' text-secondary bg-primary/80 border-secondary font-bold'
+                        : 'border-accent/30 text-black/30 hover:border-secondary/50'
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    {opt} GB
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Memory */}
             <div className="space-y-2">
               <Label htmlFor="memory">Memory</Label>
-              <Input
-                id="memory"
-                name="memory"
-                type="text"
-                value={formData.memory}
-                onChange={handleInputChange}
-                placeholder="e.g., 512GB"
-                disabled={isSubmitting}
-              />
+              <div className="flex flex-wrap gap-2">
+                {memoryOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, memory: opt }))}
+                    className={`px-3 cursor-pointer py-1 rounded-full border text-sm transition ${
+                      formData.memory === opt
+                        ? ' text-secondary bg-primary/80 border-secondary font-bold'
+                        : 'border-accent/30 text-black/30 hover:border-secondary/50'
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    {opt} GB
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

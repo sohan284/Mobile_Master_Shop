@@ -261,17 +261,58 @@ export default function PhoneIndividualPage({ params }) {
 
           {/* Details Section */}
           <MotionFade delay={0.2} immediate={true}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-14 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
               {/* Left: Image */}
-              <div className="relative flex justify-center items-start lg:sticky lg:top-24">
+            <div>
+            <div className="relative flex justify-center items-start lg:sticky lg:top-24">
                 <SafeImage
                   src={getImageSrc(phone?.icon)}
                   alt={phone?.name || 'Phone'}
                   width={480}
                   height={480}
-                  className="w-full max-w-md h-auto object-contain rounded-xl shadow-lg b p-4"
+                  className="w-full max-w-md h-auto object-contain rounded-xl p-4"
                 />
               </div>
+              <div className='flex flex-col gap-4 pt-12'>
+                 {/* Pricing */}
+                 <div className="">
+                  <div className="text-3xl font-bold text-secondary">
+                    ${parseFloat(phone.final_price).toLocaleString()}
+                  </div>
+                  {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
+                    <div className="text-accent/60 line-through text-lg">
+                      ${parseFloat(phone.main_amount).toLocaleString()}
+                    </div>
+                  )}
+                  {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                    <div className="text-secondary text-sm">
+                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                    </div>
+                  )}
+                </div>
+
+                {/* Availability */}
+                <div className="border-t border-accent/20 pt-6">
+                  <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
+                  <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
+                    <div className="flex-1">
+                      <div className="font-medium flex items-center gap-2 text-accent">
+                        <Save className="w-5 h-5 text-secondary" />
+                        {availability.store.name}
+                      </div>
+                      <div className="text-accent/80 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-accent/60" />
+                        {availability.store.location.address}
+                      </div>
+                    </div>
+                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors">
+                      <Calendar className="w-5 h-5" />
+                      Buy Now
+                    </button>
+                  </div>
+                </div>
+          </div>
+            </div>
 
               {/* Right: Content */}
               <div className="space-y-6">
@@ -354,52 +395,17 @@ export default function PhoneIndividualPage({ params }) {
 
                 {/* Description */}
                 {hasDescription && (
-                  <div className="bg-white/20  rounded-xl border border-accent/20 p-6">
+                  <div className="bg-white/10 rounded-xl border border-accent/20 p-6">
                     <h3 className="text-lg font-semibold text-secondary mb-3">Description</h3>
-                    <div className="prose prose-sm max-w-none text-primary" dangerouslySetInnerHTML={{ __html: phone.description }} />
+                    <div className="prose  prose-sm max-w-none text-secondary" dangerouslySetInnerHTML={{ __html: phone.description }} />
                   </div>
                 )}
 
         
 
-                {/* Pricing */}
-                <div className="border-t border-accent/20 pt-6">
-                  <div className="text-3xl font-bold text-secondary">
-                    ${parseFloat(phone.final_price).toLocaleString()}
-                  </div>
-                  {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                    <div className="text-accent/60 line-through text-lg">
-                      ${parseFloat(phone.main_amount).toLocaleString()}
-                    </div>
-                  )}
-                  {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                    <div className="text-secondary text-sm">
-                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
-                    </div>
-                  )}
-                </div>
-
-                {/* Availability */}
-                <div className="border-t border-accent/20 pt-6">
-                  <h3 className="font-semibold mb-4 text-accent">{availability.title}</h3>
-                  <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-accent/20">
-                    <div className="flex-1">
-                      <div className="font-medium flex items-center gap-2 text-accent">
-                        <Save className="w-5 h-5 text-secondary" />
-                        {availability.store.name}
-                      </div>
-                      <div className="text-accent/80 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-accent/60" />
-                        {availability.store.location.address}
-                      </div>
-                    </div>
-                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors">
-                      <Calendar className="w-5 h-5" />
-                      Buy Now
-                    </button>
-                  </div>
-                </div>
+               
               </div>
+      
             </div>
             </MotionFade>
 
