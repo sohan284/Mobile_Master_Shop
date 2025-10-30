@@ -119,8 +119,13 @@ export default function AccessoryDetailsPage() {
                     )}
                   </div>
 
-                  {accessory.slug && (
-                    <div className="mt-2 text-sm text-accent/70">Slug: {accessory.slug}</div>
+                 
+
+                  {accessory.description && (
+                    <div
+                      className="mt-4 text-accent/90 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: accessory.description }}
+                    />
                   )}
 
                   <div className="mt-6 flex gap-3">

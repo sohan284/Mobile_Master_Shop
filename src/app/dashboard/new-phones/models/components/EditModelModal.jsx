@@ -18,6 +18,20 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor with no SSR
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="p-4 text-gray-400">Loading editor...</div>
+    </div>
+  ),
+});
+
+const ramOptions = ['2', '4', '6', '8', '12', '16'];
+const memoryOptions = ['16', '32', '64', '128', '256', '512', '1024'];
 
 export default function EditModelModal({ isOpen, onClose, onSuccess, model, brands, colors }) {
   const [formData, setFormData] = useState({
@@ -218,10 +232,8 @@ console.log(formData);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent 
-        style={{ maxWidth: '700px', width: '90vw' }}
-      >
-        <DialogHeader>
+    <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
           <DialogTitle>Edit Model</DialogTitle>
         </DialogHeader>
 
@@ -277,29 +289,45 @@ console.log(formData);
             {/* RAM */}
             <div className="space-y-2">
               <Label htmlFor="ram">RAM</Label>
-              <Input
-                id="ram"
-                name="ram"
-                type="text"
-                value={formData.ram}
-                onChange={handleInputChange}
-                placeholder="e.g., 16GB"
-                disabled={isSubmitting}
-              />
+              <div className="flex flex-wrap gap-2">
+                {ramOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, ram: opt }))}
+                    className={`px-3 py-1 cursor-pointer rounded-full border text-sm transition ${
+                      formData.ram === opt
+                        ? ' text-secondary bg-primary/80 border-secondary font-bold'
+                        : 'border-accent/30 text-black/30 hover:border-secondary/50'
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    {opt} GB
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Memory */}
             <div className="space-y-2">
               <Label htmlFor="memory">Memory</Label>
-              <Input
-                id="memory"
-                name="memory"
-                type="text"
-                value={formData.memory}
-                onChange={handleInputChange}
-                placeholder="e.g., 512GB"
-                disabled={isSubmitting}
-              />
+              <div className="flex flex-wrap gap-2">
+                {memoryOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, memory: opt }))}
+                    className={`px-3 py-1 cursor-pointer rounded-full border text-sm transition ${
+                      formData.memory === opt
+                        ? ' text-secondary bg-primary/80 border-secondary font-bold'
+                        : 'border-accent/30 text-black/30 hover:border-secondary/50'
+                    }`}
+                    disabled={isSubmitting}
+                  >
+                    {opt} GB
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -382,11 +410,7 @@ console.log(formData);
 
          
 
-          {/* Description - Full Width */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-          
-          </div>
+      
 
           {/* Color Selection */}
           <div className="space-y-2">
@@ -499,6 +523,15 @@ console.log(formData);
                 </label>
               </div>
             )}
+                {/* Description - Full Width */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <RichTextEditor
+              content={formData.description}
+              onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
+              disabled={isSubmitting}
+            />
+          </div>
           </div>
 
 

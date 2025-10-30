@@ -46,15 +46,7 @@ export default function AccessoriesPage() {
       accessor: 'title',
       sortable: true
     },
-    {
-      header: 'Description',
-      accessor: 'subtitle',
-      render: (item) => (
-        <div className="max-w-xs truncate text-sm text-gray-600">
-          {item.subtitle || '-'}
-        </div>
-      )
-    },
+  
     {
       header: 'Price',
       accessor: 'main_amount',

@@ -57,6 +57,13 @@ export default function PhoneIndividualPage({ params }) {
     }
   });
 
+  // Ensure initial selected color is first available color (must be before any early returns)
+  useEffect(() => {
+    if (phone?.colors?.length && !selectedOptions.color) {
+      setSelectedOptions(prev => ({ ...prev, color: phone.colors[0].name }));
+    }
+  }, [phone?.colors, selectedOptions.color]);
+
   // Handler for option selection
   const handleOptionSelect = (category, option) => {
     setSelectedOptions(prev => {
@@ -171,6 +178,7 @@ export default function PhoneIndividualPage({ params }) {
     }
   };
 
+
   const refurbishmentProcess = {
     title: `At Save, every ${phone.name} goes through a meticulous process to ensure optimal quality and performance.`,
     steps: [
@@ -233,6 +241,12 @@ export default function PhoneIndividualPage({ params }) {
     ]
   };
 
+  // Determine if description has actual content (not just empty tags)
+  const hasDescription = Boolean(
+    phone?.description &&
+    phone.description.replace(/<[^>]*>/g, '').trim().length > 0
+  );
+
   return (
     <PageTransition>
       <div className="min-h-screen relative overflow-hidden bg-primary">
@@ -245,20 +259,19 @@ export default function PhoneIndividualPage({ params }) {
             </Link>
           </MotionFade>
 
-          {/* Hero Section */}
+          {/* Details Section */}
           <MotionFade delay={0.2} immediate={true}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div className="relative flex justify-center items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
+              {/* Left: Image */}
+            <div>
+            <div className="relative flex justify-center items-start lg:sticky lg:top-24">
                 <SafeImage
                   src={getImageSrc(phone?.icon)}
                   alt={phone?.name || 'Phone'}
-                  width={400}
-                  height={400}
-                  className="h-[350px] w-auto object-contain shadow-lg"
+                  width={480}
+                  height={480}
+                  className="w-full max-w-md h-auto object-contain rounded-xl p-4"
                 />
-                <span className="absolute bottom-9 md:bottom-56 right-10 md:right-28 bg-secondary text-primary px-3 py-1 rounded-full text-sm font-medium">
-                  Refurbished
-                </span>
               </div>
 
               <div className="space-y-6">

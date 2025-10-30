@@ -16,10 +16,22 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import dynamic from 'next/dynamic';
+
+// Dynamically import RichTextEditor with no SSR (match Add modal behavior)
+const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border rounded-lg overflow-hidden bg-white">
+      <div className="p-4 text-gray-400">Loading editor...</div>
+    </div>
+  ),
+});
 
 export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accessory }) {
   const [formData, setFormData] = useState({
     name: '',
+    subtitle: '',
     description: '',
     price: '',
     stock_quantity: '',
@@ -34,7 +46,8 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
     if (accessory) {
       setFormData({
         name: accessory.title || '',
-        description: accessory.subtitle || '',
+        subtitle: accessory.subtitle || '',
+        description: accessory.description || '',
         price: accessory.main_amount || '',
         stock_quantity: accessory.stock_quantity || '',
         image: null,
@@ -75,6 +88,13 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
     }
   };
 
+  const handleDescriptionChange = (htmlContent) => {
+    setFormData(prev => ({
+      ...prev,
+      description: htmlContent
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -95,7 +115,8 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
       // Create FormData for file upload
       const submitData = new FormData();
       submitData.append('title', formData.name.trim());
-      submitData.append('subtitle', formData.description.trim());
+      submitData.append('subtitle', (formData.subtitle || '').trim());
+      submitData.append('description', formData.description || '');
       submitData.append('main_amount', parseFloat(formData.price));
       submitData.append('stock_quantity', parseInt(formData.stock_quantity) || 0);
 
@@ -154,8 +175,8 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+       <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
+       <DialogHeader>
           <DialogTitle>Edit Accessory</DialogTitle>
         </DialogHeader>
 
@@ -178,17 +199,17 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
                 />
               </div>
 
-              {/* Description */}
+              {/* Subtitle */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
+                <Label htmlFor="subtitle">Subtitle</Label>
+                <Input
+                  id="subtitle"
+                  name="subtitle"
+                  type="text"
+                  value={formData.subtitle}
                   onChange={handleInputChange}
-                  placeholder="Enter accessory description"
+                  placeholder="Enter accessory subtitle"
                   disabled={isSubmitting}
-                  rows={3}
                 />
               </div>
 
@@ -312,6 +333,19 @@ export default function EditAccessoryModal({ isOpen, onClose, onSuccess, accesso
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Rich Text Description (like Add page) */}
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <RichTextEditor
+              content={formData.description}
+              onChange={handleDescriptionChange}
+              disabled={isSubmitting}
+            />
+            <p className="text-xs text-gray-500">
+              Use the toolbar to format your text with headers, lists, tables, etc.
+            </p>
           </div>
 
           {/* Form Actions */}
