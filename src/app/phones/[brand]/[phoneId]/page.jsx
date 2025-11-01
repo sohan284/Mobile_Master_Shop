@@ -450,6 +450,7 @@ export default function PhoneIndividualPage({ params }) {
             reviews={reviews}
             isLoading={reviewsLoading}
             refetchReviews={refetchReviews}
+            showReviewForm={false}
           />
         </div>
       </div>

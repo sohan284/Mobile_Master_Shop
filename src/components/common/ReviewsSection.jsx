@@ -12,7 +12,8 @@ export default function ReviewsSection({
   reviews = [],
   isLoading = false,
   onReviewSubmitted,
-  refetchReviews
+  refetchReviews,
+  showReviewForm = true // Allow hiding the review form
 }) {
   const { isAuthenticated, user } = useAuth();
   const [reviewForm, setReviewForm] = useState({
@@ -115,11 +116,11 @@ export default function ReviewsSection({
         <div className=" gap-6">
           {/* Main Reviews Section */}
           <div className=" bg-white/10 backdrop-blur-sm rounded-2xl border border-accent/20 p-6 md:p-8">
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+            <div className={showReviewForm ? 'grid grid-cols-1 md:grid-cols-2 gap-8' : ''}>
               <div>
                 <h2 className="text-2xl font-bold mb-6 text-secondary">Reviews</h2>
                 {/* Overall Rating */}
-                <div className="flex flex-col gap-6 mb-6 pb-6 border-accent/20">
+                <div className={`flex flex-col gap-6 ${showReviewForm ? 'mb-6 pb-6 border-accent/20' : 'mb-0 pb-0'}`}>
                   <div className="flex flex-col items-center md:items-start">
                     <div className="text-5xl font-bold mb-2 text-secondary">
                       {reviews.length > 0
@@ -172,67 +173,69 @@ export default function ReviewsSection({
                 </div>
               </div>
 
-              {/* Review Submission Form */}
-              <div className="mb-6 pb-6 border-accent/20">
-                <h3 className="text-base font-semibold text-secondary mb-3">Write a Review</h3>
-                <form onSubmit={handleSubmitReview} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-accent mb-2">Your Name</label>
-                    <input
-                      type="text"
-                      value={reviewForm.name}
-                      onChange={(e) => setReviewForm(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                      className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-accent mb-2">Rating</label>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <button
-                          key={rating}
-                          type="button"
-                          onClick={() => setReviewForm(prev => ({ ...prev, rating }))}
-                          className="focus:outline-none cursor-pointer"
-                        >
-                          <Star
-                            className={`w-6 h-6 ${
-                              rating <= reviewForm.rating
-                                ? 'text-orange-400 fill-current'
-                                : 'text-accent/30'
-                            } transition-colors`}
-                          />
-                        </button>
-                      ))}
+              {/* Review Submission Form - Only show if showReviewForm is true */}
+              {showReviewForm && (
+                <div className="mb-6 pb-6 border-accent/20">
+                  <h3 className="text-base font-semibold text-secondary mb-3">Write a Review</h3>
+                  <form onSubmit={handleSubmitReview} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-accent mb-2">Your Name</label>
+                      <input
+                        type="text"
+                        value={reviewForm.name}
+                        onChange={(e) => setReviewForm(prev => ({ ...prev, name: e.target.value }))}
+                        required
+                        className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary"
+                        placeholder="Enter your name"
+                      />
                     </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-accent mb-2">Your Review</label>
-                    <textarea
-                      value={reviewForm.comment}
-                      onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
-                      required
-                      rows={4}
-                      className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary resize-none"
-                      placeholder="Share your experience with this product..."
-                    />
-                  </div>
-                  
-                  <div className='flex justify-end'>
-                    <button
-                      type="submit"
-                      disabled={isSubmittingReview}
-                      className="bg-secondary text-primary px-6 py-2 rounded-full hover:bg-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-accent mb-2">Rating</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <button
+                            key={rating}
+                            type="button"
+                            onClick={() => setReviewForm(prev => ({ ...prev, rating }))}
+                            className="focus:outline-none cursor-pointer"
+                          >
+                            <Star
+                              className={`w-6 h-6 ${
+                                rating <= reviewForm.rating
+                                  ? 'text-orange-400 fill-current'
+                                  : 'text-accent/30'
+                              } transition-colors`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-accent mb-2">Your Review</label>
+                      <textarea
+                        value={reviewForm.comment}
+                        onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                        required
+                        rows={4}
+                        className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary resize-none"
+                        placeholder="Share your experience with this product..."
+                      />
+                    </div>
+                    
+                    <div className='flex justify-end'>
+                      <button
+                        type="submit"
+                        disabled={isSubmittingReview}
+                        className="bg-secondary text-primary px-6 py-2 rounded-full hover:bg-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
 
             {/* Individual Reviews List */}
@@ -359,7 +362,16 @@ export default function ReviewsSection({
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-accent/80">No reviews yet. Be the first to review this product!</p>
+                  <p className="text-accent/80">
+                    {showReviewForm 
+                      ? 'No reviews yet. Be the first to review this product!'
+                      : 'No reviews yet.'}
+                  </p>
+                  {!showReviewForm && (
+                    <p className="text-accent/60 text-sm mt-2">
+                      Reviews can be added from your orders page after placing an order.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

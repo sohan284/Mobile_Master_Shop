@@ -6,10 +6,16 @@ import { useEffect, useState } from "react";
 export default function PageTransition({ children }) {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  const [displayPathname, setDisplayPathname] = useState(pathname);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    // Update display pathname when pathname changes
+    if (pathname !== displayPathname) {
+      setDisplayPathname(pathname);
+    }
+  }, [pathname, displayPathname]);
 
   // Prevent hydration issues by not using AnimatePresence on initial mount
   if (!isMounted) {
@@ -17,13 +23,16 @@ export default function PageTransition({ children }) {
   }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence 
+      mode="wait" 
+      initial={false}
+    >
       <motion.div
-        key={pathname}
+        key={displayPathname}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
         {children}
       </motion.div>

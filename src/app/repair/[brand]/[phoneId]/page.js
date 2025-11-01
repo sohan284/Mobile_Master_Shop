@@ -373,6 +373,7 @@ export default function PhoneModelPage({ params }) {
                         reviews={reviews}
                         isLoading={reviewsLoading}
                         refetchReviews={refetchReviews}
+                        showReviewForm={false}
                     />
                  
             </div>

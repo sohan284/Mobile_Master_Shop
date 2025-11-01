@@ -211,6 +211,7 @@ export default function AccessoryDetailsPage() {
               reviews={reviews}
               isLoading={reviewsLoading}
               refetchReviews={refetchReviews}
+              showReviewForm={false}
             />
           )}
         </div>
