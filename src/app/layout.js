@@ -70,7 +70,7 @@ export default function RootLayout({ children }) {
                   },
                 },
                 error: {
-                  duration: 5000,
+                  duration: 4000,
                   style: {
                     background: '#EF4444',
                     color: '#fff',
