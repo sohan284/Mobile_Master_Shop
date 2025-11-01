@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Package,
   UserCircle,
+  LayoutDashboard,
 } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
@@ -22,7 +23,7 @@ export default function Header() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const mobileProfileDropdownRef = useRef(null);
   const desktopProfileDropdownRef = useRef(null);
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
 
   // Toggle mobile menu
   const toggleMobileMenu = () => {
@@ -178,6 +179,16 @@ export default function Header() {
                       <Package size={16} className="mr-2" />
                       Orders
                     </Link>
+                    {isAdmin() && (
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                      >
+                        <LayoutDashboard size={16} className="mr-2" />
+                        Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
@@ -259,6 +270,16 @@ export default function Header() {
                         <Package size={16} className="mr-2" />
                         Orders
                       </Link>
+                      {isAdmin() && (
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                        >
+                          <LayoutDashboard size={16} className="mr-2" />
+                          Dashboard
+                        </Link>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
@@ -339,6 +360,16 @@ export default function Header() {
                         <Package size={20} />
                         <span>Orders</span>
                       </Link>
+                      {isAdmin() && (
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
+                        >
+                          <LayoutDashboard size={20} />
+                          <span>Dashboard</span>
+                        </Link>
+                      )}
                       <button
                         onClick={async () => {
                           setIsMobileMenuOpen(false);
