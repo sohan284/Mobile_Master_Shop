@@ -1,10 +1,13 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Menu,
   User,
   LogOut,
+  ChevronDown,
+  Package,
+  UserCircle,
 } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
@@ -16,6 +19,9 @@ export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const mobileProfileDropdownRef = useRef(null);
+  const desktopProfileDropdownRef = useRef(null);
   const { user, logout, isAuthenticated } = useAuth();
 
   // Toggle mobile menu
@@ -44,6 +50,47 @@ export default function Header() {
       document.body.style.overflow = 'unset';
     };
   }, [isMobileMenuOpen]);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const mobileRef = mobileProfileDropdownRef.current;
+      const desktopRef = desktopProfileDropdownRef.current;
+      
+      if (isProfileDropdownOpen) {
+        const clickedOutsideMobile = !mobileRef || !mobileRef.contains(event.target);
+        const clickedOutsideDesktop = !desktopRef || !desktopRef.contains(event.target);
+        
+        if (clickedOutsideMobile && clickedOutsideDesktop) {
+          setIsProfileDropdownOpen(false);
+        }
+      }
+    };
+
+    if (isProfileDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isProfileDropdownOpen]);
+
+  const handleLogout = async () => {
+    setIsProfileDropdownOpen(false);
+    await logout();
+  };
+
+  const getUserInitials = () => {
+    if (!user) return 'U';
+    const name = user.name || user.username || user.email || 'User';
+    return name.charAt(0).toUpperCase();
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return 'User';
+    return user.name || user.username || user.email || 'User';
+  };
 
   // ✅ Scroll hide/show header (keep as before)
   useEffect(() => {
@@ -102,13 +149,45 @@ export default function Header() {
           <div className="flex items-center space-x-3">
             {/* <CartIcon /> */}
             {isAuthenticated() ? (
-              <button
-                onClick={logout}
-                className="text-white focus:outline-none hover:text-gray-300"
-                title="Logout"
-              >
-                <LogOut size={22} />
-              </button>
+              <div className="relative" ref={mobileProfileDropdownRef}>
+                <button
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center space-x-2 text-white focus:outline-none hover:text-gray-300 transition-colors"
+                  aria-label="Profile menu"
+                >
+                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold text-sm">
+                    {getUserInitials()}
+                  </div>
+                  <span className="text-sm hidden sm:block truncate max-w-[80px]">{getUserDisplayName()}</span>
+                </button>
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-primary rounded-lg shadow-lg py-1 z-50 border border-white/30 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right transform transition-all">
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                    >
+                      <UserCircle size={16} className="mr-2" />
+                      Profile
+                    </Link>
+                    <Link
+                      href="/orders"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                    >
+                      <Package size={16} className="mr-2" />
+                      Orders
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
+                    >
+                      <LogOut size={16} className="mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link
                 href="/login"
@@ -150,15 +229,46 @@ export default function Header() {
             <div className="flex items-center space-x-4">
               {/* <CartIcon /> */}
               {isAuthenticated() ? (
-                <>
-                  <Link href="/dashboard" className="hover:text-gray-300 flex items-center space-x-2">
-                    <User size={24} />
-                    <span className="text-sm truncate max-w-[100px]">{user?.name}</span>
-                  </Link>
-                  <button onClick={logout} className="hover:text-gray-300" title="Logout">
-                    <LogOut size={24} />
+                <div className="relative" ref={desktopProfileDropdownRef}>
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
+                    aria-label="Profile menu"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
+                      {getUserInitials()}
+                    </div>
+                    <span className="text-sm truncate max-w-[120px]">{getUserDisplayName()}</span>
+                    <ChevronDown size={16} className={`transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
-                </>
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-primary rounded-lg shadow-lg py-1 z-50 border border-white/30 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right transform transition-all">
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                      >
+                        <UserCircle size={16} className="mr-2" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                      >
+                        <Package size={16} className="mr-2" />
+                        Orders
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
+                      >
+                        <LogOut size={16} className="mr-2" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Link href="/login" className="hover:text-gray-300">
                   <User size={24} />
@@ -210,6 +320,37 @@ export default function Header() {
                   <div className="flex items-center space-x-4">
                     <Language />
                   </div>
+                  {/* User Menu in Mobile */}
+                  {isAuthenticated() && (
+                    <div className="flex flex-col space-y-2 pt-4 border-t border-secondary/20">
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
+                      >
+                        <UserCircle size={20} />
+                        <span>Profile</span>
+                      </Link>
+                      <Link
+                        href="/orders"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
+                      >
+                        <Package size={20} />
+                        <span>Orders</span>
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          setIsMobileMenuOpen(false);
+                          await logout();
+                        }}
+                        className="text-red-300 hover:text-red-200 transition-colors py-3 text-lg font-medium flex items-center space-x-2 text-left"
+                      >
+                        <LogOut size={20} />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
             
