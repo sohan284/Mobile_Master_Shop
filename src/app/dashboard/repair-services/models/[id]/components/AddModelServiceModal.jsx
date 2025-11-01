@@ -291,20 +291,6 @@ export default function AddModelServiceModal({ isOpen, onClose, onSuccess, model
             )}
           </div>
 
-          {/* Warranty Days - Global */}
-          <div className="space-y-2">
-            <Label htmlFor="warranty_days">Warranty Days</Label>
-            <Input
-              id="warranty_days"
-              name="warranty_days"
-              type="number"
-              min="0"
-              value={formData.warranty_days}
-              onChange={handleInputChange}
-              placeholder="Enter warranty days (e.g., 30)"
-              disabled={isSubmitting}
-            />
-          </div>
 
           {/* Part Types Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

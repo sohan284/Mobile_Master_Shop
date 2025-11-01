@@ -20,7 +20,8 @@ import {
   Palette,
   Users,
   Package,
-  X
+  X,
+  Home
 } from 'lucide-react';
 
 const navigation = [
@@ -205,8 +206,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </ul>
         </nav>
 
-        {/* Logout Button */}
-        <div className="p-4 border-t border-gray-200  flex-shrink-0">
+        {/* Home and Logout Buttons */}
+        <div className="p-4 border-t border-gray-200 flex-shrink-0 space-y-2">
+          <Link
+            href="/"
+            className="w-full cursor-pointer flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 rounded-lg transition-colors duration-200"
+          >
+            <Home className="mr-3 h-5 w-5" />
+            Home
+          </Link>
           <button
             onClick={handleLogout}
             className="w-full cursor-pointer flex items-center px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors duration-200"

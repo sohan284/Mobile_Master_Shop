@@ -31,8 +31,8 @@ export default function AccessoriesPage() {
       id: 101,
       name: "Clear Phone Case",
       description: "Shock-absorbent transparent TPU case",
-      price: "$15",
-      originalPrice: "$19",
+      price: "€15",
+      originalPrice: "€19",
       image: "/hood.png",
       rating: 4.5,
       reviews: 128,
@@ -43,8 +43,8 @@ export default function AccessoriesPage() {
       id: 102,
       name: "Tempered Glass",
       description: "9H hardness, edge-to-edge protection",
-      price: "$12",
-      originalPrice: "$15",
+      price: "€12",
+      originalPrice: "€15",
       image: "/screen.png",
       rating: 4.6,
       reviews: 93,
@@ -55,8 +55,8 @@ export default function AccessoriesPage() {
       id: 103,
       name: "Fast Charger 20W",
       description: "PD fast charging USB-C adapter",
-      price: "$18",
-      originalPrice: "$22",
+      price: "€18",
+      originalPrice: "€22",
       image: "/charger two port.png",
       rating: 4.7,
       reviews: 210,
@@ -67,8 +67,8 @@ export default function AccessoriesPage() {
       id: 104,
       name: "USB-C Cable",
       description: "1m braided cable, durable and fast",
-      price: "$10",
-      originalPrice: "$12",
+      price: "€10",
+      originalPrice: "€12",
       image: "/c cable.png",
       rating: 4.4,
       reviews: 76,
@@ -79,8 +79,8 @@ export default function AccessoriesPage() {
       id: 105,
       name: "Power Bank 10,000mAh",
       description: "Slim, lightweight with dual output",
-      price: "$30",
-      originalPrice: "$35",
+      price: "€30",
+      originalPrice: "€35",
       image: "/battery.png",
       rating: 4.6,
       reviews: 164,
@@ -91,8 +91,8 @@ export default function AccessoriesPage() {
       id: 106,
       name: "Bluetooth Headphones",
       description: "Over-ear, noise isolation, 20h battery",
-      price: "$35",
-      originalPrice: "$49",
+      price: "€35",
+      originalPrice: "€49",
       image: "/camera.png",
       rating: 4.3,
       reviews: 58,
@@ -237,17 +237,17 @@ export default function AccessoriesPage() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold text-white">
-                              ${parseFloat(item.final_price).toLocaleString()}
+                              €{parseFloat(item.final_price).toLocaleString()}
                             </span>
                             {item.discounted_amount && item.discounted_amount !== item.main_amount && (
                               <span className="text-sm text-slate-500 line-through">
-                                ${parseFloat(item.main_amount).toLocaleString()}
+                                €{parseFloat(item.main_amount).toLocaleString()}
                               </span>
                             )}
                           </div>
                           {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
                             <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
-                              Save ${(parseFloat(item.main_amount) - parseFloat(item.final_price)).toFixed(2)}
+                              Save €{(parseFloat(item.main_amount) - parseFloat(item.final_price)).toFixed(2)}
                             </div>
                           )}
                         </div>
