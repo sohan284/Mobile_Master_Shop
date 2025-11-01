@@ -1,8 +1,8 @@
 "use client";
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, memo } from "react";
 
-export default function MotionFade({
+function MotionFadeComponent({
   as: Component = "div",
   children,
   className,
@@ -15,22 +15,20 @@ export default function MotionFade({
 
   useEffect(() => {
     setMounted(true);
-    
-    // Cleanup function to handle component unmounting
     return () => {
-      // Ensure any pending animations are cleaned up
-      if (containerRef.current) {
-        containerRef.current = null;
-      }
+      containerRef.current = null;
     };
   }, []);
 
-  // For immediate content (like hero sections), use animate instead of whileInView
+  // For sections that appear immediately (e.g., hero)
   if (immediate) {
-    // During SSR and initial hydration, show content without animation
     if (!mounted) {
       return (
-        <div ref={containerRef} className={className} style={{ opacity: 1, transform: 'translateY(0)' }}>
+        <div
+          ref={containerRef}
+          className={className}
+          style={{ opacity: 1, transform: "translateY(0)" }}
+        >
           {children}
         </div>
       );
@@ -63,4 +61,4 @@ export default function MotionFade({
   );
 }
 
-
+export default memo(MotionFadeComponent);

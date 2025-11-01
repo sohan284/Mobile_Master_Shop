@@ -82,7 +82,7 @@ export default function AccessoryDetailsPage() {
           <div className="mb-6">
             <button
               onClick={() => router.back()}
-              className="text-accent hover:text-secondary transition-colors"
+              className="text-accent hover:text-secondary transition-colors cursor-pointer"
             >
               ← Back
             </button>

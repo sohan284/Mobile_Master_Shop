@@ -1,9 +1,9 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 
-export default function PageTransition({ children }) {
+function PageTransitionComponent({ children }) {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
   const [displayPathname, setDisplayPathname] = useState(pathname);
@@ -17,7 +17,7 @@ export default function PageTransition({ children }) {
     }
   }, [pathname, displayPathname]);
 
-  // Prevent hydration issues by not using AnimatePresence on initial mount
+  // Prevent hydration flicker
   if (!isMounted) {
     return <div>{children}</div>;
   }
@@ -40,4 +40,4 @@ export default function PageTransition({ children }) {
   );
 }
 
-
+export default memo(PageTransitionComponent);
