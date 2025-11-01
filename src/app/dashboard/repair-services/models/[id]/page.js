@@ -95,15 +95,7 @@ export default function ModelDetailsPage() {
         </div>
       ),
     },  
-    {
-      header:"Warranty Days",
-      accessor: 'warranty_days',
-      render: (item) => (
-        <div className="text-sm text-gray-600">
-          {item?.original?.warranty_days || item?.duplicate?.warranty_days || 'N/A'}
-        </div>
-      ),
-    },
+    
    
     {
       header: 'Created At',

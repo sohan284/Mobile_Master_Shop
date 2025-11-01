@@ -16,8 +16,23 @@ export default function AccessoryDetailsPage() {
   const router = useRouter();
   const id = params?.id;
 
+  // Helper function to get initial quantity from sessionStorage
+  const getInitialQuantity = () => {
+    if (typeof window === 'undefined' || !id) return 1;
+    try {
+      const raw = sessionStorage.getItem('selectedAccessory');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && String(parsed.id) === String(id) && parsed.quantity && parsed.quantity > 0) {
+          return parsed.quantity;
+        }
+      }
+    } catch {}
+    return 1;
+  };
+
   const [sessionItem, setSessionItem] = useState(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(() => getInitialQuantity());
   
   // Fetch reviews
   const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
@@ -35,14 +50,16 @@ export default function AccessoryDetailsPage() {
   }, [reviewsData, id]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && id) {
       const raw = sessionStorage.getItem('selectedAccessory');
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
           if (parsed && String(parsed.id) === String(id)) {
             setSessionItem(parsed);
-            if (parsed.quantity && parsed.quantity > 0) setQuantity(parsed.quantity);
+            if (parsed.quantity && parsed.quantity > 0) {
+              setQuantity(parsed.quantity);
+            }
           }
         } catch {}
       }
@@ -134,16 +151,16 @@ export default function AccessoryDetailsPage() {
                         </span>
                       )}
                       <span className="text-3xl font-extrabold text-secondary">
-                        ${parseFloat(accessory.final_price).toLocaleString()}
+                        €{parseFloat(accessory.final_price).toLocaleString()}
                       </span>
                       {accessory.discounted_amount && accessory.discounted_amount !== accessory.main_amount && (
                         <span className="text-sm text-accent/60 line-through">
-                          ${parseFloat(accessory.main_amount).toLocaleString()}
+                          €{parseFloat(accessory.main_amount).toLocaleString()}
                         </span>
                       )}
                     </p>
                     <div className="text-accent/80 text-sm mt-1">
-                      Total: <span className="font-semibold text-secondary">${(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
+                        Total: <span className="font-semibold text-secondary">€{(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
                     </div>
                   </div>
 
