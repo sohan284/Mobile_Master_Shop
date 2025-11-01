@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, Instagram, Linkedin, Facebook } from 'lucide-react';
 
 export default function ContactPage() {
@@ -11,6 +11,14 @@ export default function ContactPage() {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // new: mounted flag to trigger fast enter animations
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    // use requestAnimationFrame for immediate next-frame activation (perceived faster)
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,12 +83,18 @@ export default function ContactPage() {
     },
   ];
 
+  // helper classes for enter animation (fast durations)
+  const baseEnter = "transform-gpu transition-all duration-300 ease-out motion-safe:";
+  const heroAnim = mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-3";
+  const formAnim = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2";
+  const cardsAnim = mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1";
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         
         {/* Hero Section */}
-        <div className="text-center mb-20">
+        <div className={`${baseEnter} ${heroAnim} delay-75 text-center mb-20`}>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
             Get in Touch
           </h1>
@@ -90,7 +104,7 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Form - Centered */}
-        <div className="max-w-2xl mx-auto mb-20">
+        <div className={`max-w-2xl mx-auto mb-20 ${baseEnter} ${formAnim} delay-150`}>
           <div className="space-y-6">
             
             {/* Name & Email Row */}
@@ -105,7 +119,7 @@ export default function ContactPage() {
                   type="text"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
                   placeholder="John Doe"
                 />
               </div>
@@ -120,7 +134,7 @@ export default function ContactPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
                   placeholder="john@example.com"
                 />
               </div>
@@ -137,7 +151,7 @@ export default function ContactPage() {
                 type="text"
                 value={formData.subject}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
                 placeholder="How can we help?"
               />
             </div>
@@ -153,7 +167,7 @@ export default function ContactPage() {
                 value={formData.message}
                 onChange={handleInputChange}
                 rows={6}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01] resize-none"
                 placeholder="Tell us more about your inquiry..."
               />
             </div>
@@ -162,7 +176,7 @@ export default function ContactPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="cursor-pointer w-full px-8 py-3 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="cursor-pointer w-full px-8 py-3 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu active:scale-95"
             >
               {isSubmitting ? (
                 'Sending...'
@@ -177,7 +191,7 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Info - Below Form */}
-        <div className="max-w-4xl mx-auto">
+        <div className={`max-w-4xl mx-auto ${baseEnter} ${cardsAnim} delay-200`}>
           
           {/* Contact Info Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
@@ -185,7 +199,7 @@ export default function ContactPage() {
               const Icon = info.icon;
               return (
                 <div key={info.title} className="flex flex-col items-center text-center group">
-                  <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-amber-500/10 transition-colors mb-3">
+                  <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-amber-500/10 transition-colors duration-200 mb-3 transform-gpu group-hover:scale-105">
                     <Icon className="w-6 h-6 text-amber-500" />
                   </div>
                   <h3 className="font-semibold text-white mb-1 text-sm">
