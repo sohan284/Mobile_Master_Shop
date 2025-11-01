@@ -9,6 +9,7 @@ import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomButton } from "@/components/ui/button";
+import ReviewsSection from '@/components/common/ReviewsSection';
 
 export default function AccessoryDetailsPage() {
   const params = useParams();
@@ -17,6 +18,21 @@ export default function AccessoryDetailsPage() {
 
   const [sessionItem, setSessionItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  
+  // Fetch reviews
+  const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
+    ['accessory-reviews', id],
+    () => apiFetcher.get(`/api/accessories/review/`),
+    { enabled: !!id }
+  );
+  
+  // Filter reviews by product_id
+  const reviews = useMemo(() => {
+    const allReviews = reviewsData?.data || reviewsData?.results || [];
+    return allReviews.filter(review => 
+      String(review.product_id) === String(id)
+    );
+  }, [reviewsData, id]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -57,6 +73,7 @@ export default function AccessoryDetailsPage() {
       sessionStorage.setItem('selectedAccessory', JSON.stringify(payload));
     } catch {}
   }, [quantity, accessory]);
+
 
   return (
     <PageTransition>
@@ -184,6 +201,18 @@ export default function AccessoryDetailsPage() {
             <div className="text-center text-accent/80 py-24">
               Could not load this accessory.
             </div>
+          )}
+
+          {/* Reviews Section */}
+          {accessory && (
+            <ReviewsSection
+              productId={id}
+              type="accessory"
+              reviews={reviews}
+              isLoading={reviewsLoading}
+              refetchReviews={refetchReviews}
+              showReviewForm={false}
+            />
           )}
         </div>
       </div>

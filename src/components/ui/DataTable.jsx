@@ -104,6 +104,9 @@ export default function DataTable({
     return '-';
   };
 
+  // Check if any actions are provided
+  const hasActions = !!(onView || onEdit || onDelete);
+
   // Show skeleton loader when loading
   if (loading) {
     return (
@@ -186,13 +189,13 @@ export default function DataTable({
                   </div>
                 </TableHead>
               ))}
-              <TableHead>Actions</TableHead>
+              {hasActions && <TableHead>Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + 1} className="h-80 text-center">
+                <TableCell colSpan={columns.length + (hasActions ? 1 : 0)} className="h-80 text-center">
                   No data found
                 </TableCell>
               </TableRow>
@@ -208,40 +211,42 @@ export default function DataTable({
                       {renderCell(item, column)}
                     </TableCell>
                   ))}
-                  <TableCell>
-                    <div className="flex items-center space-x-2 cursor-pointer">
-                     {onView && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); onView(item); }}
-                          className="h-8 w-8 p-0 cursor-pointer"
-                        >
-                          <Eye className="h-4 w-4 cursor-pointer" />
-                        </Button>
-                      )}
-                      {onEdit && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                          className="h-8 w-8 p-0 cursor-pointer"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {onDelete && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); onDelete(item); }}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
+                  {hasActions && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2 cursor-pointer">
+                       {onView && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); onView(item); }}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
+                            <Eye className="h-4 w-4 cursor-pointer" />
+                          </Button>
+                        )}
+                        {onEdit && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); onEdit(item); }}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {onDelete && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); onDelete(item); }}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}
