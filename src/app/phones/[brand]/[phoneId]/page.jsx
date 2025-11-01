@@ -14,6 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,7 @@ import SafeImage from '@/components/ui/SafeImage';
 export default function PhoneIndividualPage({ params }) {
   const phoneId = use(params).phoneId;
   const brand = use(params).brand;
+  const router = useRouter();
 
   // Fetch phone data from API
   const { data: phoneData, isLoading: phoneLoading, error: phoneError } = useApiGet(
@@ -32,16 +34,17 @@ export default function PhoneIndividualPage({ params }) {
   );
 
   const phone = phoneData?.data;
+  const [quantity] = useState(1);
 
   // Helper function to get the correct image source
   const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
     if (!imageSrc) return fallback;
-
+    
     // If it's a remote URL and starts with http, use it directly
     if (imageSrc.startsWith('http')) {
       return imageSrc;
     }
-
+    
     // If it's a local path, ensure it starts with /
     return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
   };
@@ -64,6 +67,27 @@ export default function PhoneIndividualPage({ params }) {
     }
   }, [phone?.colors, selectedOptions.color]);
 
+  // Save phone data to sessionStorage
+  useEffect(() => {
+    if (!phone || !phoneId) return;
+    try {
+      const selectedColorObj = phone?.colors?.find(c => 
+        c.name === selectedOptions.color
+      ) || (selectedOptions.color ? { name: selectedOptions.color } : null);
+      
+      const payload = {
+        ...phone,
+        id: parseInt(phoneId),
+        quantity,
+        selectedColor: selectedColorObj,
+        color: selectedOptions.color
+      };
+      sessionStorage.setItem('selectedPhone', JSON.stringify(payload));
+    } catch (e) {
+      console.error('Error saving phone to sessionStorage:', e);
+    }
+  }, [phone, phoneId, quantity, selectedOptions.color]);
+
   // Handler for option selection
   const handleOptionSelect = (category, option) => {
     setSelectedOptions(prev => {
@@ -84,6 +108,10 @@ export default function PhoneIndividualPage({ params }) {
 
       return newState;
     });
+  };
+
+  const handleProceedToCheckout = () => {
+    router.push(`/phones/${brand}/${phoneId}/breakdown`);
   };
 
   // Show loading state
@@ -226,17 +254,17 @@ export default function PhoneIndividualPage({ params }) {
       {
         quote: `I'm impressed with the quality of my refurbished ${phone.name}. It looks and works like new, and the price was unbeatable. The staff at Save were very helpful with the setup!`,
         author: "Thomas",
-        product: `${phone.name}`
+        product: `Refurbished ${phone.name}`
       },
       {
         quote: `Great experience buying from Save. My ${phone.brand_name} phone arrived in perfect condition, and the 2-year warranty gives me complete peace of mind. Will definitely recommend to friends!`,
         author: "Sophie L.",
-        product: `${phone.name}`
+        product: `Refurbished ${phone.name}`
       },
       {
         quote: `Fast service and excellent quality. My refurbished ${phone.name} works flawlessly, and the battery life is amazing. Much better value than buying new!`,
         author: "Marc D.",
-        product: `${phone.name}`
+        product: `Refurbished ${phone.name}`
       }
     ]
   };
@@ -263,83 +291,19 @@ export default function PhoneIndividualPage({ params }) {
           <MotionFade delay={0.2} immediate={true}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
               {/* Left: Image */}
-              <div>
-                <div className="relative flex justify-center items-start lg:sticky lg:top-24">
-                  <SafeImage
-                    src={getImageSrc(phone?.icon)}
-                    alt={phone?.name || 'Phone'}
-                    width={480}
-                    height={480}
-                    className="w-full max-w-md h-auto object-contain rounded-xl p-4"
-                  />
-                </div>
-
-                <div className="space-y-6">
-                  <h1 className="text-3xl font-bold text-accent">{phone.name}</h1>
-                  <p className="text-accent/80 text-lg">{phone.brand_name}</p>
-
-                  {/* Features */}
-                  <div className="flex gap-4">
-                    {features.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        {feature.text === "Guarantee" ? (
-                          <Shield className="w-5 h-5 text-secondary" />
-                        ) : (
-                          <CreditCard className="w-5 h-5 text-secondary" />
-                        )}
-                        <span className="text-accent">{feature.text}: {feature.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Phone Specifications */}
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-accent/80">Storage:</span>
-                      <span className="text-accent ml-2">{phone.memory}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">RAM:</span>
-                      <span className="text-accent ml-2">{phone.ram}GB</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Stock:</span>
-                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
-                    </div>
-                    <div>
-                      <span className="text-accent/80">Status:</span>
-                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
-                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Selections */}
-                {Object.entries(selections).map(([key, selection]) => (
-                  <div key={key} className="space-y-2">
-                    <h3 className="font-semibold text-accent">{selection.title}</h3>
-                    <div className="flex gap-2">
-                      {selection.options.map((option) => (
-                        <button
-                          key={typeof option === 'string' ? option : option.name}
-                          onClick={() => handleOptionSelect(key, option)}
-                          className={`px-4 py-2 rounded-full border transition-all duration-200 hover:border-secondary/50 cursor-pointer ${option === selectedOptions[key]
-                            ? 'bg-secondary text-primary border-secondary hover:shadow-md'
-                            : 'border-accent/30 text-accent hover:shadow-md'
-                            }`}
-                        >
-                          {typeof option === 'string' ? option : option.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Pricing */}
-                <div className="border-t border-accent/20 pt-6">
+            <div>
+            <div className="relative flex justify-center items-start lg:sticky lg:top-24">
+                <SafeImage
+                  src={getImageSrc(phone?.icon)}
+                  alt={phone?.name || 'Phone'}
+                  width={480}
+                  height={480}
+                  className="w-full max-w-md h-auto object-contain rounded-xl p-4"
+                />
+              </div>
+              <div className='flex flex-col gap-4 pt-12'>
+                 {/* Pricing */}
+                 <div className="">
                   <div className="text-3xl font-bold text-secondary">
                     ${parseFloat(phone.final_price).toLocaleString()}
                   </div>
@@ -369,15 +333,113 @@ export default function PhoneIndividualPage({ params }) {
                         {availability.store.location.address}
                       </div>
                     </div>
-                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer">
+                    <button 
+                      onClick={handleProceedToCheckout}
+                      className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer"
+                    >
                       <Calendar className="w-5 h-5" />
                       Buy Now
                     </button>
                   </div>
                 </div>
-              </div>
+          </div>
             </div>
-          </MotionFade>
+
+              {/* Right: Content */}
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-extrabold text-secondary tracking-tight">{phone.name}</h1>
+                  <p className="text-accent/80 text-base md:text-lg mt-1">{phone.brand_name}</p>
+                </div>
+
+                {/* Storage (fixed) and Colors (selectable) */}
+                <div className="space-y-5">
+                  {/* Storage */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">RAM</h3>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
+                        {phone?.ram}GB
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">Storage capacity</h3>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
+                        {phone?.memory}GB
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Colors */}
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-accent">Choose the color</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {(phone.colors || []).map((color) => {
+                        const isSelected = (selectedOptions.color || phone.colors?.[0]?.name) === color.name;
+                        return (
+                          <button
+                            key={color.name}
+                            onClick={() => setSelectedOptions(prev => ({ ...prev, color: color.name }))}
+                            className={`px-3 py-2 rounded-full border transition-all duration-200 flex items-center gap-2 ${
+                              isSelected
+                                ? 'bg-secondary text-primary border-secondary hover:shadow-md'
+                                : 'border-accent/30 text-accent hover:shadow-md'
+                            }`}
+                          >
+                            <span
+                              className="inline-block w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: color.hex_code || '#ccc' }}
+                            />
+                            <span>{color.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                {/* Phone Specifications */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
+                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-1">
+                    <div>
+                      <span className="text-accent/80">Storage:</span>
+                      <span className="text-accent ml-2">{phone.memory}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">RAM:</span>
+                      <span className="text-accent ml-2">{phone.ram}GB</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Stock:</span>
+                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
+                    </div>
+                    <div>
+                      <span className="text-accent/80">Status:</span>
+                      <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
+                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                {hasDescription && (
+                  <div className="bg-white/10 rounded-xl border border-accent/20 p-6">
+                    <h3 className="text-lg font-semibold text-secondary mb-3">Description</h3>
+                    <div className="prose  prose-sm max-w-none text-secondary" dangerouslySetInnerHTML={{ __html: phone.description }} />
+                  </div>
+                )}
+
+        
+
+               
+              </div>
+      
+            </div>
+            </MotionFade>
+
           {/* Refurbishment Process */}
           <MotionFade delay={0.3} immediate={true}>
             <section className="my-16">
@@ -401,7 +463,7 @@ export default function PhoneIndividualPage({ params }) {
                     )}
                   </div>
                 ))}
-              </div>
+        </div>
             </section>
           </MotionFade>
 
@@ -423,37 +485,11 @@ export default function PhoneIndividualPage({ params }) {
             </section>
           </MotionFade>
 
-          {/* Related Products */}
-          {/* <MotionFade delay={0.5} immediate={true}>
-            <section className="my-16">
-              <h2 className="text-2xl font-bold mb-8 text-secondary">Related Products</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {relatedProducts.map((item, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-3 md:p-4 hover:shadow-lg transition-shadow duration-200">
-                    <div className="relative aspect-square mb-3 md:mb-4">
-                      <SafeImage
-                        src={getImageSrc(phone?.icon)}
-                        alt={item.fullName || 'Related Product'}
-                        width={180}
-                        height={180}
-                        className="object-contain w-full h-full max-h-[180px] rounded-lg"
-                      />
-                    </div>
-                    <h3 className="font-semibold text-sm md:text-base text-accent">{item.fullName}</h3>
-                    <p className="text-secondary font-bold text-sm md:text-base">{item.price}</p>
-                    <div className="flex items-center gap-2 text-xs md:text-sm text-accent/80 mt-2">
-                      <Shield className="w-4 h-4" />
-                      <span>{item.warranty.text}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </MotionFade> */}
+        
         </div>
       </div>
-    </PageTransition >
-
+    </PageTransition>
+  
 
   )
 }

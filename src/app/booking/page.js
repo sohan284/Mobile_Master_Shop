@@ -7,12 +7,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
-import { apiFetcher } from '@/lib/api';
 import { decryptBkp } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-function CheckoutForm({ clientSecret, orderId, amount, currency, paymentIntentId }) {
+function CheckoutForm({ clientSecret, amount, currency }) {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -40,20 +40,19 @@ function CheckoutForm({ clientSecret, orderId, amount, currency, paymentIntentId
             return;
         }
 
-        const confirmedIntentId = paymentIntent?.id || paymentIntentId;
-        try {
-            if (orderId && confirmedIntentId) {
-                await apiFetcher.post(`/api/repair/orders/${orderId}/confirm_payment/`, {
-                    payment_intent_id: confirmedIntentId
-                });
-                setMessage('Payment confirmed successfully.');
-                sessionStorage.removeItem('bkp');
+        // Payment successful - redirect to orders page
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+            toast.success('Payment confirmed successfully!', {
+                duration: 3000,
+                position: 'top-right',
+            });
+            sessionStorage.removeItem('bkp');
+            // Small delay to show the toast before redirecting
+            setTimeout(() => {
                 router.push('/orders');
-            } else {
-                setMessage('Missing order ID or payment intent ID.');
-            }
-        } catch (err) {
-            setMessage('Payment confirmed with Stripe, but backend confirmation failed.');
+            }, 1500);
+        } else {
+            setMessage('Payment processing...');
         }
 
         setSubmitting(false);
@@ -101,8 +100,6 @@ export default function BookingPage() {
 
     const amount = bookingPayment?.amount ?? 0;
     const currency = bookingPayment?.currency || 'EUR';
-    const orderId = bookingPayment?.orderId;
-    const paymentIntentId = bookingPayment?.payment_intent_id;
 
     if (isLoading) {
         return (
@@ -208,6 +205,12 @@ export default function BookingPage() {
                                                     <span>-{bookingPayment.summary.websiteDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
+                                            {bookingPayment.summary?.shippingCost > 0 && (
+                                                <div className="flex justify-between text-secondary">
+                                                    <span>Shipping Cost</span>
+                                                    <span>{bookingPayment.summary.shippingCost.toFixed(2)}</span>
+                                                </div>
+                                            )}
                                             <div className="border-t border-accent/20 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
                                                     <span>Total</span>
@@ -218,7 +221,7 @@ export default function BookingPage() {
 
                                         {clientSecret && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
                                             <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
-                                                <CheckoutForm clientSecret={clientSecret} orderId={orderId} amount={amount} currency={currency} paymentIntentId={paymentIntentId} />
+                                                <CheckoutForm clientSecret={clientSecret} amount={amount} currency={currency} />
                                             </Elements>
                                         ) : (
                                             <CustomButton disabled className="w-full bg-secondary text-primary/60 py-3 opacity-60">Loading Payment</CustomButton>
