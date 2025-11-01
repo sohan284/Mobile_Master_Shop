@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import ClientLayout from "./components/ClientLayout";
 import Script from "next/script";
 import QueryProvider from "../../providers/QueryProvider";
+import SafeDOMPatch from "@/components/SafeDOMPatch";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
         />
         <QueryProvider>
           <AuthProvider>
+            <SafeDOMPatch />
             <ClientLayout>
             <div id="google_translate_element" style={{ position: "absolute", top: "-9999px", left: "-9999px" }}></div>
               {children}

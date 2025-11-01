@@ -6,10 +6,16 @@ import { useEffect, useState, memo } from "react";
 function PageTransitionComponent({ children }) {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  const [displayPathname, setDisplayPathname] = useState(pathname);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+
+    // Update display pathname when pathname changes
+    if (pathname !== displayPathname) {
+      setDisplayPathname(pathname);
+    }
+  }, [pathname, displayPathname]);
 
   // Prevent hydration flicker
   if (!isMounted) {
@@ -17,14 +23,16 @@ function PageTransitionComponent({ children }) {
   }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {/* ✅ Key only changes when navigating to another page */}
+    <AnimatePresence 
+      mode="wait" 
+      initial={false}
+    >
       <motion.div
-        key={`page-${pathname}`}
+        key={displayPathname}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
         {children}
       </motion.div>

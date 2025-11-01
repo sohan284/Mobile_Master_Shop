@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useState, useEffect } from 'react';
+import React, { use, useState, useEffect, useMemo } from 'react';
 import {
   CheckCircle,
   CreditCard,
@@ -9,7 +9,6 @@ import {
   Save,
   Shield,
   ArrowLeft,
-  Star,
   Clock,
   Check
 } from 'lucide-react';
@@ -21,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import SafeImage from '@/components/ui/SafeImage';
+import ReviewsSection from '@/components/common/ReviewsSection';
 
 export default function PhoneIndividualPage({ params }) {
   const phoneId = use(params).phoneId;
@@ -35,6 +35,22 @@ export default function PhoneIndividualPage({ params }) {
 
   const phone = phoneData?.data;
   const [quantity] = useState(1);
+  
+  // Fetch reviews
+  const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
+    ['phone-reviews', phoneId],
+    () => apiFetcher.get(`/api/brandnew/review/`),
+    { enabled: !!phoneId }
+  );
+  
+  // Filter reviews by phone_model
+  const reviews = useMemo(() => {
+    const allReviews = reviewsData?.data || reviewsData?.results || [];
+    return allReviews.filter(review => 
+      String(review.phone_model) === String(phoneId) || 
+      String(review.phone_model_id) === String(phoneId)
+    );
+  }, [reviewsData, phoneId]);
 
   // Helper function to get the correct image source
   const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
@@ -177,19 +193,6 @@ export default function PhoneIndividualPage({ params }) {
     }
   ];
 
-  const selections = {
-    storage: {
-      title: "Choose storage capacity",
-      options: [phone.memory + "GB"],
-      selected: phone.memory + "GB"
-    },
-    color: {
-      title: "Choose the color",
-      options: phone.colors?.map(color => color.name) || ["Black"],
-      selected: phone.colors?.[0]?.name || "Black"
-    }
-  };
-
   const availability = {
     title: `Your ${phone.name} is available at`,
     store: {
@@ -205,7 +208,6 @@ export default function PhoneIndividualPage({ params }) {
       }
     }
   };
-
 
   const refurbishmentProcess = {
     title: `At Save, every ${phone.name} goes through a meticulous process to ensure optimal quality and performance.`,
@@ -244,27 +246,6 @@ export default function PhoneIndividualPage({ params }) {
         number: 6,
         title: "Final Test and Certification",
         description: `Before being put on sale, each refurbished ${phone.name} undergoes a final quality test. We ensure that all the phone's features work perfectly and that its performance meets SAVE's high standards.`
-      }
-    ]
-  };
-
-  const testimonials = {
-    title: "Our customers' SAVE experience",
-    reviews: [
-      {
-        quote: `I'm impressed with the quality of my refurbished ${phone.name}. It looks and works like new, and the price was unbeatable. The staff at Save were very helpful with the setup!`,
-        author: "Thomas",
-        product: `Refurbished ${phone.name}`
-      },
-      {
-        quote: `Great experience buying from Save. My ${phone.brand_name} phone arrived in perfect condition, and the 2-year warranty gives me complete peace of mind. Will definitely recommend to friends!`,
-        author: "Sophie L.",
-        product: `Refurbished ${phone.name}`
-      },
-      {
-        quote: `Fast service and excellent quality. My refurbished ${phone.name} works flawlessly, and the battery life is amazing. Much better value than buying new!`,
-        author: "Marc D.",
-        product: `Refurbished ${phone.name}`
       }
     ]
   };
@@ -431,14 +412,9 @@ export default function PhoneIndividualPage({ params }) {
                     <div className="prose  prose-sm max-w-none text-secondary" dangerouslySetInnerHTML={{ __html: phone.description }} />
                   </div>
                 )}
-
-        
-
-               
               </div>
-      
             </div>
-            </MotionFade>
+          </MotionFade>
 
           {/* Refurbishment Process */}
           <MotionFade delay={0.3} immediate={true}>
@@ -463,33 +439,21 @@ export default function PhoneIndividualPage({ params }) {
                     )}
                   </div>
                 ))}
-        </div>
-            </section>
-          </MotionFade>
-
-          {/* Testimonials */}
-          <MotionFade delay={0.4} immediate={true}>
-            <section className="my-16 bg-white/10 backdrop-blur-sm py-12 px-6 rounded-xl border border-accent/20">
-              <h2 className="text-2xl font-bold mb-8 text-center text-secondary">{testimonials.title}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {testimonials.reviews.map((review, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm p-6 rounded-lg shadow border border-accent/20">
-                    <p className="italic mb-4 text-accent">"{review.quote}"</p>
-                    <div className="text-sm">
-                      <strong className="text-accent">{review.author}</strong>
-                      <p className="text-accent/80">{review.product}</p>
-                    </div>
-                  </div>
-                ))}
               </div>
             </section>
           </MotionFade>
 
-        
+          {/* Reviews Section */}
+          <ReviewsSection
+            productId={phoneId}
+            type="phone"
+            reviews={reviews}
+            isLoading={reviewsLoading}
+            refetchReviews={refetchReviews}
+            showReviewForm={false}
+          />
         </div>
       </div>
     </PageTransition>
-  
-
-  )
+  );
 }
