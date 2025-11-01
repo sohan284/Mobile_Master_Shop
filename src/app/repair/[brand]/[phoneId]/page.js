@@ -14,6 +14,7 @@ import { apiFetcher } from '@/lib/api';
 import { useApiGet } from '@/hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from '@/components/ui/NotFound';
+import ReviewsSection from '@/components/common/ReviewsSection';
 
 export default function PhoneModelPage({ params }) {
     const { brand, phoneId } = use(params);
@@ -30,6 +31,21 @@ export default function PhoneModelPage({ params }) {
     () => apiFetcher.get(`/api/repair/repair-prices/?phone_model=${phoneId}`)
   );
   const repairServices = servicesResponse?.data || [];
+
+  // Fetch reviews for this repair service/phone model
+  const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
+    ['repair-reviews', phoneId],
+    () => apiFetcher.get(`/api/repair/review/`),
+    { enabled: !!phoneId }
+  );
+  
+  // Filter reviews by phone_model_id
+  const reviews = useMemo(() => {
+    const allReviews = reviewsData?.data || reviewsData?.results || [];
+    return allReviews.filter(review => 
+      String(review.phone_model_id) === String(phoneId)
+    );
+  }, [reviewsData, phoneId]);
  
     // Filter services based on search term
     const filteredServices = repairServices.filter(service =>
@@ -350,8 +366,14 @@ export default function PhoneModelPage({ params }) {
                         ]}
                     />
 
-                
-
+                    {/* Reviews Section */}
+                    <ReviewsSection
+                        productId={phoneId}
+                        type="repair"
+                        reviews={reviews}
+                        isLoading={reviewsLoading}
+                        refetchReviews={refetchReviews}
+                    />
                  
             </div>
          </div>
