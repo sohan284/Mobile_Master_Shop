@@ -1,14 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Clock, Send, Facebook, Instagram, Linkedin } from 'lucide-react';
-import { CustomButton } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import PageTransition from '@/components/animations/PageTransition';
-import toast from 'react-hot-toast';
+import { Mail, Phone, MapPin, Clock, Send, Instagram, Linkedin, Facebook } from 'lucide-react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -32,48 +25,19 @@ export default function ContactPage() {
     return emailRegex.test(email);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.name.trim()) {
-      toast.error('Please enter your name');
-      return;
-    }
-
-    if (!formData.email.trim()) {
-      toast.error('Please enter your email address');
-      return;
-    }
-
-    if (!validateEmail(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
-
-    if (!formData.subject.trim()) {
-      toast.error('Please enter a subject');
-      return;
-    }
-
-    if (!formData.message.trim()) {
-      toast.error('Please enter your message');
+  const handleSubmit = async () => {
+    if (!formData.name.trim() || !formData.email.trim() || !validateEmail(formData.email) || 
+        !formData.subject.trim() || !formData.message.trim()) {
+      alert('Please fill in all fields correctly');
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Sending message...');
 
     try {
-      // TODO: Replace with actual API endpoint when available
-      // await apiFetcher.post('/api/contact/', formData);
-      
-      // Simulate API call for now
       await new Promise(resolve => setTimeout(resolve, 1500));
+      alert('Message sent successfully! We will get back to you soon.');
       
-      toast.dismiss(loadingToast);
-      toast.success('Message sent successfully! We will get back to you soon.');
-      
-      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -82,8 +46,7 @@ export default function ContactPage() {
       });
       
     } catch (error) {
-      toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.');
+      alert('Failed to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -94,224 +57,149 @@ export default function ContactPage() {
       icon: MapPin,
       title: 'Address',
       content: 'Repair Paris, France',
-      link: '#',
     },
     {
       icon: Phone,
       title: 'Phone',
       content: '+33 1 XX XX XX XX',
-      link: 'tel:+331XXXXXXXX',
     },
     {
       icon: Mail,
       title: 'Email',
       content: 'contact@mlkphone.com',
-      link: 'mailto:contact@mlkphone.com',
     },
     {
       icon: Clock,
       title: 'Business Hours',
       content: 'Mon - Sat: 9:00 AM - 7:00 PM',
-      link: '#',
     },
   ];
 
   return (
-    <PageTransition>
-      <div className="min-h-screen relative overflow-hidden bg-primary text-secondary">
-        <div className="container mx-auto px-4 py-8">
-          
-          {/* Hero Section - Banner Style */}
-          <div className="text-center mb-16">
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl md:text-6xl font-extrabold tracking-wider text-white"
+    <div className="min-h-screen bg-slate-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        
+        {/* Hero Section */}
+        <div className="text-center mb-20">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
+            Get in Touch
+          </h1>
+          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
+            Have questions? We would love to hear from you. Send us a message and we will respond as soon as possible.
+          </p>
+        </div>
+
+        {/* Contact Form - Centered */}
+        <div className="max-w-2xl mx-auto mb-20">
+          <div className="space-y-6">
+            
+            {/* Name & Email Row */}
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1">
+                <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  placeholder="John Doe"
+                />
+              </div>
+
+              <div className="flex-1">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+            </div>
+
+            {/* Subject */}
+            <div>
+              <label htmlFor="subject" className="block text-sm font-medium text-slate-300 mb-2">
+                Subject
+              </label>
+              <input
+                id="subject"
+                name="subject"
+                type="text"
+                value={formData.subject}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+                placeholder="How can we help?"
+              />
+            </div>
+
+            {/* Message */}
+            <div>
+              <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+                rows={6}
+                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all resize-none"
+                placeholder="Tell us more about your inquiry..."
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="cursor-pointer w-full px-8 py-3 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              CONTACT US
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-4 text-lg md:text-xl text-gray-300"
-            >
-              Have a question or need assistance? We're here to help! Get in touch with us and we'll respond as soon as possible.
-            </motion.p>
+              {isSubmitting ? (
+                'Sending...'
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Send Message
+                </>
+              )}
+            </button>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 md:p-8 border border-white/20 hover:border-secondary/50 transition-all duration-300">
-                <h3 className="text-2xl font-bold text-white mb-6">Send us a Message</h3>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-white font-medium">
-                      Name *
-                    </Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus-visible:border-secondary focus-visible:ring-secondary/50"
-                      required
-                    />
+        {/* Contact Info - Below Form */}
+        <div className="max-w-4xl mx-auto">
+          
+          {/* Contact Info Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            {contactInfo.map((info) => {
+              const Icon = info.icon;
+              return (
+                <div key={info.title} className="flex flex-col items-center text-center group">
+                  <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-amber-500/10 transition-colors mb-3">
+                    <Icon className="w-6 h-6 text-amber-500" />
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white font-medium">
-                      Email *
-                    </Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your.email@example.com"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus-visible:border-secondary focus-visible:ring-secondary/50"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="subject" className="text-white font-medium">
-                      Subject *
-                    </Label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      type="text"
-                      placeholder="What's this about?"
-                      value={formData.subject}
-                      onChange={handleInputChange}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus-visible:border-secondary focus-visible:ring-secondary/50"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message" className="text-white font-medium">
-                      Message *
-                    </Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      placeholder="Tell us more about your inquiry..."
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      rows={6}
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-300 focus-visible:border-secondary focus-visible:ring-secondary/50 resize-none"
-                      required
-                    />
-                  </div>
-
-                  <CustomButton
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-secondary text-primary hover:bg-secondary/90 font-semibold py-4 text-base"
-                  >
-                    {isSubmitting ? (
-                      'Sending...'
-                    ) : (
-                      <>
-                        <Send className="mr-2 h-4 w-4" />
-                        Send Message
-                      </>
-                    )}
-                  </CustomButton>
-                </form>
-              </div>
-            </motion.div>
-
-            {/* Contact Information */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="space-y-6"
-            >
-              {/* Contact Info Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-                {contactInfo.map((info, index) => {
-                  const Icon = info.icon;
-                  return (
-                    <motion.div
-                      key={info.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                    >
-                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 hover:bg-white/15 transition-all duration-300 border border-white/20 hover:border-secondary/50 h-full">
-                        <a
-                          href={info.link}
-                          className="flex flex-col sm:flex-row sm:items-center gap-4 group"
-                        >
-                          <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center group-hover:bg-secondary/30 transition-colors duration-300">
-                            <Icon className="h-6 w-6 text-secondary group-hover:text-white transition-colors duration-300" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-white mb-1 group-hover:text-secondary transition-colors duration-300">
-                              {info.title}
-                            </h3>
-                            <p className="text-gray-300 group-hover:text-gray-200 transition-colors duration-300">
-                              {info.content}
-                            </p>
-                          </div>
-                        </a>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {/* Social Media */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1.0 }}
-              >
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                  <h3 className="text-xl font-semibold text-white mb-4">Follow Us</h3>
-                  <div className="flex space-x-4">
-                    <a
-                      href="#"
-                      aria-label="Instagram"
-                      className="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center hover:bg-secondary/30 transition-all duration-300 hover:scale-110 group"
-                    >
-                      <Instagram className="w-6 h-6 text-secondary group-hover:text-white transition-colors duration-300" />
-                    </a>
-                    <a
-                      href="#"
-                      aria-label="LinkedIn"
-                      className="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center hover:bg-secondary/30 transition-all duration-300 hover:scale-110 group"
-                    >
-                      <Linkedin className="w-6 h-6 text-secondary group-hover:text-white transition-colors duration-300" />
-                    </a>
-                    <a
-                      href="#"
-                      aria-label="Facebook"
-                      className="w-12 h-12 rounded-lg bg-secondary/20 flex items-center justify-center hover:bg-secondary/30 transition-all duration-300 hover:scale-110 group"
-                    >
-                      <Facebook className="w-6 h-6 text-secondary group-hover:text-white transition-colors duration-300" />
-                    </a>
-                  </div>
+                  <h3 className="font-semibold text-white mb-1 text-sm">
+                    {info.title}
+                  </h3>
+                  <p className="text-slate-400 text-sm">
+                    {info.content}
+                  </p>
                 </div>
-              </motion.div>
-            </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
-    </PageTransition>
+    </div>
   );
 }
-

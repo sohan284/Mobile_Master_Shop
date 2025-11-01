@@ -14,6 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,7 @@ import SafeImage from '@/components/ui/SafeImage';
 export default function PhoneIndividualPage({ params }) {
   const phoneId = use(params).phoneId;
   const brand = use(params).brand;
+  const router = useRouter();
 
   // Fetch phone data from API
   const { data: phoneData, isLoading: phoneLoading, error: phoneError } = useApiGet(
@@ -32,6 +34,7 @@ export default function PhoneIndividualPage({ params }) {
   );
 
   const phone = phoneData?.data;
+  const [quantity] = useState(1);
 
   // Helper function to get the correct image source
   const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
@@ -64,6 +67,27 @@ export default function PhoneIndividualPage({ params }) {
     }
   }, [phone?.colors, selectedOptions.color]);
 
+  // Save phone data to sessionStorage
+  useEffect(() => {
+    if (!phone || !phoneId) return;
+    try {
+      const selectedColorObj = phone?.colors?.find(c => 
+        c.name === selectedOptions.color
+      ) || (selectedOptions.color ? { name: selectedOptions.color } : null);
+      
+      const payload = {
+        ...phone,
+        id: parseInt(phoneId),
+        quantity,
+        selectedColor: selectedColorObj,
+        color: selectedOptions.color
+      };
+      sessionStorage.setItem('selectedPhone', JSON.stringify(payload));
+    } catch (e) {
+      console.error('Error saving phone to sessionStorage:', e);
+    }
+  }, [phone, phoneId, quantity, selectedOptions.color]);
+
   // Handler for option selection
   const handleOptionSelect = (category, option) => {
     setSelectedOptions(prev => {
@@ -84,6 +108,10 @@ export default function PhoneIndividualPage({ params }) {
 
       return newState;
     });
+  };
+
+  const handleProceedToCheckout = () => {
+    router.push(`/phones/${brand}/${phoneId}/breakdown`);
   };
 
   // Show loading state
@@ -305,7 +333,10 @@ export default function PhoneIndividualPage({ params }) {
                         {availability.store.location.address}
                       </div>
                     </div>
-                    <button className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors">
+                    <button 
+                      onClick={handleProceedToCheckout}
+                      className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer"
+                    >
                       <Calendar className="w-5 h-5" />
                       Buy Now
                     </button>
@@ -454,33 +485,7 @@ export default function PhoneIndividualPage({ params }) {
             </section>
           </MotionFade>
 
-          {/* Related Products */}
-          {/* <MotionFade delay={0.5} immediate={true}>
-            <section className="my-16">
-              <h2 className="text-2xl font-bold mb-8 text-secondary">Related Products</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                {relatedProducts.map((item, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-3 md:p-4 hover:shadow-lg transition-shadow duration-200">
-                    <div className="relative aspect-square mb-3 md:mb-4">
-                      <SafeImage
-                        src={getImageSrc(phone?.icon)}
-                        alt={item.fullName || 'Related Product'}
-                        width={180}
-                        height={180}
-                        className="object-contain w-full h-full max-h-[180px] rounded-lg"
-                      />
-                    </div>
-                    <h3 className="font-semibold text-sm md:text-base text-accent">{item.fullName}</h3>
-                    <p className="text-secondary font-bold text-sm md:text-base">{item.price}</p>
-                    <div className="flex items-center gap-2 text-xs md:text-sm text-accent/80 mt-2">
-                      <Shield className="w-4 h-4" />
-                      <span>{item.warranty.text}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </MotionFade> */}
+        
         </div>
       </div>
     </PageTransition>

@@ -176,11 +176,16 @@ export default function BrandPage({ params }) {
   return (
     <PageTransition>
       <div className="min-h-screen relative overflow-hidden bg-primary">
-        <div className="container mx-auto px-4 py-8">
-
-          {/* Search Section */}
-
-
+        <div className="container mx-auto px-4">
+          {/* Search bar*/}
+          <div className='flex justify-end '>
+            <SearchSection
+              className='p-0 m-0'
+              placeholder="Search by model ..."
+              searchTerm={searchQuery}
+              onSearchChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           {/* Filter and Grid Section */}
           <div className="flex flex-col lg:flex-row gap-8 my-10">
             {/* Filter Sidebar - Sticky */}
@@ -193,7 +198,7 @@ export default function BrandPage({ params }) {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">Sort by Price</label>
                     <select
-                      className="w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value)}
                     >
@@ -212,7 +217,7 @@ export default function BrandPage({ params }) {
                       step="100"
                       value={priceRange.max}
                       onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
-                      className="w-full accent-secondary"
+                      className="w-full accent-secondary cursor-pointer"
                     />
                     <div className="flex justify-between text-accent/80 text-sm mt-2">
                       <span>${priceRange.min.toLocaleString()}</span>
@@ -224,7 +229,7 @@ export default function BrandPage({ params }) {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">Storage</label>
                     <select
-                      className="w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={storage}
                       onChange={(e) => setStorage(e.target.value)}
                     >
@@ -241,7 +246,7 @@ export default function BrandPage({ params }) {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">RAM</label>
                     <select
-                      className="w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={ram}
                       onChange={(e) => setRam(e.target.value)}
                     >
@@ -259,7 +264,7 @@ export default function BrandPage({ params }) {
                   <div className="mb-6">
                     <label className="block text-sm font-medium text-accent mb-3">Availability</label>
                     <select
-                      className="w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={availability}
                       onChange={(e) => setAvailability(e.target.value)}
                     >
@@ -284,7 +289,7 @@ export default function BrandPage({ params }) {
                         setAvailability('all');
                         setDiscount('all');
                       }}
-                      className="w-full p-3 bg-secondary/20 text-secondary border border-secondary/30 rounded-lg hover:bg-secondary/30 transition-colors duration-200 font-medium"
+                      className="cursor-pointer w-full p-3 bg-secondary/20 text-secondary border border-secondary/30 rounded-lg hover:bg-secondary/30 transition-colors duration-200 font-medium"
                     >
                       Clear All Filters
                     </button>
@@ -295,15 +300,6 @@ export default function BrandPage({ params }) {
 
             {/* Phones Grid - Scrollable */}
             <div className="lg:w-3/4">
-              <div className='flex justify-end'>
-                <SearchSection
-                  className=''
-                  placeholder="Search by model ..."
-                  searchTerm={searchQuery}
-                  onSearchChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-
               <div className="max-h-[80vh] overflow-y-auto pr-2 " style={{
                 scrollbarWidth: 'none', /* Firefox */
                 msOverflowStyle: 'none', /* Internet Explorer 10+ */
@@ -342,11 +338,11 @@ export default function BrandPage({ params }) {
                                 <div className="space-y-1">
 
                                   <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
-                                  {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                                    <span className="text-xs text-green-500">
-                                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
-                                    </span>
-                                  )}
+                                    {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                                      <span className="text-xs text-green-500">
+                                        {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                                      </span>
+                                    )}
                                     <span className='font-bold text-secondary'>${parseFloat(phone.final_price).toLocaleString()}</span>
                                     {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
                                       <span className="text-sm text-accent/60 line-through">
@@ -354,7 +350,6 @@ export default function BrandPage({ params }) {
                                       </span>
                                     )}
                                   </p>
-                                 
                                 </div>
                               </div>
                             </div>
@@ -367,10 +362,6 @@ export default function BrandPage({ params }) {
               </div>
             </div>
           </div>
-
-
-          {/* CTA Section */}
-
         </div>
       </div>
     </PageTransition>

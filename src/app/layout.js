@@ -1,10 +1,10 @@
 import { Roboto, Nunito } from "next/font/google";
 import "./globals.css";
-import QueryProvider from "@/providers/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from 'react-hot-toast';
 import ClientLayout from "./components/ClientLayout";
 import Script from "next/script";
+import QueryProvider from "../../providers/QueryProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
