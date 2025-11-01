@@ -21,6 +21,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import SafeImage from '@/components/ui/SafeImage';
+import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function PhoneIndividualPage({ params }) {
   const phoneId = use(params).phoneId;
@@ -35,6 +38,41 @@ export default function PhoneIndividualPage({ params }) {
 
   const phone = phoneData?.data;
   const [quantity] = useState(1);
+  const { isAuthenticated, user } = useAuth();
+  
+  // Reviews state
+  const [reviews, setReviews] = useState([]);
+  const [reviewForm, setReviewForm] = useState({
+    rating: 5,
+    comment: '',
+    name: ''
+  });
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  
+  // Fetch reviews
+  const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
+    ['phone-reviews', phoneId],
+    () => apiFetcher.get(`/api/brandnew/models/${phoneId}/reviews/`),
+    { enabled: !!phoneId }
+  );
+  
+  useEffect(() => {
+    if (reviewsData?.data) {
+      setReviews(reviewsData.data);
+    } else if (reviewsData?.results) {
+      setReviews(reviewsData.results);
+    }
+  }, [reviewsData]);
+  
+  useEffect(() => {
+    if (user?.name || user?.username) {
+      setReviewForm(prev => ({
+        ...prev,
+        name: user?.name || user?.username || ''
+      }));
+    }
+  }, [user]);
 
   // Helper function to get the correct image source
   const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
@@ -114,6 +152,63 @@ export default function PhoneIndividualPage({ params }) {
     router.push(`/phones/${brand}/${phoneId}/breakdown`);
   };
 
+  // Review submission handler
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    
+    if (!isAuthenticated()) {
+      toast.error('Please login to submit a review');
+      return;
+    }
+    
+    if (!reviewForm.comment.trim()) {
+      toast.error('Please enter your review comment');
+      return;
+    }
+    
+    setIsSubmittingReview(true);
+    const loadingToast = toast.loading('Submitting review...');
+    
+    try {
+      await apiFetcher.post(`/api/brandnew/review/`, {
+        rating: reviewForm.rating,
+        review: reviewForm.comment.trim(),
+        customer_name: reviewForm.name || user?.name || user?.username || 'Anonymous',
+        customer_email: user?.email || '',
+        phone_model: parseInt(phoneId)
+      });
+      
+      toast.dismiss(loadingToast);
+      toast.success('Review submitted successfully!');
+      
+      setReviewForm({
+        rating: 5,
+        comment: '',
+        name: user?.name || user?.username || ''
+      });
+      
+      refetchReviews();
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error(error.response?.data?.message || 'Failed to submit review. Please try again.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  // Review slider navigation
+  const nextReview = () => {
+    if (reviews.length > 0) {
+      setCurrentReviewIndex((prev) => (prev + 1) % reviews.length);
+    }
+  };
+
+  const prevReview = () => {
+    if (reviews.length > 0) {
+      setCurrentReviewIndex((prev) => (prev - 1 + reviews.length) % reviews.length);
+    }
+  };
+
   // Show loading state
   if (phoneLoading) {
     return (
@@ -177,18 +272,7 @@ export default function PhoneIndividualPage({ params }) {
     }
   ];
 
-  const selections = {
-    storage: {
-      title: "Choose storage capacity",
-      options: [phone.memory + "GB"],
-      selected: phone.memory + "GB"
-    },
-    color: {
-      title: "Choose the color",
-      options: phone.colors?.map(color => color.name) || ["Black"],
-      selected: phone.colors?.[0]?.name || "Black"
-    }
-  };
+
 
   const availability = {
     title: `Your ${phone.name} is available at`,
@@ -248,26 +332,6 @@ export default function PhoneIndividualPage({ params }) {
     ]
   };
 
-  const testimonials = {
-    title: "Our customers' SAVE experience",
-    reviews: [
-      {
-        quote: `I'm impressed with the quality of my refurbished ${phone.name}. It looks and works like new, and the price was unbeatable. The staff at Save were very helpful with the setup!`,
-        author: "Thomas",
-        product: `Refurbished ${phone.name}`
-      },
-      {
-        quote: `Great experience buying from Save. My ${phone.brand_name} phone arrived in perfect condition, and the 2-year warranty gives me complete peace of mind. Will definitely recommend to friends!`,
-        author: "Sophie L.",
-        product: `Refurbished ${phone.name}`
-      },
-      {
-        quote: `Fast service and excellent quality. My refurbished ${phone.name} works flawlessly, and the battery life is amazing. Much better value than buying new!`,
-        author: "Marc D.",
-        product: `Refurbished ${phone.name}`
-      }
-    ]
-  };
 
   // Determine if description has actual content (not just empty tags)
   const hasDescription = Boolean(
@@ -467,21 +531,157 @@ export default function PhoneIndividualPage({ params }) {
             </section>
           </MotionFade>
 
-          {/* Testimonials */}
+          {/* Reviews Section */}
           <MotionFade delay={0.4} immediate={true}>
-            <section className="my-16 bg-white/10 backdrop-blur-sm py-12 px-6 rounded-xl border border-accent/20">
-              <h2 className="text-2xl font-bold mb-8 text-center text-secondary">{testimonials.title}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {testimonials.reviews.map((review, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm p-6 rounded-lg shadow border border-accent/20">
-                    <p className="italic mb-4 text-accent">"{review.quote}"</p>
-                    <div className="text-sm">
-                      <strong className="text-accent">{review.author}</strong>
-                      <p className="text-accent/80">{review.product}</p>
+            <section className="my-16">
+              <h2 className="text-2xl font-bold mb-8 text-secondary text-center">Customer Reviews</h2>
+              
+              {/* Review Submission Form */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-accent/20 p-6 mb-8">
+                <h3 className="text-lg font-semibold text-secondary mb-4">Write a Review</h3>
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-2">Your Name</label>
+                    <input
+                      type="text"
+                      value={reviewForm.name}
+                      onChange={(e) => setReviewForm(prev => ({ ...prev, name: e.target.value }))}
+                      required
+                      className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-2">Rating</label>
+                    <div className="flex gap-2">
+                      {[1, 2, 3, 4, 5].map((rating) => (
+                        <button
+                          key={rating}
+                          type="button"
+                          onClick={() => setReviewForm(prev => ({ ...prev, rating }))}
+                          className="focus:outline-none cursor-pointer"
+                        >
+                          <Star
+                            className={`w-6 h-6 ${
+                              rating <= reviewForm.rating
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-accent/30'
+                            } transition-colors`}
+                          />
+                        </button>
+                      ))}
                     </div>
                   </div>
-                ))}
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-accent mb-2">Your Review</label>
+                    <textarea
+                      value={reviewForm.comment}
+                      onChange={(e) => setReviewForm(prev => ({ ...prev, comment: e.target.value }))}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary"
+                      placeholder="Share your experience with this product..."
+                    />
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={isSubmittingReview}
+                    className="bg-secondary text-primary px-6 py-2 rounded-full hover:bg-secondary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </form>
               </div>
+
+              {/* Reviews Slider */}
+              {reviewsLoading ? (
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="relative">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-accent/20 p-8 overflow-hidden">
+                    <div 
+                      className="flex transition-transform duration-500 ease-in-out"
+                      style={{ transform: `translateX(-${currentReviewIndex * 100}%)` }}
+                    >
+                      {reviews.map((review, index) => (
+                        <div
+                          key={review.id || index}
+                          className="min-w-full px-4 flex-shrink-0"
+                        >
+                          <div className="text-center">
+                            <div className="flex justify-center gap-1 mb-4">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-5 h-5 ${
+                                    star <= (review.rating || 5)
+                                      ? 'text-yellow-400 fill-current'
+                                      : 'text-accent/30'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <p className="text-accent italic mb-4 text-lg">"{review.comment || review.review || review.text}"</p>
+                            <div className="text-sm">
+                              <strong className="text-secondary">{review.customer_name || review.name || review.author || 'Anonymous'}</strong>
+                              {review.created_at && (
+                                <p className="text-accent/60 mt-1">
+                                  {new Date(review.created_at).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Navigation Buttons */}
+                    {reviews.length > 1 && (
+                      <>
+                        <button
+                          onClick={prevReview}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+                          aria-label="Previous review"
+                        >
+                          <ChevronLeft className="w-6 h-6 text-accent" />
+                        </button>
+                        <button
+                          onClick={nextReview}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+                          aria-label="Next review"
+                        >
+                          <ChevronRight className="w-6 h-6 text-accent" />
+                        </button>
+                        
+                        {/* Dots Indicator */}
+                        <div className="flex justify-center gap-2 mt-6">
+                          {reviews.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentReviewIndex(index)}
+                              className={`h-2 rounded-full transition-all ${
+                                index === currentReviewIndex
+                                  ? 'w-8 bg-secondary'
+                                  : 'w-2 bg-accent/30'
+                              }`}
+                              aria-label={`Go to review ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl border border-accent/20 p-8 text-center">
+                  <p className="text-accent/80">No reviews yet. Be the first to review this product!</p>
+                </div>
+              )}
             </section>
           </MotionFade>
 
