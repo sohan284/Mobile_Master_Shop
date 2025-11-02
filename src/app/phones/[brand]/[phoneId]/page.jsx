@@ -21,8 +21,10 @@ import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import SafeImage from '@/components/ui/SafeImage';
 import ReviewsSection from '@/components/common/ReviewsSection';
+import { useTranslations } from 'next-intl';
 
 export default function PhoneIndividualPage({ params }) {
+  const t = useTranslations('phones');
   const phoneId = use(params).phoneId;
   const brand = use(params).brand;
   const router = useRouter();
@@ -39,7 +41,7 @@ export default function PhoneIndividualPage({ params }) {
   // Fetch reviews
   const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
     ['phone-reviews', phoneId],
-    () => apiFetcher.get(`/api/brandnew/review/`),
+    () => apiFetcher.get(`/api/brandnew/review/?phone_model=${phoneId}`),
     { enabled: !!phoneId }
   );
   
@@ -164,11 +166,11 @@ export default function PhoneIndividualPage({ params }) {
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center space-y-4">
-                <h2 className="text-2xl font-bold text-accent">Phone Not Found</h2>
-                <p className="text-accent/80">Sorry, we couldn't find the phone you're looking for.</p>
+                <h2 className="text-2xl font-bold text-accent">{t('phoneNotFound')}</h2>
+                <p className="text-accent/80">{t('couldntFindPhone')}</p>
                 <Link href={`/phones/${brand}`} className="inline-flex items-center gap-2 text-secondary hover:text-secondary/80">
                   <ArrowLeft className="w-4 h-4" />
-                  Back to {brand.charAt(0).toUpperCase() + brand.slice(1)} Phones
+                  {t('backToBrandPhones', { brand: brand.charAt(0).toUpperCase() + brand.slice(1) })}
                 </Link>
               </div>
             </div>
@@ -179,13 +181,13 @@ export default function PhoneIndividualPage({ params }) {
   }
 
   const availability = {
-    title: `Your ${phone.name} is available at`,
+    title: t('yourPhoneAvailableAt', { phoneName: phone.name }),
     store: {
       icon: "saveIcon",
-      name: "Save Paris République",
+      name: t('saveParisRepublique'),
       location: {
         icon: "locationIcon",
-        address: "15 Place de la République 75011 Paris"
+        address: t('address')
       },
       reservation: {
         icon: "calendarIcon",
@@ -209,7 +211,7 @@ export default function PhoneIndividualPage({ params }) {
           <MotionFade delay={0.1} immediate={true}>
             <Link href={`/phones/${brand}`} className="inline-flex items-center gap-2 text-accent hover:text-secondary transition-colors mb-6">
               <ArrowLeft className="w-4 h-4" />
-              Back to {phone.brand_name} Phones
+              {t('backToBrandPhones', { brand: phone.brand_name })}
             </Link>
           </MotionFade>
 
@@ -264,7 +266,7 @@ export default function PhoneIndividualPage({ params }) {
                       className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer"
                     >
                       <Calendar className="w-5 h-5" />
-                      Buy Now
+                      {t('buyNow')}
                     </button>
                   </div>
                 </div>
@@ -282,7 +284,7 @@ export default function PhoneIndividualPage({ params }) {
                 <div className="space-y-5">
                   {/* Storage */}
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-accent">RAM</h3>
+                    <h3 className="font-semibold text-accent">{t('ram')}</h3>
                     <div className="flex gap-2">
                       <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
                         {phone?.ram}GB
@@ -290,7 +292,7 @@ export default function PhoneIndividualPage({ params }) {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-accent">Storage capacity</h3>
+                    <h3 className="font-semibold text-accent">{t('storageCapacity')}</h3>
                     <div className="flex gap-2">
                       <span className="px-2 py-1 rounded-full border bg-secondary text-primary border-secondary cursor-not-allowed">
                         {phone?.memory}GB
@@ -300,7 +302,7 @@ export default function PhoneIndividualPage({ params }) {
 
                   {/* Colors */}
                   <div className="space-y-2">
-                    <h3 className="font-semibold text-accent">Choose the color</h3>
+                    <h3 className="font-semibold text-accent">{t('chooseTheColor')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {(phone.colors || []).map((color) => {
                         const isSelected = selectedOptions.color === color.name;
@@ -327,24 +329,24 @@ export default function PhoneIndividualPage({ params }) {
                 </div>
                 {/* Phone Specifications */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                  <h3 className="text-lg font-semibold text-secondary mb-4">Specifications</h3>
+                  <h3 className="text-lg font-semibold text-secondary mb-4">{t('specifications')}</h3>
                   <div className="grid grid-cols-2 gap-4 text-sm mb-1">
                     <div>
-                      <span className="text-accent/80">Storage:</span>
+                      <span className="text-accent/80">{t('storage')}:</span>
                       <span className="text-accent ml-2">{phone.memory}GB</span>
                     </div>
                     <div>
-                      <span className="text-accent/80">RAM:</span>
+                      <span className="text-accent/80">{t('ram')}:</span>
                       <span className="text-accent ml-2">{phone.ram}GB</span>
                     </div>
                     <div>
-                      <span className="text-accent/80">Stock:</span>
-                      <span className="text-accent ml-2">{phone.stock_quantity} units</span>
+                      <span className="text-accent/80">{t('stock')}:</span>
+                      <span className="text-accent ml-2">{phone.stock_quantity} {t('units')}</span>
                     </div>
                     <div>
-                      <span className="text-accent/80">Status:</span>
+                      <span className="text-accent/80">{t('status')}:</span>
                       <span className={`ml-2 ${phone.is_in_stock ? 'text-green-400' : 'text-red-400'}`}>
-                        {phone.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                        {phone.is_in_stock ? t('inStock') : t('outOfStock')}
                       </span>
                     </div>
                   </div>
@@ -353,7 +355,7 @@ export default function PhoneIndividualPage({ params }) {
                 {/* Description */}
                 {hasDescription && (
                   <div className="bg-white/10 rounded-xl border border-accent/20 p-6">
-                    <h3 className="text-lg font-semibold text-secondary mb-3">Description</h3>
+                    <h3 className="text-lg font-semibold text-secondary mb-3">{t('description')}</h3>
                     <div className="prose  prose-sm max-w-none text-secondary" dangerouslySetInnerHTML={{ __html: phone.description }} />
                   </div>
                 )}

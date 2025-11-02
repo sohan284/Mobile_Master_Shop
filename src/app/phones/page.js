@@ -9,12 +9,14 @@ import FeaturesSection from "@/components/common/FeaturesSection";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
 import phone from "../../../public/banner.png";
+import { useTranslations } from 'next-intl';
 
 // ✅ Memoize static sections to prevent re-rendering
 const MemoHeroSection = memo(HeroSection);
 const MemoFeaturesSection = memo(FeaturesSection);
 
 export default function PhonesPage() {
+  const t = useTranslations('phones');
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: brandsResponse, isLoading, error } = useApiGet(
@@ -51,13 +53,13 @@ export default function PhonesPage() {
 
             {/* ✅ Memoized HeroSection */}
             <MemoHeroSection
-              title="Choose Your"
-              subtitle="Phone Brand"
-              description="Select your phone brand to browse our collection of new smartphones with the best prices and warranty."
+              title={t('chooseYour')}
+              subtitle={t('phoneBrand')}
+              description={t('selectPhoneBrandDescription')}
               image={phone}
-              imageAlt="New Phones"
-              badgeText="Latest Phone Collection"
-              backButtonText="← Back to Home"
+              imageAlt={t('newPhones')}
+              badgeText={t('latestPhoneCollection')}
+              backButtonText={t('backToHome')}
               showBackButton={true}
               backButtonHref="/"
             />
@@ -69,9 +71,9 @@ export default function PhonesPage() {
       {/* ✅ Search Section moved outside PageTransition to prevent flicker */}
       <div className="container mx-auto px-4">
         <SearchSection
-          title="Find Your Phone Brand"
-          description="Search for your phone brand or browse our supported manufacturers below."
-          placeholder="Search brand..."
+          title={t('findYourPhoneBrand')}
+          description={t('searchPhoneBrandDescription')}
+          placeholder={t('searchBrand')}
           searchTerm={searchTerm}
           onSearchChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -94,17 +96,17 @@ export default function PhonesPage() {
             }
           }}
           gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-          notFoundTitle="No Brands Found"
-          notFoundDescription={`No brands found matching "${searchTerm}". Try a different search term.`}
+          notFoundTitle={t('noBrandsFound')}
+          notFoundDescription={t('noBrandsMatching', { searchTerm })}
           searchTerm={searchTerm}
           onClearSearch={() => setSearchTerm("")}
           primaryAction={{
-            text: "Clear Search",
+            text: t('clearSearch'),
             href: "#",
             onClick: () => setSearchTerm(""),
           }}
           secondaryAction={{
-            text: "View All Brands",
+            text: t('viewAllBrands'),
             href: "#",
             onClick: () => setSearchTerm(""),
           }}
@@ -116,7 +118,7 @@ export default function PhonesPage() {
         <MotionFade delay={0.15}>
           <div className="text-center py-12">
             <div className="text-red-500 mb-4">
-              Failed to load brands. Using fallback data.
+              {t('failedToLoadBrands')}
             </div>
           </div>
         </MotionFade>
@@ -125,29 +127,27 @@ export default function PhonesPage() {
       {/* ✅ Memoized FeaturesSection moved below search & grid */}
       <div className="container mx-auto px-4 py-8">
         <MemoFeaturesSection
-          title="Why Choose Our New Phones?"
-          description="Premium quality phones with comprehensive warranty and support."
+          title={t('whyChooseOurNewPhones')}
+          description={t('premiumQualityWithWarranty')}
           features={[
             {
-              title: "Quality Assurance",
-              description:
-                "All phones are thoroughly tested and certified to work like new",
+              title: t('qualityAssurance'),
+              description: t('thoroughlyTested'),
               icon: "🔧",
             },
             {
-              title: "24 Month Warranty",
-              description:
-                "Full coverage for peace of mind on all new devices",
+              title: t('twentyFourMonthWarranty'),
+              description: t('fullCoverageNewDevices'),
               icon: "🛡️",
             },
             {
-              title: "Best Prices",
-              description: "Competitive pricing on all new phone models",
+              title: t('bestPricesPhones'),
+              description: t('competitivePricingModels'),
               icon: "💰",
             },
             {
-              title: "Latest Technology",
-              description: "Get the latest features and technology",
+              title: t('latestTechnology'),
+              description: t('latestFeaturesTechnology'),
               icon: "⚡",
             },
           ]}

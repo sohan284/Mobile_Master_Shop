@@ -7,8 +7,10 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import logo from "@/assets/logoMlk.png";
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
+  const t = useTranslations('auth');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -65,20 +67,20 @@ export default function LoginPage() {
 
     // Basic validation - check if input is not empty
     if (!userName.trim()) {
-      toast.error('Please enter your username or email');
+      toast.error(t('pleaseEnterUsername'));
       setIsLoading(false);
       setIsSubmitting(false);
       return;
     }
 
     if (!password.trim()) {
-      toast.error('Please enter your password');
+      toast.error(t('pleaseEnterPassword'));
       setIsLoading(false);
       setIsSubmitting(false);
       return;
     }
 
-    const loadingToast = toast.loading('Signing you in...');
+    const loadingToast = toast.loading(t('signingYouIn'));
 
     try {
       console.log('Calling login API...');
@@ -87,7 +89,7 @@ export default function LoginPage() {
       toast.dismiss(loadingToast);
       
       if (result.success) {
-        toast.success('Welcome back! Redirecting ...');
+        toast.success(t('welcomeBack'));
         // Use setTimeout to ensure toast is visible before redirect
         setTimeout(() => {
           const user = result.user;
@@ -98,7 +100,7 @@ export default function LoginPage() {
           }
         }, 1000);
       } else {
-        const errorMessage = result.error || 'Login failed. Please check your credentials.';
+        const errorMessage = result.error || t('loginFailed');
         console.log('Login failed:', errorMessage);
         
         toast.error(errorMessage, {
@@ -116,7 +118,7 @@ export default function LoginPage() {
       toast.dismiss(loadingToast);
       
       // Show error toast with longer duration
-      const errorMessage = error.response?.data?.message || error.message || 'Login failed. Please try again.';
+      const errorMessage = error.response?.data?.message || error.message || t('loginFailedTryAgain');
      
       // Temporary alert to test if error is caught
       alert(`Login Error: ${errorMessage}`);
@@ -156,10 +158,10 @@ export default function LoginPage() {
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <div className="space-y-6" role="form" aria-label="Login form">
             {/* Username or Email Field */}
-             <h1 className="text-3xl font-bold text-accent mb-2">Login</h1>
+             <h1 className="text-3xl font-bold text-accent mb-2">{t('login')}</h1>
             <div>
               <label htmlFor="userName" className="block text-sm font-medium text-accent mb-2">
-                Username or Email
+                {t('usernameOrEmail')}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
@@ -171,20 +173,20 @@ export default function LoginPage() {
                   onChange={(e) => setUserName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
                   className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                  placeholder="Enter your userName or email"
+                  placeholder={t('enterUsernameOrEmail')}
                   autoComplete="off"
                   required
                 />
               </div>
               <p className="mt-1 text-xs text-accent/80">
-                You can use either your userName or email address to sign in
+                {t('canUseEither')}
               </p>
             </div>
 
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-accent mb-2">
-                Password
+                {t('password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
@@ -196,7 +198,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
                   className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                  placeholder="Enter your password"
+                  placeholder={t('enterPassword')}
                   autoComplete="new-password"
                   required
                 />
@@ -225,7 +227,7 @@ export default function LoginPage() {
               {isLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
               ) : (
-                'Sign In'
+                t('signIn')
               )}
             </button>
           </div>
@@ -233,12 +235,12 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
             <p className="text-accent text-sm">
-              Don&apos;t have an account?{' '}
+              {t('dontHaveAccount')}{' '}
               <button
                 onClick={() => router.push('/signup')}
                 className="text-secondary hover:text-secondary/80 font-medium transition-colors cursor-pointer"
               >
-                Create Account
+                {t('createAccount')}
               </button>
             </p>
           </div>
@@ -250,7 +252,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center mt-12">
           <p className="text-secondary text-sm">
-            © 2024 Mobile Shop Repair. All rights reserved.
+            {t('copyright')}
           </p>
         </div>
       </div>

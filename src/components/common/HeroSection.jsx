@@ -99,7 +99,7 @@ export default function HeroSection({
 
   return (
     <div className="relative">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center max-w-[1200px] mx-auto">
         {layout === "image-left" ? (
           <>
             <VisualComponent />

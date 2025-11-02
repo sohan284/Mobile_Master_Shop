@@ -15,8 +15,10 @@ import { useApiGet } from '@/hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import NotFound from '@/components/ui/NotFound';
 import ReviewsSection from '@/components/common/ReviewsSection';
+import { useTranslations } from 'next-intl';
 
 export default function PhoneModelPage({ params }) {
+    const t = useTranslations('repair');
     const { brand, phoneId } = use(params);
     const [selectedServices, setSelectedServices] = useState([]);
     const [servicePartTypes, setServicePartTypes] = useState({"1":"original"}); // Store part type for each service
@@ -35,7 +37,7 @@ export default function PhoneModelPage({ params }) {
   // Fetch reviews for this repair service/phone model
   const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
     ['repair-reviews', phoneId],
-    () => apiFetcher.get(`/api/repair/review/`),
+    () => apiFetcher.get(`/api/repair/review/?phone_model=${phoneId}`),
     { enabled: !!phoneId }
   );
   
@@ -156,24 +158,24 @@ export default function PhoneModelPage({ params }) {
                     {/* Hero Section */}
                     {React.useMemo(() => (
                         <HeroSection
-                            title="Choose Your"
-                            subtitle="Repair Service"
-                            description={`Select the repair services you need for your ${phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1)} device. You can choose up to 3 services.`}
+                            title={t('chooseYour')}
+                            subtitle={t('chooseYourRepairService')}
+                            description={t('selectRepairServicesDescription', { phoneName: phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1) })}
                             image={heroImage}
                             imageAlt={phoneInfo?.name || `${brand.charAt(0).toUpperCase() + brand.slice(1)} Phone`}
-                            badgeText="Step 3: Select Services"
+                            badgeText={t('step3SelectServices')}
                             showBackButton={true}
-                            backButtonText="← Back to Models"
+                            backButtonText={t('backToModels')}
                             backButtonHref={`/repair/${brand}`}
                             layout="image-left"
                         />
-                    ), [phoneInfo?.name, heroImage, brand])}
+                    ), [phoneInfo?.name, heroImage, brand, t])}
                     
                     {/* Search Section */}
                     <SearchSection
-                        title="Find Your Repair Service"
-                        description="Search for specific repair services or browse all available options below."
-                        placeholder="Search repair services..."
+                        title={t('findYourRepairService')}
+                        description={t('searchRepairServicesDescription')}
+                        placeholder={t('searchRepairServices')}
                         searchTerm={searchTerm}
                         onSearchChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -188,8 +190,7 @@ export default function PhoneModelPage({ params }) {
                                     </div>
                                     <div className="ml-3">
                                         <p className="text-sm text-accent">
-                                            <strong>Maximum limit reached:</strong> You can select up to 3 services. 
-                                            Deselect a service to choose a different one.
+                                            <strong>{t('maximumLimitReached')}</strong> {t('maxLimitReachedDesc')}
                                         </p>
                                     </div>
                                 </div>
@@ -209,27 +210,27 @@ export default function PhoneModelPage({ params }) {
                             return '#'; // Prevent navigation, just handle selection
                         }}
                         gridCols="grid-cols-1 md:grid-cols-3 lg:grid-cols-4"
-                        notFoundTitle="No Services Found"
+                        notFoundTitle={t('noServicesFound')}
                         notFoundDescription={searchTerm 
-                            ? `No repair services found matching "${searchTerm}". Try a different search term.`
-                            : "We don't have any repair services available for this phone model at the moment. Please check back later or contact us for assistance."
+                            ? t('noServicesMatching', { searchTerm })
+                            : t('noServicesAvailableDesc')
                         }
                         searchTerm={searchTerm}
                         onClearSearch={() => setSearchTerm('')}
                         primaryAction={searchTerm ? {
-                            text: "Clear Search",
+                            text: t('clearSearch'),
                             href: "#",
                             onClick: () => setSearchTerm('')
                         } : {
-                            text: "Choose Different Model",
+                            text: t('chooseDifferentModel'),
                             href: `/repair/${brand}`
                         }}
                         secondaryAction={searchTerm ? {
-                            text: "Browse All Services",
+                            text: t('browseAllServices'),
                             href: "#",
                             onClick: () => setSearchTerm('')
                         } : {
-                            text: "Browse All Brands",
+                            text: t('browseAllBrands'),
                             href: "/repair"
                         }}
                         renderItem={(service) => (
@@ -324,10 +325,10 @@ export default function PhoneModelPage({ params }) {
                                                 </div>
                                             </button>
                                             <div className="text-xs text-accent/80 mt-1 text-center">
-                                                        Original
+                                                        {t('original')}
                                                     </div>
                                             <div className="text-xs text-accent/80 mt-1 text-center">
-                                                        Compatible
+                                                        {t('compatible')}
                                                     </div>
                                         </div>
                                     </div>
@@ -349,20 +350,20 @@ export default function PhoneModelPage({ params }) {
                                     onClick={handleContinueToBreakdown}
                                     className='bg-secondary text-primary hover:bg-secondary/90 text-lg px-8 py-4 font-bold shadow hover:shadow-lg transition-all duration-300'
                                 >
-                                Continue with {selectedServices.length} selected service{selectedServices.length > 1 ? 's' : ''}
+                                {t('continueWithSelected', { count: selectedServices.length, plural: selectedServices.length > 1 ? 's' : '' })}
                                 </CustomButton>
                             </div>
                         </MotionFade>
                     )}
                     {/* Features Section */}
                     <FeaturesSection
-                        title="Why Choose Our Repair Services?"
-                        description="Professional repair services with guaranteed quality and customer satisfaction."
+                        title={t('whyChooseOurRepairServicesQuestion')}
+                        description={t('professionalRepairServicesGuaranteed')}
                         features={[
-                            { title: "Expert Technicians", description: "Certified professionals with years of experience", icon: "🔧" },
-                            { title: "Quality Parts", description: "We use only genuine parts and components", icon: "🛡️" },
-                            { title: "Fast Service", description: "Most repairs completed within 24 hours", icon: "⚡" },
-                            { title: "Warranty", description: "90-day warranty on all repairs", icon: "✅" }
+                            { title: t('expertTechniciansRepair'), description: t('certifiedProfessionalsYears'), icon: "🔧" },
+                            { title: t('qualityParts'), description: t('useOnlyGenuineParts'), icon: "🛡️" },
+                            { title: t('fastServiceRepair'), description: t('mostRepairsWithin24Hours'), icon: "⚡" },
+                            { title: t('warranty'), description: t('ninetyDayWarranty'), icon: "✅" }
                         ]}
                     />
 

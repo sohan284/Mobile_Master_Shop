@@ -3,8 +3,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Mail, RotateCcw } from 'lucide-react';
 import { verifyOTP, sendOTP } from '@/lib/api.js';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 export default function OTPVerificationPopup({ email, onVerified, onClose }) {
+  const t = useTranslations('auth');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -55,12 +57,12 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
     const otpCode = otp.join('');
     
     if (otpCode.length !== 6) {
-      toast.error('Please enter the complete 6-digit code');
+      toast.error(t('pleaseEnterCompleteCode'));
       return;
     }
 
     setIsLoading(true);
-    const loadingToast = toast.loading('Verifying code...');
+    const loadingToast = toast.loading(t('verifyingCode'));
 
     try {
       await verifyOTP(email, otpCode);
@@ -68,7 +70,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
       onVerified();
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || 'Invalid verification code. Please try again.');
+      toast.error(error.response?.data?.message || t('invalidVerificationCode'));
     } finally {
       setIsLoading(false);
     }
@@ -76,18 +78,18 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
 
   const handleResend = async () => {
     setIsLoading(true);
-    const loadingToast = toast.loading('Resending code...');
+    const loadingToast = toast.loading(t('resendingCode'));
     
     try {
       await sendOTP(email);
       toast.dismiss(loadingToast);
-      toast.success('New verification code sent!');
+      toast.success(t('newCodeSent'));
       setTimeLeft(60);
       setCanResend(false);
       setOtp(['', '', '', '', '', '']);
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || 'Failed to resend code. Please try again.');
+      toast.error(error.response?.data?.message || t('failedToSendOTP'));
     } finally {
       setIsLoading(false);
     }
@@ -103,8 +105,8 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
               <Mail className="text-primary" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-accent">Verify Email</h2>
-              <p className="text-sm text-accent/80">Enter the code sent to your email</p>
+              <h2 className="text-xl font-bold text-accent">{t('verifyEmail')}</h2>
+              <p className="text-sm text-accent/80">{t('enterCodeSentToEmail')}</p>
             </div>
           </div>
           <button
@@ -117,7 +119,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
 
         {/* Email Display */}
         <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-6">
-          <p className="text-sm text-accent/80">Code sent to:</p>
+          <p className="text-sm text-accent/80">{t('codeSentTo')}</p>
           <p className="font-medium text-accent">{email}</p>
         </div>
 
@@ -125,7 +127,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-accent mb-3">
-              Enter 6-digit verification code
+              {t('enter6DigitCode')}
             </label>
             <div className="flex space-x-2 justify-center">
               {otp.map((digit, index) => (
@@ -156,11 +158,11 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                 className="text-secondary hover:text-secondary/80 font-medium transition-colors disabled:opacity-50 cursor-pointer"
               >
                 <RotateCcw size={16} className="inline mr-1" />
-                Resend Code
+                {t('resendCode')}
               </button>
             ) : (
               <p className="text-accent/60 text-sm cursor-pointer">
-                Resend code in {timeLeft}s
+                {t('resendCodeIn', { seconds: timeLeft })}
               </p>
             )}
           </div>
@@ -174,7 +176,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
             ) : (
-              'Verify Code'
+              t('verifyCode')
             )}
           </button>
         </form>

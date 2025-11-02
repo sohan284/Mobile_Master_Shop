@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, Instagram, Linkedin, Facebook } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ContactPage() {
+  const t = useTranslations('contact');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,7 +38,7 @@ export default function ContactPage() {
   const handleSubmit = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !validateEmail(formData.email) || 
         !formData.subject.trim() || !formData.message.trim()) {
-      alert('Please fill in all fields correctly');
+      alert(t('fillAllFields'));
       return;
     }
 
@@ -44,7 +46,7 @@ export default function ContactPage() {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      alert('Message sent successfully! We will get back to you soon.');
+      alert(t('messageSent'));
       
       setFormData({
         name: '',
@@ -54,7 +56,7 @@ export default function ContactPage() {
       });
       
     } catch (error) {
-      alert('Failed to send message. Please try again.');
+      alert(t('messageFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -63,23 +65,23 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: MapPin,
-      title: 'Address',
+      title: t('address'),
       content: 'MLK Paris, France',
     },
     {
       icon: Phone,
-      title: 'Phone',
+      title: t('phone'),
       content: '+33 1 XX XX XX XX',
     },
     {
       icon: Mail,
-      title: 'Email',
+      title: t('email'),
       content: 'contact@mlkphone.com',
     },
     {
       icon: Clock,
-      title: 'Business Hours',
-      content: 'Mon - Sat: 9:00 AM - 7:00 PM',
+      title: t('businessHours'),
+      content: t('monSat'),
     },
   ];
 
@@ -96,10 +98,10 @@ export default function ContactPage() {
         {/* Hero Section */}
         <div className={`${baseEnter} ${heroAnim} delay-75 text-center mb-20`}>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
-            Get in Touch
+            {t('getInTouch')}
           </h1>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Have questions? We would love to hear from you. Send us a message and we will respond as soon as possible.
+            {t('haveQuestions')}
           </p>
         </div>
 
@@ -111,7 +113,7 @@ export default function ContactPage() {
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="flex-1">
                 <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
-                  Name
+                  {t('name')}
                 </label>
                 <input
                   id="name"
@@ -120,13 +122,13 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
-                  placeholder="John Doe"
+                  placeholder={t('namePlaceholder')}
                 />
               </div>
 
               <div className="flex-1">
                 <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-                  Email
+                  {t('email')}
                 </label>
                 <input
                   id="email"
@@ -135,7 +137,7 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
-                  placeholder="john@example.com"
+                  placeholder={t('emailPlaceholder')}
                 />
               </div>
             </div>
@@ -143,7 +145,7 @@ export default function ContactPage() {
             {/* Subject */}
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-slate-300 mb-2">
-                Subject
+                {t('subject')}
               </label>
               <input
                 id="subject"
@@ -152,14 +154,14 @@ export default function ContactPage() {
                 value={formData.subject}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01]"
-                placeholder="How can we help?"
+                placeholder={t('howCanWeHelp')}
               />
             </div>
 
             {/* Message */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-slate-300 mb-2">
-                Message
+                {t('message')}
               </label>
               <textarea
                 id="message"
@@ -168,7 +170,7 @@ export default function ContactPage() {
                 onChange={handleInputChange}
                 rows={6}
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 transform-gpu hover:scale-[1.01] resize-none"
-                placeholder="Tell us more about your inquiry..."
+                placeholder={t('tellUsMore')}
               />
             </div>
 
@@ -179,11 +181,11 @@ export default function ContactPage() {
               className="cursor-pointer w-full px-8 py-3 bg-white/90 text-slate-900 hover:text-white font-semibold rounded-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu active:scale-95"
             >
               {isSubmitting ? (
-                'Sending...'
+                t('sending')
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  Send Message
+                  {t('sendMessage')}
                 </>
               )}
             </button>

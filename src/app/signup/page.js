@@ -9,8 +9,10 @@ import CredentialsSetupPopup from './components/CredentialsSetupPopup';
 import { sendOTP } from '@/lib/api.js';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function SignupPage() {
+  const t = useTranslations('auth');
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showOTPPopup, setShowOTPPopup] = useState(false);
@@ -28,40 +30,40 @@ export default function SignupPage() {
     e.preventDefault();
     
     if (!email.trim()) {
-      toast.error('Please enter your email address');
+      toast.error(t('pleaseEnterEmail'));
       return;
     }
 
     if (!validateEmail(email)) {
-      toast.error('Please enter a valid email address');
+      toast.error(t('pleaseEnterValidEmail'));
       return;
     }
 
     setIsLoading(true);
-    const loadingToast = toast.loading('Sending verification code...');
+    const loadingToast = toast.loading(t('sendingVerificationCode'));
     
     try {
       await sendOTP(email);
       toast.dismiss(loadingToast);
-      toast.success('Verification code sent to your email!');
+      toast.success(t('verificationCodeSent'));
       setUserEmail(email);
       setShowOTPPopup(true);
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || 'Failed to send OTP. Please try again.');
+      toast.error(error.response?.data?.message || t('failedToSendOTP'));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleOTPVerified = () => {
-    toast.success('Email verified successfully!');
+    toast.success(t('emailVerifiedSuccessfully'));
     setShowOTPPopup(false);
     setShowCredentialsPopup(true);
   };
 
   const handleCredentialsSubmitted = () => {
-    toast.success('Account created successfully! Redirecting to login...');
+    toast.success(t('accountCreatedSuccessfully'));
     setShowCredentialsPopup(false);
     setTimeout(() => {
       router.push('/login');
@@ -86,12 +88,12 @@ export default function SignupPage() {
         {/* Signup Form */}
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="signup-form">
-          <h1 className="text-3xl font-bold text-accent mb-2">Create Account</h1>
-          <p className="text-secondary">Get started with your new account</p>
+          <h1 className="text-3xl font-bold text-accent mb-2">{t('createAccountTitle')}</h1>
+          <p className="text-secondary">{t('getStarted')}</p>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-accent mb-2">
-                Email Address
+                {t('emailAddress')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
@@ -102,7 +104,7 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                  placeholder="Enter your email address"
+                  placeholder={t('enterEmailAddress')}
                   autoComplete="off"
                   required
                 />
@@ -118,7 +120,7 @@ export default function SignupPage() {
               {isLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
               ) : (
-                'Send Verification Code'
+                t('sendVerificationCode')
               )}
             </button>
           </form>
@@ -130,7 +132,7 @@ export default function SignupPage() {
               className="flex items-center cursor-pointer justify-center text-accent hover:text-secondary transition-colors duration-200"
             >
               <ArrowLeft size={16} className="mr-2" />
-              Back to Login
+              {t('backToLogin')}
             </button>
           </div>
         </div>
@@ -138,7 +140,7 @@ export default function SignupPage() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-secondary text-sm">
-            © 2024 Mobile Shop Repair. All rights reserved.
+            {t('copyright')}
           </p>
         </div>
       </div>

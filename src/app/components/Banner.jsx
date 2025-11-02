@@ -4,12 +4,15 @@ import { motion } from "framer-motion";
 import { CustomButton } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 
 import hero from "../../../public/banner.png";
 import repair from "../../../public/repair.png";
 import accessories from "../../../public/Accessories.png";
 
 export default function Banner() {
+  const t = useTranslations('banner');
+  
   return (
     <div className="relative  text-white pb-20 pt-3 overflow-hidden min-h-screen">
       <div className="container mx-auto px-4 z-10 relative ">
@@ -21,7 +24,7 @@ export default function Banner() {
             transition={{ duration: 0.5 }}
             className="text-5xl md:text-7xl font-bold tracking-tight"
           >
-            Repair. Sell. Buy.
+            {t('repairSellBuy')}
           </motion.h1>
 
           <motion.p
@@ -30,7 +33,7 @@ export default function Banner() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mt-8 text-xl md:text-2xl text-gray-300 font-light"
           >
-            Experience Premium at MLKPHONE.
+            {t('experiencePremium')}
           </motion.p>
 
           <motion.div
@@ -41,7 +44,7 @@ export default function Banner() {
           >
             <Link href="/repair">
               <CustomButton className="bg-blue-600 text-white hover:bg-blue-700">
-                Book Appointment
+                {t('bookAppointment')}
               </CustomButton>
             </Link>
             <Link href="/phones">
@@ -49,7 +52,7 @@ export default function Banner() {
                 variant="outline"
                 className="bg-transparent border-2 border-white text-white hover:text-white"
               >
-                View Models
+                {t('viewModels')}
               </CustomButton>
             </Link>
           </motion.div>
@@ -74,7 +77,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Repair</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">{t('repair')}</h2>
             </motion.div>
           </Link>
 
@@ -115,7 +118,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">Accessories</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">{t('accessories')}</h2>
             </motion.div>
           </Link>
         </div>
@@ -159,7 +162,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Repair</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">{t('repair')}</h2>
               </motion.div>
             </Link>
 
@@ -178,7 +181,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">Accessories</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">{t('accessories')}</h2>
               </motion.div>
             </Link>
           </div>

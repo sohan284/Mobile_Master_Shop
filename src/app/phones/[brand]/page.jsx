@@ -13,16 +13,15 @@ import { useApiGet } from '@/hooks/useApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { apiFetcher } from '@/lib/api';
 import NotFound from '@/components/ui/NotFound';
-
-
-
+import { useTranslations } from 'next-intl';
 
 
 export default function BrandPage({ params }) {
+  const t = useTranslations('phones');
   const brand = use(params).brand?.toLowerCase();
   const [sortOrder, setSortOrder] = useState('asc');
   const [filteredPhones, setFilteredPhones] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 2000 });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
   const [storage, setStorage] = useState('all');
   const [ram, setRam] = useState('all');
   const [availability, setAvailability] = useState('all');
@@ -38,7 +37,9 @@ export default function BrandPage({ params }) {
 
   useEffect(() => {
     let phones = [...brandPhones];
-
+    if (priceRange.max === 0) {
+setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, parseFloat(phone.final_price || phone.main_amount || 0)), 0) || 0 });
+    }
     // Apply search filter
     if (searchQuery && typeof searchQuery === 'string') {
       phones = phones.filter(phone =>
@@ -89,7 +90,7 @@ export default function BrandPage({ params }) {
     });
 
     setFilteredPhones(phones);
-  }, [brandPhones, searchQuery, sortOrder, priceRange.min, priceRange.max, storage, ram, availability, discount]);
+  }, [brandPhones, searchQuery, sortOrder, priceRange.min, priceRange.max, storage, ram, availability, discount ]);
 
   if (phonesLoading) {
     return (
@@ -134,8 +135,8 @@ export default function BrandPage({ params }) {
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center space-y-4">
-                <h2 className="text-2xl font-bold text-accent">Error Loading Phones</h2>
-                <p className="text-accent/80">Sorry, we couldn't load the phones for this brand.</p>
+                <h2 className="text-2xl font-bold text-accent">{t('errorLoadingPhones')}</h2>
+                <p className="text-accent/80">{t('couldntLoadPhones')}</p>
               </div>
             </div>
           </div>
@@ -151,18 +152,18 @@ export default function BrandPage({ params }) {
         <div className="min-h-screen relative overflow-hidden bg-primary">
           <div className="container mx-auto px-4 py-8">
             <NotFound
-              title="No Phones Found"
-              description={`Sorry, we couldn't find any phones for the brand "${brand}". Please try another brand or check back later.`}
+              title={t('noPhonesFound')}
+              description={t('noPhonesForBrand', { brand: brand.charAt(0).toUpperCase() + brand.slice(1) })}
               showSearch={true}
               searchTerm=""
               onClearSearch={() => setSearchQuery('')}
               primaryAction={{
-                text: "Browse All Brands",
+                text: t('browseAllBrands'),
                 href: "/phones",
                 onClick: () => { }
               }}
               secondaryAction={{
-                text: "Try Repair Services",
+                text: t('tryRepairServices'),
                 href: "/repair",
                 onClick: () => { }
               }}
@@ -181,7 +182,7 @@ export default function BrandPage({ params }) {
           <div className='flex justify-end '>
             <SearchSection
               className='p-0 m-0'
-              placeholder="Search by model ..."
+              placeholder={t('searchByModel')}
               searchTerm={searchQuery}
               onSearchChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -192,48 +193,48 @@ export default function BrandPage({ params }) {
             <MotionFade delay={0.2} immediate={true}>
               <div className="lg:w-1/4 min-w-[280px] lg:sticky lg:top-24 lg:h-[calc(90vh-8rem)]">
                 <div className=" rounded-xl p-6  border-accent/20 h-full overflow-y-auto scrollbar-hide">
-                  <h3 className="text-xl font-bold text-secondary mb-6">Filters</h3>
+                  <h3 className="text-xl font-bold text-secondary mb-6">{t('filters')}</h3>
 
                   {/* Price Sort */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">Sort by Price</label>
+                    <label className="block text-sm font-medium text-accent mb-3">{t('sortByPrice')}</label>
                     <select
                       className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value)}
                     >
-                      <option value="asc">Price: Low to High</option>
-                      <option value="desc">Price: High to Low</option>
+                      <option value="asc">{t('priceLowToHigh')}</option>
+                      <option value="desc">{t('priceHighToLow')}</option>
                     </select>
                   </div>
 
                   {/* Price Range Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">Price Range</label>
+                    <label className="block text-sm font-medium text-accent mb-3">{t('priceRange')}</label>
                     <input
                       type="range"
                       min="0"
-                      max="2000"
+                      max={brandPhones.reduce((max, phone) => Math.max(max, parseFloat(phone.final_price || phone.main_amount || 0)), 0)}
                       step="100"
                       value={priceRange.max}
                       onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
                       className="w-full accent-secondary cursor-pointer"
                     />
                     <div className="flex justify-between text-accent/80 text-sm mt-2">
-                      <span>${priceRange.min.toLocaleString()}</span>
-                      <span>${priceRange.max.toLocaleString()}</span>
+                      <span>€{priceRange.min.toLocaleString()}</span>
+                      <span>€{priceRange.max.toLocaleString()}</span>
                     </div>
                   </div>
 
                   {/* Storage Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">Storage</label>
+                    <label className="block text-sm font-medium text-accent mb-3">{t('storage')}</label>
                     <select
                       className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={storage}
                       onChange={(e) => setStorage(e.target.value)}
                     >
-                      <option value="all">All Storage</option>
+                      <option value="all">{t('allStorage')}</option>
                       <option value="64">64GB</option>
                       <option value="128">128GB</option>
                       <option value="256">256GB</option>
@@ -244,13 +245,13 @@ export default function BrandPage({ params }) {
 
                   {/* RAM Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">RAM</label>
+                    <label className="block text-sm font-medium text-accent mb-3">{t('ram')}</label>
                     <select
                       className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={ram}
                       onChange={(e) => setRam(e.target.value)}
                     >
-                      <option value="all">All RAM</option>
+                      <option value="all">{t('allRam')}</option>
                       <option value="4">4GB</option>
                       <option value="6">6GB</option>
                       <option value="8">8GB</option>
@@ -262,15 +263,15 @@ export default function BrandPage({ params }) {
 
                   {/* Availability Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">Availability</label>
+                    <label className="block text-sm font-medium text-accent mb-3">{t('availability')}</label>
                     <select
                       className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
                       value={availability}
                       onChange={(e) => setAvailability(e.target.value)}
                     >
-                      <option value="all">All Phones</option>
-                      <option value="in_stock">In Stock</option>
-                      <option value="out_of_stock">Out of Stock</option>
+                      <option value="all">{t('allPhones')}</option>
+                      <option value="in_stock">{t('inStock')}</option>
+                      <option value="out_of_stock">{t('outOfStock')}</option>
                     </select>
                   </div>
 
@@ -291,7 +292,7 @@ export default function BrandPage({ params }) {
                       }}
                       className="cursor-pointer w-full p-3 bg-secondary/20 text-secondary border border-secondary/30 rounded-lg hover:bg-secondary/30 transition-colors duration-200 font-medium"
                     >
-                      Clear All Filters
+                      {t('clearAllFilters')}
                     </button>
                   </div>
                 </div>

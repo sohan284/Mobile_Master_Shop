@@ -13,8 +13,10 @@ import AuthModal from '@/components/AuthModal';
 import Link from 'next/link';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { Home, Wrench, Smartphone, Settings } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function PriceBreakdownPage({ params }) {
+    const t = useTranslations('repair');
     const { brand, phoneId } = use(params);
     const router = useRouter();
     const { isAuthenticated, user } = useAuth();
@@ -311,14 +313,13 @@ export default function PriceBreakdownPage({ params }) {
                 <div className="min-h-screen relative overflow-hidden bg-primary">
                     <div className="container  mx-auto px-4 py-8">
                         <div className="text-center">
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
                                 <div className="text-red-600 text-xl mb-2">⚠️</div>
-                                <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
+                                <h2 className="text-xl font-semibold text-red-800 mb-2">{t('error')}</h2>
                                 <p className="text-red-600 mb-4">{error}</p>
                                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
                                     <p className="text-yellow-800 text-sm">
-                                        <strong>Note:</strong> You can still proceed with your repair request. 
-                                        Our team will provide you with accurate pricing during the booking process.
+                                        <strong>{t('note')}:</strong> {t('noteCanStillProceed')}
                                     </p>
                                 </div>
                             </div>
@@ -327,13 +328,13 @@ export default function PriceBreakdownPage({ params }) {
                                     onClick={handleBackToServices}
                                     className="bg-gray-500 text-white hover:bg-gray-600"
                                 >
-                                    ← Back to Services
+                                    {t('backToServices')}
                                 </CustomButton>
                                 <CustomButton 
                                     onClick={handleProceedToBooking}
                                     className="bg-primary text-white hover:bg-primary/90"
                                 >
-                                    Proceed to Booking →
+                                    {t('proceedToBooking')}
                                 </CustomButton>
                             </div>
                         </div>
@@ -369,7 +370,7 @@ export default function PriceBreakdownPage({ params }) {
                                 <div className="flex items-center">
                                     <div className="text-secondary text-xl mr-3">⚠️</div>
                                     <div>
-                                        <h3 className="font-semibold text-accent">Estimated Pricing</h3>
+                                        <h3 className="font-semibold text-accent">{t('estimatedPricing')}</h3>
                                         <p className="text-accent/80 text-sm">{error}</p>
                                     </div>
                                 </div>
@@ -384,15 +385,15 @@ export default function PriceBreakdownPage({ params }) {
                                 {/* Breadcrumb Navigation */}
                                 <Breadcrumb
                                     items={[
-                                        { label: 'Home', href: '/', icon: Home },
-                                        { label: 'Repair', href: '/repair', icon: Wrench },
+                                        { label: t('home'), href: '/', icon: Home },
+                                        { label: t('repair'), href: '/repair', icon: Wrench },
                                         { label: brand.charAt(0).toUpperCase() + brand.slice(1), href: `/repair/${brand}`, icon: Smartphone },
-                                        { label: phoneInfo?.name || 'Phone Model', href: `/repair/${brand}/${phoneId}`, icon: Smartphone },
-                                        { label: 'Breakdown', icon: Settings }
+                                        { label: phoneInfo?.name || t('phoneModel'), href: `/repair/${brand}/${phoneId}`, icon: Smartphone },
+                                        { label: t('breakdown'), icon: Settings }
                                     ]}
                                     className="mb-6"
                                 />
-                                <h2 className="text-2xl font-bold text-secondary mb-6">Repair Cost Breakdown</h2>
+                                <h2 className="text-2xl font-bold text-secondary mb-6">{t('repairCostBreakdown')}</h2>
                                 
                                 {/* Device Info */}
                                 <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
@@ -409,14 +410,14 @@ export default function PriceBreakdownPage({ params }) {
 
                                 {/* Selected Services */}
                                 <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-accent mb-4">Selected Services</h3>
+                                    <h3 className="text-lg font-semibold text-accent mb-4">{t('selectedServices')}</h3>
                                     <div className="space-y-3">
                                         {priceData.items.map((item, index) => (
                                             <div key={index} className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
                                                 <div>
                                                     <h4 className="font-medium text-accent">{item.problem_name}</h4>
                                                     <p className="text-sm text-accent/80">
-                                                        Part Type: <span className="font-medium capitalize">{item.part_type}</span>
+                                                        {t('partType')}: <span className="font-medium capitalize">{item.part_type}</span>
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
@@ -436,40 +437,41 @@ export default function PriceBreakdownPage({ params }) {
 
                                 {/* Price Summary */}
                                 <div className="border-t border-accent/20 pt-6">
+                                    <h3 className="text-lg font-semibold text-accent mb-4">{t('priceSummary')}</h3>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-accent/80">Subtotal:</span>
+                                            <span className="text-accent/80">{t('subtotalBreakdown')}:</span>
                                             <span className="font-medium text-accent">€{parseFloat(priceData.subtotal).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.item_discount) > 0 && (
                                             <div className="flex justify-between text-secondary">
-                                                <span>Item Discount:</span>
+                                                <span>{t('itemDiscountBreakdown')}:</span>
                                                 <span>-€{parseFloat(priceData.item_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
                                         <div className="flex justify-between">
-                                            <span className="text-accent/80">Price after item discount:</span>
+                                            <span className="text-accent/80">{t('priceAfterDiscount')}:</span>
                                             <span className="font-medium text-accent">€{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.website_discount) > 0 && (
                                             <div className="flex justify-between text-secondary">
-                                                <span>Website Discount ({priceData.website_discount_percentage}%):</span>
+                                                <span>{t('websiteDiscountBreakdown')} ({priceData.website_discount_percentage}%):</span>
                                                 <span>-€{parseFloat(priceData.website_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         {parseFloat(priceData.website_discount_amount) > 0 && (
                                             <div className="flex justify-between text-secondary">
-                                                <span>Website Discount Amount:</span>
+                                                <span>{t('websiteDiscountBreakdown')}:</span>
                                                 <span>-€{parseFloat(priceData.website_discount_amount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
                                         <div className="border-t border-accent/20 pt-3">
                                             <div className="flex justify-between text-lg font-bold">
-                                                <span className="text-accent">Total Amount:</span>
+                                                <span className="text-accent">{t('totalBreakdown')}:</span>
                                                 <span className="text-secondary">€{parseFloat(priceData.total_amount).toFixed(2)}</span>
                                             </div>
                                         </div>
@@ -492,14 +494,14 @@ export default function PriceBreakdownPage({ params }) {
                                 onClick={handleBackToServices}
                                 className="bg-accent/20 text-accent hover:bg-accent/30 px-8 py-3"
                             >
-                                ← Back to Services
+                                {t('backToServices')}
                             </CustomButton>
                             
                             <CustomButton 
                                 onClick={handleProceedToBooking}
                                 className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
                             >
-                                Proceed to Booking →
+                                {t('proceedToBooking')}
                             </CustomButton>
                         </div>
                     </MotionFade>

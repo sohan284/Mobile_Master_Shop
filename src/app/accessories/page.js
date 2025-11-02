@@ -12,8 +12,10 @@ import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from 'next-intl';
 
 export default function AccessoriesPage() {
+  const t = useTranslations('accessories');
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: accessoriesResponse, isLoading, error } = useApiGet(
@@ -110,15 +112,15 @@ export default function AccessoriesPage() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                  Premium Accessories
+                  {t('premiumAccessories')}
                 </h1>
                 <p className="text-lg text-white opacity-90">
-                  Discover high-quality accessories for your devices
+                  {t('discoverHighQuality')}
                 </p>
               </div>
               <div className="md:w-96">
                 <SearchSection
-                  placeholder="Search accessories..."
+                  placeholder={t('searchAccessories')}
                   searchTerm={searchTerm}
                   onSearchChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -145,17 +147,17 @@ export default function AccessoriesPage() {
               }
             }}
             gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-            notFoundTitle="No Accessories Found"
-            notFoundDescription={`No accessories found matching "${searchTerm}". Try a different search term.`}
+            notFoundTitle={t('noAccessoriesFound')}
+            notFoundDescription={t('noAccessoriesMatching', { searchTerm })}
             searchTerm={searchTerm}
             onClearSearch={() => setSearchTerm("")}
             primaryAction={{
-              text: "Clear Search",
+              text: t('clearSearch'),
               href: "#",
               onClick: () => setSearchTerm(""),
             }}
             secondaryAction={{
-              text: "View All Accessories",
+              text: t('viewAllAccessories'),
               href: "/accessories",
               onClick: () => setSearchTerm(""),
             }}
@@ -215,7 +217,7 @@ export default function AccessoriesPage() {
             <MotionFade delay={0.15}>
               <div className="text-center py-12">
                 <div className="inline-flex items-center gap-2 bg-red-50 text-red-600 px-6 py-3 rounded-lg border border-red-200">
-                  Failed to load accessories. Using fallback data.
+                  {t('failedToLoadAccessories')}
                 </div>
               </div>
             </MotionFade>
@@ -224,27 +226,27 @@ export default function AccessoriesPage() {
           {/* Features */}
           <div className="mt-20">
             <FeaturesSection
-              title="Why Choose Our Accessories?"
-              description="Premium accessories designed to enhance and protect your devices with guaranteed quality."
+              title={t('whyChooseOurAccessories')}
+              description={t('premiumAccessoriesDescription')}
               features={[
                 {
-                  title: "Premium Quality",
-                  description: "Built for durability and performance.",
+                  title: t('premiumQuality'),
+                  description: t('builtForDurability'),
                   icon: "🛡️",
                 },
                 {
-                  title: "Great Value",
-                  description: "Best quality at affordable prices.",
+                  title: t('greatValue'),
+                  description: t('bestQualityAffordable'),
                   icon: "💰",
                 },
                 {
-                  title: "Fast Shipping",
-                  description: "Get your accessories delivered quickly.",
+                  title: t('fastShipping'),
+                  description: t('deliveredQuickly'),
                   icon: "🚚",
                 },
                 {
-                  title: "Warranty",
-                  description: "30-day replacement guarantee.",
+                  title: t('warranty'),
+                  description: t('thirtyDayReplacement'),
                   icon: "✅",
                 },
               ]}

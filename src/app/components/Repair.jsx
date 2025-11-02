@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image'; 
@@ -7,18 +7,20 @@ import { CustomButton } from '@/components/ui/button';
 import { Award, Clock, ShieldCheck, Wrench } from 'lucide-react';
 import { apiFetcher } from '@/lib/api';
 import { useApiGet } from '@/hooks/useApi';
+import { useTranslations } from 'next-intl';
 
 
 export default function Repair() {
+  const t = useTranslations('repair');
 
 
-    const repairServices = [
+  const repairServices = useMemo(() => [
         {
             id: 1,
             src: "/screen.png",
-            alt: "Screen Repair",
-            title: "Screen Repair",
-            description: "Cracked or broken screens",
+            alt: t('screenRepair'),
+            title: t('screenRepair'),
+            description: t('crackedOrBroken'),
             price: "From €29",
             time: "30-45 min",
             popular: true
@@ -26,9 +28,9 @@ export default function Repair() {
         {
             id: 2,
             src: "/battery.png",
-            alt: "Battery Replacement",
-            title: "Battery Replacement",
-            description: "Poor battery life",
+            alt: t('batteryReplacement'),
+            title: t('batteryReplacement'),
+            description: t('poorBatteryLife'),
             price: "From €39",
             time: "20-30 min",
             popular: false
@@ -36,9 +38,9 @@ export default function Repair() {
         {
             id: 3,
             src: "/camera.png",
-            alt: "Camera Repair",
-            title: "Camera Repair",
-            description: "Blurry or damaged camera",
+            alt: t('cameraRepair'),
+            title: t('cameraRepair'),
+            description: t('blurryOrDamaged'),
             price: "From €49",
             time: "45-60 min",
             popular: false
@@ -46,41 +48,41 @@ export default function Repair() {
         {
             id: 4,
             src: "/backshell.png",
-            alt: "Back Cover",
-            title: "Back Shell Repair",
-            description: "Damaged back housing",
+            alt: t('backShellRepair'),
+            title: t('backShellRepair'),
+            description: t('damagedBackHousing'),
             price: "From €35",
             time: "25-35 min",
             popular: false
         }
-    ];
+    ], [t]);
 
-   const features = [
+   const features = useMemo(() => [
     { 
-      text: "Expert Technicians", 
-      desc: "Certified professionals with years of experience", 
+      text: t('expertTechniciansFeature'), 
+      desc: t('certifiedProfessionals'), 
       icon: Wrench,
       gradient: "from-orange-500 to-red-500"
     },
     { 
-      text: "Quick Turnaround", 
-      desc: "Most repairs completed within 24 hours", 
+      text: t('quickTurnaround'), 
+      desc: t('mostRepairs24Hours'), 
       icon: Clock,
       gradient: "from-blue-500 to-indigo-500"
     },
     { 
-      text: "Warranty Guarantee", 
-      desc: "All repairs backed by our quality guarantee", 
+      text: t('warrantyGuarantee'), 
+      desc: t('qualityGuarantee'), 
       icon: ShieldCheck,
       gradient: "from-green-500 to-teal-500"
     },
     { 
-      text: "Premium Quality", 
-      desc: "Only genuine parts and materials used", 
+      text: t('premiumQuality'), 
+      desc: t('genuineParts'), 
       icon: Award,
       gradient: "from-purple-500 to-pink-500"
     }
-  ];
+  ], [t]);
   const { data: brandsResponse, isLoading: brandsLoading, error: brandsError } = useApiGet(
     ['brands'],
     () => apiFetcher.get('/api/repair/brands/')
@@ -99,7 +101,7 @@ export default function Repair() {
                         transition={{ duration: 0.5 }}
                         className="text-4xl md:text-6xl font-extrabold tracking-wider text-white"
                     >
-                        FIX YOUR DEVICE
+                        {t('fixYourDevice')}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -107,7 +109,7 @@ export default function Repair() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="mt-4 text-lg md:text-xl text-gray-300"
                     >
-                        Expert technicians, premium parts, and a €25 repair bonus for every service. Get your device fixed with confidence.
+                        {t('expertTechnicians')}
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -117,7 +119,7 @@ export default function Repair() {
                     >
                         <Link href="/repair">
                             <CustomButton variant="outline" className="border-secondary bg-secondary text-primary hover:bg-secondary hover:text-primary">
-                                Book Repair
+                                {t('bookRepair')}
                             </CustomButton>
                         </Link>
                     </motion.div>
@@ -135,8 +137,8 @@ export default function Repair() {
                     className="mb-16"
                 >
                     <div className="text-center mb-12">
-                        <h3 className="text-3xl font-bold mb-4">Our Repair Services</h3>
-                        <p className="text-gray-300 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
+                        <h3 className="text-3xl font-bold mb-4">{t('ourRepairServices')}</h3>
+                        <p className="text-gray-300 max-w-2xl mx-auto">{t('professionalRepairs')}</p>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -188,8 +190,8 @@ export default function Repair() {
                     className="mb-16"
                 >
                     <div className="text-center mb-12">
-                        <h3 className="text-2xl font-bold mb-4">Trusted by Leading Brands</h3>
-                        <p className="text-gray-300">We repair devices from all major manufacturers</p>
+                        <h3 className="text-2xl font-bold mb-4">{t('trustedByBrands')}</h3>
+                        <p className="text-gray-300">{t('weRepairDevices')}</p>
                     </div>
 
                     <div className="relative overflow-hidden backdrop-blur-sm rounded-lg py-8">
@@ -229,9 +231,9 @@ export default function Repair() {
       className="mb-16"
     >
       <div className="text-center mb-12">
-        <h3 className="text-3xl font-bold mb-4 text-white">Why Choose Us?</h3>
+        <h3 className="text-3xl font-bold mb-4 text-white">{t('whyChooseUs')}</h3>
         <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-          We provide exceptional repair services with unmatched quality and customer satisfaction.
+          {t('weProvideExceptional')}
         </p>
       </div>
 
