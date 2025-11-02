@@ -1,11 +1,7 @@
 "use client";
 import React from 'react';
-import MotionFade from '@/components/animations/MotionFade';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import HeroSection from '@/components/common/HeroSection';
-import FeaturesSection from '@/components/common/FeaturesSection';
-import CTASection from '@/components/common/CTASection';
 import Image from 'next/image'; 
 import { CustomButton } from '@/components/ui/button';
 import { Award, Clock, ShieldCheck, Wrench } from 'lucide-react';

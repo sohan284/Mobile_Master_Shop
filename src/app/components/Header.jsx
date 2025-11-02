@@ -57,11 +57,11 @@ export default function Header() {
     const handleClickOutside = (event) => {
       const mobileRef = mobileProfileDropdownRef.current;
       const desktopRef = desktopProfileDropdownRef.current;
-      
+
       if (isProfileDropdownOpen) {
         const clickedOutsideMobile = !mobileRef || !mobileRef.contains(event.target);
         const clickedOutsideDesktop = !desktopRef || !desktopRef.contains(event.target);
-        
+
         if (clickedOutsideMobile && clickedOutsideDesktop) {
           setIsProfileDropdownOpen(false);
         }
@@ -125,132 +125,40 @@ export default function Header() {
   return (
     <>
       <header
-        className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${
-          isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-        }`}
+        className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+          }`}
       >
-      <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
-        
-        {/* ✅ Mobile Header: Hamburger + Logo + User */}
-        <div className="md:hidden flex justify-between items-center w-full mobile-menu-container">
-          <button 
-            className="text-white focus:outline-none hover:text-gray-300 transition-colors"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle mobile menu"
-          >
-            <Menu size={28} />
-          </button>
+        <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
 
-          <Link href="/" className="group relative">
-             <div className="flex items-center gap-2">
-              <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
-          </div>
-          </Link>
+          {/* ✅ Mobile Header: Hamburger + Logo + User */}
+          <div className="md:hidden flex justify-between items-center w-full mobile-menu-container">
+            <button
+              className="text-white focus:outline-none hover:text-gray-300 transition-colors"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              <Menu size={28} />
+            </button>
 
-          <div className="flex items-center space-x-3">
-            {/* <CartIcon /> */}
-            {isAuthenticated() ? (
-              <div className="relative" ref={mobileProfileDropdownRef}>
-                <button
-                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  className="flex items-center space-x-2 text-white focus:outline-none hover:text-gray-300 transition-colors"
-                  aria-label="Profile menu"
-                >
-                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold text-sm">
-                    {getUserInitials()}
-                  </div>
-                  <span className="text-sm hidden sm:block truncate max-w-[80px]">{getUserDisplayName()}</span>
-                </button>
-                {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-primary rounded-lg shadow-lg py-1 z-50 border border-white/30 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right transform transition-all">
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
-                    >
-                      <UserCircle size={16} className="mr-2" />
-                      Profile
-                    </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
-                    >
-                      <Package size={16} className="mr-2" />
-                      Orders
-                    </Link>
-                    {isAdmin() && (
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
-                      >
-                        <LayoutDashboard size={16} className="mr-2" />
-                        Dashboard
-                      </Link>
-                    )}
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
-                    >
-                      <LogOut size={16} className="mr-2" />
-                      Logout
-                    </button>
-                  </div>
-                )}
+            <Link href="/" className="group relative">
+              <div className="flex items-center gap-2">
+                <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
               </div>
-            ) : (
-              <Link
-                href="/login"
-                className="text-white focus:outline-none hover:text-gray-300"
-              >
-                <User size={22} />
-              </Link>
-            )}
-          </div>
-        </div>
+            </Link>
 
-        {/* ✅ Desktop Header (md and up) */}
-        <div className="hidden md:flex flex-col w-full items-center space-y-4">
-          {/* Logo */}
-          <div className="text-2xl font-bold text-center">
-           <Link href="/">
-           <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
-           </Link>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-center space-x-8 lg:space-x-12 xl:space-x-20 text-base xl:text-lg">
-            <Link href="/repair" className="hover:underline hover:text-white transition">
-              Repair
-            </Link>
-            <Link href="/phones" className="hover:underline hover:text-white transition">
-              Phones
-            </Link>
-            <Link href="/accessories" className="hover:underline hover:text-white transition">
-              Accessories
-            </Link>
-            <Link href="/contact" className="hover:underline hover:text-white transition">
-              Contact
-            </Link>
-            <div className="flex items-center space-x-4 relative">
-              <Language />
-            </div>
-            {/* Cart and User */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               {/* <CartIcon /> */}
               {isAuthenticated() ? (
-                <div className="relative" ref={desktopProfileDropdownRef}>
+                <div className="relative" ref={mobileProfileDropdownRef}>
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
+                    className="flex items-center space-x-2 text-white focus:outline-none hover:text-gray-300 transition-colors"
                     aria-label="Profile menu"
                   >
-                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold text-sm">
                       {getUserInitials()}
                     </div>
-                    <span className="text-sm truncate max-w-[120px]">{getUserDisplayName()}</span>
-                    <ChevronDown size={16} className={`transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                    <span className="text-sm hidden sm:block truncate max-w-[80px]">{getUserDisplayName()}</span>
                   </button>
                   {isProfileDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-primary rounded-lg shadow-lg py-1 z-50 border border-white/30 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right transform transition-all">
@@ -291,48 +199,139 @@ export default function Header() {
                   )}
                 </div>
               ) : (
-                <Link href="/login" className="hover:text-gray-300">
-                  <User size={24} />
+                <Link
+                  href="/login"
+                  className="text-white focus:outline-none hover:text-gray-300"
+                >
+                  <User size={22} />
                 </Link>
               )}
             </div>
           </div>
-        </div>
 
-      </div>
+          {/* ✅ Desktop Header (md and up) */}
+          <div className="hidden md:flex flex-col w-full items-center space-y-4">
+            {/* Logo */}
+            <div className="text-2xl font-bold text-center">
+              <Link href="/">
+                <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} loading="eager" style={{ height: 'auto' }} />
+              </Link>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-center space-x-8 lg:space-x-12 xl:space-x-20 text-base xl:text-lg">
+              <Link href="/repair" className="hover:underline hover:text-white transition">
+                Repair
+              </Link>
+              <Link href="/phones" className="hover:underline hover:text-white transition">
+                Phones
+              </Link>
+              <Link href="/accessories" className="hover:underline hover:text-white transition">
+                Accessories
+              </Link>
+              <Link href="/contact" className="hover:underline hover:text-white transition">
+                Contact
+              </Link>
+              <div className="flex items-center space-x-4 relative">
+                <Language />
+              </div>
+              {/* Cart and User */}
+              <div className="flex items-center space-x-4">
+                {/* <CartIcon /> */}
+                {isAuthenticated() ? (
+                  <div className="relative" ref={desktopProfileDropdownRef}>
+                    <button
+                      onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                      className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
+                      aria-label="Profile menu"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
+                        {getUserInitials()}
+                      </div>
+                      <span className="text-sm truncate max-w-[120px]">{getUserDisplayName()}</span>
+                      <ChevronDown size={16} className={`transition-transform ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isProfileDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-primary rounded-lg shadow-lg py-1 z-50 border border-white/30 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right transform transition-all">
+                        <Link
+                          href="/profile"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                        >
+                          <UserCircle size={16} className="mr-2" />
+                          Profile
+                        </Link>
+                        <Link
+                          href="/orders"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                        >
+                          <Package size={16} className="mr-2" />
+                          Orders
+                        </Link>
+                        {isAdmin() && (
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                            className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                          >
+                            <LayoutDashboard size={16} className="mr-2" />
+                            Dashboard
+                          </Link>
+                        )}
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
+                        >
+                          <LogOut size={16} className="mr-2" />
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link href="/login" className="hover:text-gray-300">
+                    <User size={24} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
       </header>
 
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 w-full h-screen bg-black/50 z-40 mobile-menu-container">
+        <div className="md:hidden fixed top-14 left-0 w-full h-screen bg-black/50 z-40 mobile-menu-container">
           <div className="bg-primary border-t border-secondary/20 shadow-lg animate-in slide-in-from-top-2 duration-300">
             <div className="container mx-auto px-4 py-6">
               <div className="flex flex-col space-y-6">
                 {/* Navigation Links */}
                 <div className="flex flex-col space-y-4">
-                  <Link 
-                    href="/repair" 
+                  <Link
+                    href="/repair"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Repair
                   </Link>
-                  <Link 
-                    href="/phones" 
+                  <Link
+                    href="/phones"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Phones
                   </Link>
-                  <Link 
-                    href="/accessories" 
+                  <Link
+                    href="/accessories"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Accessories
                   </Link>
-                  <Link 
-                    href="/contact" 
+                  <Link
+                    href="/contact"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -341,50 +340,9 @@ export default function Header() {
                   <div className="flex items-center space-x-4">
                     <Language />
                   </div>
-                  {/* User Menu in Mobile */}
-                  {isAuthenticated() && (
-                    <div className="flex flex-col space-y-2 pt-4 border-t border-secondary/20">
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
-                      >
-                        <UserCircle size={20} />
-                        <span>Profile</span>
-                      </Link>
-                      <Link
-                        href="/orders"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
-                      >
-                        <Package size={20} />
-                        <span>Orders</span>
-                      </Link>
-                      {isAdmin() && (
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium flex items-center space-x-2"
-                        >
-                          <LayoutDashboard size={20} />
-                          <span>Dashboard</span>
-                        </Link>
-                      )}
-                      <button
-                        onClick={async () => {
-                          setIsMobileMenuOpen(false);
-                          await logout();
-                        }}
-                        className="text-red-300 hover:text-red-200 transition-colors py-3 text-lg font-medium flex items-center space-x-2 text-left"
-                      >
-                        <LogOut size={20} />
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  )}
                 </div>
 
-            
+
               </div>
             </div>
           </div>
