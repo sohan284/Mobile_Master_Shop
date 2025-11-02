@@ -64,7 +64,7 @@ export default function ContactPage() {
     {
       icon: MapPin,
       title: 'Address',
-      content: 'Repair Paris, France',
+      content: 'MLK Paris, France',
     },
     {
       icon: Phone,

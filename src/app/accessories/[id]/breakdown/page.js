@@ -206,11 +206,11 @@ export default function AccessoryBreakdownPage({ params }) {
                   <div className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
                     <div>
                       <h4 className="font-medium text-accent">{accessory.title}</h4>
-                      <p className="text-sm text-accent/80">Unit Price: <span className="font-medium">{unitPrice.toFixed(2)}</span></p>
+                      <p className="text-sm text-accent/80">Unit Price: <span className="font-medium">€{unitPrice.toFixed(2)}</span></p>
                       <p className="text-sm text-accent/80">Quantity: <span className="font-medium">{quantity}</span></p>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-bold text-secondary">{(unitPrice * quantity).toFixed(2)}</div>
+                      <div className="text-lg font-bold text-secondary">€{(unitPrice * quantity).toFixed(2)}</div>
                     </div>
                   </div>
                 </div>
@@ -220,39 +220,39 @@ export default function AccessoryBreakdownPage({ params }) {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-accent/80">Subtotal:</span>
-                    <span className="font-medium text-accent">{subtotal.toFixed(2)}</span>
+                    <span className="font-medium text-accent">€{subtotal.toFixed(2)}</span>
                   </div>
                   {itemDiscount > 0 && (
                     <div className="flex justify-between text-secondary">
                       <span>Item Discount:</span>
-                      <span>-{itemDiscount.toFixed(2)}</span>
+                      <span>-€{itemDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-accent/80">Price after item discount:</span>
-                    <span className="font-medium text-accent">{priceAfterItemDiscount.toFixed(2)}</span>
+                    <span className="font-medium text-accent">€{priceAfterItemDiscount.toFixed(2)}</span>
                   </div>
                   {websiteDiscount > 0 && (
                     <div className="flex justify-between text-secondary">
                       <span>Website Discount:</span>
-                      <span>-{websiteDiscount.toFixed(2)}</span>
+                      <span>-€{websiteDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   {shippingCost > 0 && (
                     <div className="flex justify-between text-secondary">
                       <span>Shipping Cost:</span>
-                      <span>{shippingCost.toFixed(2)}</span>
+                      <span>€{shippingCost.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="border-t border-accent/20 pt-3">
                     <div className="flex justify-between text-lg font-bold">
                       <span className="text-accent">Total Amount:</span>
-                      <span className="text-secondary">{totalAmount.toFixed(2)}</span>
+                      <span className="text-secondary">€{totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
                   {totalDiscount > 0 && (
                     <div className="text-center text-secondary font-medium">
-                      You saved {totalDiscount.toFixed(2)}!
+                      You saved €{totalDiscount.toFixed(2)}!
                     </div>
                   )}
                 </div>

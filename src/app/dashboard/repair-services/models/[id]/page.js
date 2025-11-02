@@ -9,7 +9,7 @@ import DataTable from '@/components/ui/DataTable';
 import DataTableSkeleton from '@/components/ui/DataTableSkeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Eye, Wrench } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher, deleteService } from '@/lib/api';
 import Image from 'next/image';
@@ -122,11 +122,11 @@ export default function ModelDetailsPage() {
   };
 
   const handleAddServiceSuccess = () => {
-    refetchServices(); // Refresh the services data
+    modelServicesRefetch(); // Refresh the services data
   };
 
   const handleEditServiceSuccess = () => {
-    refetchServices(); // Refresh the services data
+    modelServicesRefetch(); // Refresh the services data
   };
 
   const handleEditService = (service) => {
@@ -135,6 +135,7 @@ export default function ModelDetailsPage() {
   };
 
   const handleDeleteService = (service) => {
+    console.log(service);
     setSelectedService(service);
     setIsDeleteDialogOpen(true);
   };
@@ -147,8 +148,8 @@ export default function ModelDetailsPage() {
     
     try {
       await deleteService(selectedService.problem_id);
-      toast.success(`${selectedService.name} deleted successfully`);
-      refetchServices(); // Refresh the services data
+      toast.success(`${selectedService.problem_name} deleted successfully`);
+      modelServicesRefetch(); // Refresh the services data
       setIsDeleteDialogOpen(false);
       setSelectedService(null);
     } catch (error) {
@@ -164,9 +165,7 @@ export default function ModelDetailsPage() {
     setIsDeleting(false);
   };
 
-  const handleViewService = (service) => {
-    toast.success(`View service: ${service.name}`);
-  };
+
 
   if (modelLoading) {
     return (
@@ -269,67 +268,65 @@ export default function ModelDetailsPage() {
         </div>
       </div>
 
-      {/* Model Information Card */}
       <Card>
-        <CardHeader>
-          <CardTitle>Model Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Model Image */}
-            <div className="flex flex-col items-center space-y-2">
-              <Image 
-                src={model?.image || '/Apple.png'} 
-                alt={model?.name}
-                className="h-24 w-24 object-contain"
-                width={96}
-                height={96}
-              />
-              <span className="text-sm text-gray-500">Model Image</span>
-            </div>
-
-            {/* Model Details */}
-            <div className="space-y-2">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Brand</label>
-                <p className="text-lg font-semibold">{model?.brand_name || 'N/A'}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Brand Logo</label>
-                <Image 
-                src={model?.brand_logo || '/Apple.png'} 
-                alt={model?.name}
-                className="h-12 w-12 object-contain"
-                width={24}
-                height={24}
-              />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Status</label>
-                <div>
-                  <Badge variant={model?.status === 'Active' ? 'default' : 'destructive'}>
-                    {model?.status}
-                  </Badge>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Created</label>
-                <p className="text-sm">{new Date(model?.created_at).toLocaleDateString()}</p>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Services Count</label>
-                <p className="text-2xl font-bold text-blue-600">{model.available_repairs_count}</p>
-              </div>
-            </div>
+  <CardHeader>
+    <CardTitle className="text-xl font-semibold">Model Overview</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Model Information */}
+      <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-white  transition-shadow">
+        <div className="flex-shrink-0">
+          <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center p-2">
+            <Image 
+              src={model?.image || '/Apple.png'} 
+              alt={model?.name}
+              className="object-contain"
+              width={64}
+              height={64}
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Device Model</p>
+          <p className="text-base font-semibold text-gray-900 truncate">{model?.name}</p>
+        </div>
+      </div>
+
+      {/* Brand Information */}
+      <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-white transition-shadow">
+        <div className="flex-shrink-0">
+          <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center p-2">
+            <Image 
+              src={model?.brand_logo || '/Apple.png'} 
+              alt={model?.brand_name}
+              className="object-contain"
+              width={64}
+              height={64}
+            />
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Brand</p>
+          <p className="text-base font-semibold text-gray-900 truncate">{model?.brand_name || 'N/A'}</p>
+        </div>
+      </div>
+
+      {/* Services Count */}
+      <div className="flex items-center gap-4 p-4 border border-blue-200 rounded-lg bg-blue-50 transition-shadow">
+        <div className="flex-shrink-0">
+          <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Wrench className="h-7 w-7 text-blue-600" />
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-blue-700 uppercase tracking-wide mb-1">Available Services</p>
+          <p className="text-2xl font-bold text-blue-600">{model.available_repairs_count}</p>
+        </div>
+      </div>
+    </div>
+  </CardContent>
+</Card>
 
    <DataTable
             data={modelServices}
@@ -338,7 +335,6 @@ export default function ModelDetailsPage() {
             onAdd={handleAddService}
             onEdit={handleEditService}
             onDelete={handleDeleteService}
-            onView={handleViewService}
             searchable={true}
             pagination={true}
             itemsPerPage={10}
@@ -361,6 +357,7 @@ export default function ModelDetailsPage() {
         onClose={handleEditServiceModalClose}
         onSuccess={handleEditServiceSuccess}
         service={selectedService}
+        modelId={modelId}
       />
 
       {/* Delete Confirmation Dialog */}
@@ -369,7 +366,7 @@ export default function ModelDetailsPage() {
         onClose={handleDeleteServiceCancel}
         onConfirm={handleDeleteServiceConfirm}
         title="Delete Service"
-        message={`Are you sure you want to delete "${selectedService?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${selectedService?.problem_name}"? This action cannot be undone.`}
         confirmText="Yes, delete it!"
         cancelText="Cancel"
         type="danger"

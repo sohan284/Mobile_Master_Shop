@@ -3,7 +3,6 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from 'react-hot-toast';
 import ClientLayout from "./components/ClientLayout";
-import Script from "next/script";
 import QueryProvider from "../../providers/QueryProvider";
 import SafeDOMPatch from "@/components/SafeDOMPatch";
 
@@ -31,27 +30,10 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
-        {/* Google Translate Initialization Script */}
-        <Script id="google-translate-init" strategy="afterInteractive">
-          {`
-            function googleTranslateElementInit() {
-              new google.translate.TranslateElement({
-                pageLanguage: 'fr',
-                includedLanguages: 'fr,en', // English and French
-                autoDisplay: false
-              }, 'google_translate_element');
-            }
-          `}
-        </Script>
-        <Script
-          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-          strategy="afterInteractive"
-        />
         <QueryProvider>
           <AuthProvider>
             <SafeDOMPatch />
             <ClientLayout>
-            <div id="google_translate_element" style={{ position: "absolute", top: "-9999px", left: "-9999px" }}></div>
               {children}
             </ClientLayout>
             <Toaster
@@ -70,7 +52,7 @@ export default function RootLayout({ children }) {
                   },
                 },
                 error: {
-                  duration: 5000,
+                  duration: 4000,
                   style: {
                     background: '#EF4444',
                     color: '#fff',

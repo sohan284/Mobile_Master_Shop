@@ -2,19 +2,16 @@
 import React, { useState, useMemo } from 'react';
 import { 
   Package, 
-  ShoppingCart,
   Wrench,
   Smartphone,
   ShoppingBag,
-  CheckCircle2,
-  Clock,
-  XCircle,
   Calendar
 } from 'lucide-react';
 import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import DataTable from '@/components/ui/DataTable';
 
 export default function Dashboard() {
   const [selectedFilter, setSelectedFilter] = useState('all'); // 'all', 'repair', 'phone', 'accessory'
@@ -33,11 +30,13 @@ export default function Dashboard() {
     () => apiFetcher.get('/api/accessories/orders/')
   );
 
-  // Normalize order data
+  // Normalize order data - ensure orderType is set correctly and cannot be overwritten
   const normalizeOrder = (order, type) => {
     const normalized = {
       ...order,
+      // Explicitly set orderType after spread to ensure it's correct
       orderType: type,
+      // Normalize common fields
       productName: order.phone_model_name || order.product_title || 'N/A',
       brandName: order.brand_name || order.phone_model_brand || 'N/A',
       productImage: order.phone_image || order.product_image || null,
@@ -53,6 +52,8 @@ export default function Dashboard() {
       paymentStatusDisplay: order.payment_status_display || order.payment_status || 'Unknown',
       createdAt: order.created_at || null,
     };
+    // Force orderType to be correct (in case original order had conflicting property)
+    normalized.orderType = type;
     return normalized;
   };
 
@@ -89,21 +90,156 @@ export default function Dashboard() {
   const isLoading = isLoadingRepair || isLoadingPhone || isLoadingAccessory;
   const error = errorRepair || errorPhone || errorAccessory;
 
-  // Filter orders based on selected filter
+  // Filter orders based on selected filter with explicit type checking
   const filteredOrders = useMemo(() => {
+    // Combine all orders for filtering
+    const allOrders = [
+      ...normalizedRepairOrders,
+      ...normalizedPhoneOrders,
+      ...normalizedAccessoryOrders
+    ];
+    
     switch(selectedFilter) {
       case 'repair':
-        return normalizedRepairOrders;
+        // Explicitly filter by orderType to ensure correct data
+        return allOrders.filter(order => order.orderType === 'repair').sort((a, b) => {
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
       case 'phone':
-        return normalizedPhoneOrders;
+        // Explicitly filter by orderType to ensure correct data
+        return allOrders.filter(order => order.orderType === 'phone').sort((a, b) => {
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
       case 'accessory':
-        return normalizedAccessoryOrders;
+        // Explicitly filter by orderType to ensure correct data
+        return allOrders.filter(order => order.orderType === 'accessory').sort((a, b) => {
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        });
       default:
-        return [...normalizedRepairOrders, ...normalizedPhoneOrders, ...normalizedAccessoryOrders].sort((a, b) => {
+        // Return all orders sorted by date
+        return allOrders.sort((a, b) => {
           return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
         });
     }
   }, [selectedFilter, normalizedRepairOrders, normalizedPhoneOrders, normalizedAccessoryOrders]);
+
+  // Get status badge styling
+  const getStatusBadge = (status) => {
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'confirmed' || statusLower === 'completed') {
+      return 'bg-green-100 text-green-800';
+    } else if (statusLower === 'pending' || statusLower === 'processing') {
+      return 'bg-yellow-100 text-yellow-800';
+    } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
+      return 'bg-red-100 text-red-800';
+    } else if (statusLower === 'shipped') {
+      return 'bg-blue-100 text-blue-800';
+    }
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  // Define columns for DataTable
+  const columns = [
+    {
+      header: 'Order Number',
+      accessor: 'orderNumber',
+      sortable: true,
+    },
+    {
+      header: 'Type',
+      accessor: 'orderType',
+      sortable: true,
+      render: (order) => (
+        <span className="inline-flex items-center gap-1">
+          {order.orderType === 'repair' && <Wrench size={14} className="text-blue-600" />}
+          {order.orderType === 'phone' && <Smartphone size={14} className="text-green-600" />}
+          {order.orderType === 'accessory' && <ShoppingBag size={14} className="text-purple-600" />}
+          <span className="capitalize">
+            {order.orderType === 'phone' ? 'New Phone' : 
+             order.orderType === 'repair' ? 'Repair' : 
+             'Accessory'}
+          </span>
+        </span>
+      ),
+    },
+    {
+      header: 'Product',
+      accessor: 'productName',
+      sortable: true,
+      render: (order) => (
+        <div className="flex flex-col">
+          <span className="font-medium">{order.productName}</span>
+          {order.brandName && order.brandName !== 'N/A' && (
+            <span className="text-xs text-gray-500">Brand: {order.brandName}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: 'Customer',
+      accessor: 'customerName',
+      sortable: true,
+      render: (order) => (
+        <div className="flex flex-col">
+          <span>{order.customerName}</span>
+          {order.customerPhone && order.customerPhone !== 'N/A' && (
+            <span className="text-xs text-gray-500">{order.customerPhone}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: 'Amount',
+      accessor: 'totalAmount',
+      sortable: true,
+      render: (order) => (
+        <span className="font-medium">
+          {order.totalAmount.toFixed(2)} {order.currency}
+        </span>
+      ),
+    },
+    {
+      header: 'Status',
+      accessor: 'status',
+      sortable: true,
+      render: (order) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.status)}`}>
+          {order.statusDisplay}
+        </span>
+      ),
+    },
+    {
+      header: 'Payment',
+      accessor: 'paymentStatus',
+      sortable: true,
+      render: (order) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.paymentStatus)}`}>
+          {order.paymentStatusDisplay}
+        </span>
+      ),
+    },
+    {
+      header: 'Date',
+      accessor: 'createdAt',
+      sortable: true,
+      render: (order) => (
+        order.createdAt ? (
+          <div className="flex items-center gap-1">
+            <Calendar size={14} />
+            <span>
+              {new Date(order.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+        ) : (
+          'N/A'
+        )
+      ),
+    },
+  ];
 
   // Order cards configuration
   const orderCards = [
@@ -141,34 +277,15 @@ export default function Dashboard() {
     },
   ];
 
-  // Get status badge styling
-  const getStatusBadge = (status) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === 'confirmed' || statusLower === 'completed') {
-      return 'bg-green-100 text-green-800';
-    } else if (statusLower === 'pending' || statusLower === 'processing') {
-      return 'bg-yellow-100 text-yellow-800';
-    } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
-      return 'bg-red-100 text-red-800';
-    } else if (statusLower === 'shipped') {
-      return 'bg-blue-100 text-blue-800';
-    }
-    return 'bg-gray-100 text-gray-800';
-  };
-
   return (
     <PageTransition>
       <div className="flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
         {/* Fixed Header and Cards Section */}
         <div className="flex-shrink-0 space-y-6 pb-6">
-          {/* Page header */}
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back! Here&apos;s what&apos;s happening with your business.</p>
-          </div>
+   
 
           {/* Order Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {orderCards.map((card) => (
               <button
                 key={card.id}
@@ -179,7 +296,7 @@ export default function Dashboard() {
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-600">{card.name}</p>
                     {isLoading ? (
@@ -187,147 +304,44 @@ export default function Dashboard() {
                     ) : (
                       <p className="text-2xl font-bold text-gray-900 mt-1">{card.count}</p>
                     )}
-                  </div>
+              </div>
                   <div className={`p-3 ${card.color} rounded-lg`}>
                     <card.icon className={`h-6 w-6 ${card.iconColor}`} />
-                  </div>
-                </div>
+              </div>
+            </div>
               </button>
             ))}
           </div>
         </div>
 
         {/* Scrollable Orders Table Section */}
-        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {selectedFilter === 'all' ? 'All Orders' : 
-                 selectedFilter === 'repair' ? 'Repair Services Orders' :
-                 selectedFilter === 'phone' ? 'New Phone Orders' :
-                 'Accessories Orders'}
-              </h2>
-            </div>
-            <div className="flex-1 overflow-y-auto overflow-x-auto min-h-0">
-            {isLoading ? (
-              <div className="p-6">
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Skeleton key={i} className="h-16 w-full" />
-                  ))}
-                </div>
-              </div>
-            ) : error ? (
-              <div className="p-6 text-center">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col ">
+            {error ? (
+              <div className="p-6 text-center bg-white rounded-lg shadow-sm border border-gray-200">
                 <p className="text-red-600">Error loading orders: {error.message || 'Unknown error'}</p>
               </div>
-            ) : filteredOrders.length === 0 ? (
-              <div className="p-6 text-center">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No orders found.</p>
-              </div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order Number
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payment
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredOrders.map((order) => (
-                    <tr key={order.id || order.order_number} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.orderNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className="inline-flex items-center gap-1">
-                          {order.orderType === 'repair' && <Wrench size={14} className="text-blue-600" />}
-                          {order.orderType === 'phone' && <Smartphone size={14} className="text-green-600" />}
-                          {order.orderType === 'accessory' && <ShoppingBag size={14} className="text-purple-600" />}
-                          <span className="capitalize">
-                            {order.orderType === 'phone' ? 'New Phone' : 
-                             order.orderType === 'repair' ? 'Repair' : 
-                             'Accessory'}
-                          </span>
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex flex-col">
-                          <span className="font-medium">{order.productName}</span>
-                          {order.brandName && order.brandName !== 'N/A' && (
-                            <span className="text-xs text-gray-500">Brand: {order.brandName}</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="flex flex-col">
-                          <span>{order.customerName}</span>
-                          {order.customerPhone && order.customerPhone !== 'N/A' && (
-                            <span className="text-xs text-gray-500">{order.customerPhone}</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.totalAmount.toFixed(2)} {order.currency}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.status)}`}>
-                          {order.statusDisplay}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.paymentStatus)}`}>
-                          {order.paymentStatusDisplay}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.createdAt ? (
-                          <div className="flex items-center gap-1">
-                            <Calendar size={14} />
-                            <span>
-                              {new Date(order.createdAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </span>
-                          </div>
-                        ) : (
-                          'N/A'
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <DataTable
+                key={selectedFilter}
+                data={filteredOrders}
+                columns={columns}
+                title={
+                  selectedFilter === 'all' ? 'All Orders' : 
+                  selectedFilter === 'repair' ? 'Repair Services Orders' :
+                  selectedFilter === 'phone' ? 'New Phone Orders' :
+                  'Accessories Orders'
+                }
+                searchable={true}
+                pagination={true}
+                itemsPerPage={10}
+                loading={isLoading}
+                className="bg-white border-gray-200"
+              />
             )}
-            </div>
-          </div>
         </div>
       </div>
+    </div>
     </PageTransition>
   );
 }
