@@ -143,7 +143,7 @@ export default function Repair() {
                         <p className="text-gray-300 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                         {repairServices.map((service, idx) => (
                          <motion.div
                          key={service.id}
@@ -239,7 +239,7 @@ export default function Repair() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-6 lg:gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (
