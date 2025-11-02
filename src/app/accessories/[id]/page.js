@@ -47,9 +47,10 @@ export default function AccessoryDetailsPage() {
   const reviews = useMemo(() => {
     const allReviews = reviewsData?.data || reviewsData?.results || [];
     return allReviews.filter(review => 
-      String(review.product_id) === String(id)
+      String(review.product) === String(id)
     );
   }, [reviewsData, id]);
+  console.log(reviews);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && id) {
