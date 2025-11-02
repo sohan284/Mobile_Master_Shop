@@ -15,9 +15,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { CustomButton } from '@/components/ui/button';
 import NotFound from '@/components/ui/NotFound';
+import { useTranslations } from 'next-intl';
 
 
 export default function BrandRepairPage({ params }) {
+    const t = useTranslations('repair');
     const { brand } = use(params);
     const [searchTerm, setSearchTerm] = useState('');
     const [brandInfo, setBrandInfo] = useState(null);
@@ -93,22 +95,22 @@ export default function BrandRepairPage({ params }) {
                 
                 {/* Hero Section */}
                 <HeroSection
-                    title="Choose Your"
-                    subtitle={`${brandInfo?.name} Model`}
-                    description={`Select your ${brandInfo?.name} model to get started with professional repair services and expert support.`}
+                    title={t('chooseYour')}
+                    subtitle={t('chooseYourModel', { brand: brandInfo?.name })}
+                    description={t('selectModelDescription', { brand: brandInfo?.name })}
                     image={brandInfo?.logo || '/Apple.png'}
                     imageAlt={`${brandInfo?.name} Repair`}
-                    badgeText={`${brandInfo?.name} Repair Services`}
+                    badgeText={t('brandRepairServices', { brand: brandInfo?.name })}
                     showBackButton={true}
-                    backButtonText="← Back to Brands"
+                    backButtonText={t('backToBrands')}
                     backButtonHref="/repair"
                 />
                 
                 {/* Search Section */}
                 <SearchSection
-                    title={`Find Your ${brandInfo?.name} Model`}
-                    description={`Search for your ${brandInfo?.name} model or browse our supported devices below.`}
-                    placeholder={`Search ${brandInfo?.name} models...`}
+                    title={t('findYourModel', { brand: brandInfo?.name })}
+                    description={t('searchModelDescription', { brand: brandInfo?.name })}
+                    placeholder={t('searchModels', { brand: brandInfo?.name })}
                     searchTerm={searchTerm}
                     onSearchChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -137,26 +139,26 @@ export default function BrandRepairPage({ params }) {
                         }
                     }}
                     gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-                    notFoundTitle={searchTerm ? "No Models Found" : `No ${brandInfo?.name} Models Available`}
+                    notFoundTitle={searchTerm ? t('noModelsFound') : t('noBrandModelsAvailable', { brand: brandInfo?.name })}
                     notFoundDescription={searchTerm 
-                        ? `No ${brandInfo?.name} models found matching "${searchTerm}". Try a different search term.`
-                        : `We don't have any ${brandInfo?.name} models available at the moment. Please check back later or browse other brands.`
+                        ? t('noModelsMatching', { brand: brandInfo?.name, searchTerm })
+                        : t('noBrandModelsAvailableDesc', { brand: brandInfo?.name })
                     }
                                 searchTerm={searchTerm}
                                 onClearSearch={() => setSearchTerm('')}
                     primaryAction={searchTerm ? {
-                        text: "Clear Search",
+                        text: t('clearSearch'),
                         href: "#",
                         onClick: () => setSearchTerm('')
                     } : {
-                        text: "Browse All Brands",
+                        text: t('browseAllBrands'),
                         href: "/repair"
                     }}
                     secondaryAction={searchTerm ? {
-                        text: "Browse All Brands",
+                        text: t('browseAllBrands'),
                         href: "/repair"
                     } : {
-                        text: "Contact Support",
+                        text: t('contactSupport'),
                         href: "/contact"
                     }}
                 />
@@ -164,8 +166,8 @@ export default function BrandRepairPage({ params }) {
                 
                 {/* Features Section */}
                 <FeaturesSection
-                    title={`Why Choose Our ${brandInfo?.name} Repair Services?`}
-                    description={`Professional repair services with guaranteed quality and customer satisfaction for ${brandInfo?.name} devices.`}
+                    title={t('whyChooseOurBrandRepairServices', { brand: brandInfo?.name })}
+                    description={t('professionalRepairServicesBrandDesc', { brand: brandInfo?.name })}
                     features={brandInfo?.features?.map(feature => ({
                         title: feature.title,
                         description: feature.description,
@@ -175,13 +177,13 @@ export default function BrandRepairPage({ params }) {
 
                 {/* CTA Section */}
                 <CTASection
-                    title={`Ready to Get Your ${brandInfo?.name} Device Fixed?`}
-                    description="Choose your model above to get started with professional repair services!"
+                    title={t('readyToGetYourBrandDeviceFixed', { brand: brandInfo?.name })}
+                    description={t('chooseModelAboveDescription')}
                     primaryAction={{
-                        text: "Browse All Brands",
+                        text: t('browseAllBrands'),
                         href: "/repair"
                     }}
-                    features={["Free Diagnosis", "Same Day Service", "12 Month Warranty"]}
+                    features={[t('freeDiagnosisFeature'), t('sameDayService'), t('twelveMonthWarrantyFeature')]}
                 />
             </div>
         </div>

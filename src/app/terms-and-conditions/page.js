@@ -1,83 +1,131 @@
 'use client';
 
 import React from 'react';
-import MotionFade from '@/components/animations/MotionFade';
+import { useTranslations } from 'next-intl';
 
 export default function TermsAndConditionsPage() {
+    const t = useTranslations('terms');
     const sections = [
         {
-            title: "Introduction",
-            content: "Welcome to MobileShopRepair. These Terms and Conditions govern your use of our website and services. By accessing or using our service, you agree to be bound by these terms. If you disagree with any part of the terms, you may not access the service."
+            title: t('sections.introduction.title'),
+            content: t('sections.introduction.content')
         },
         {
-            title: "User Responsibilities",
-            content: "You are responsible for your conduct and any data, text, information, or other materials that you submit to the service. You agree not to misuse the services or help anyone else to do so. You must comply with our acceptable use policy."
+            title: t('sections.definitions.title'),
+            content: t('sections.definitions.content')
         },
         {
-            title: "Privacy & Security",
-            content: "Your privacy is important to us. Our Privacy Policy explains how we collect, use, and share your personal information. By using our services, you agree to the collection and use of information in accordance with our Privacy Policy."
+            title: t('sections.servicesOffered.title'),
+            content: t('sections.servicesOffered.content')
         },
         {
-            title: "Intellectual Property",
-            content: "The service and its original content, features, and functionality are and will remain the exclusive property of MobileShopRepair and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent."
+            title: t('sections.repairServices.title'),
+            content: t('sections.repairServices.content')
         },
         {
-            title: "Termination",
-            content: "We may terminate or suspend your access to our service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. All provisions of the Terms which by their nature should survive termination shall survive termination."
+            title: t('sections.productSales.title'),
+            content: t('sections.productSales.content')
         },
         {
-            title: "Limitation of Liability",
-            content: "In no event shall MobileShopRepair, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses."
+            title: t('sections.userAccount.title'),
+            content: t('sections.userAccount.content')
         },
         {
-            title: "Governing Law",
-            content: "These Terms shall be governed and construed in accordance with the laws of our jurisdiction, without regard to its conflict of law provisions. Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights."
+            title: t('sections.paymentTerms.title'),
+            content: t('sections.paymentTerms.content')
         },
         {
-            title: "Changes to Terms",
-            content: "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion."
+            title: t('sections.warranties.title'),
+            content: t('sections.warranties.content')
         },
         {
-            title: "Contact Us",
-            content: "If you have any questions about these Terms, please contact us through our official contact channels. We are here to help and address any concerns you may have."
+            title: t('sections.limitationLiability.title'),
+            content: t('sections.limitationLiability.content')
+        },
+        {
+            title: t('sections.intellectualProperty.title'),
+            content: t('sections.intellectualProperty.content')
+        },
+        {
+            title: t('sections.privacyData.title'),
+            content: t('sections.privacyData.content')
+        },
+        {
+            title: t('sections.cancellationRefund.title'),
+            content: t('sections.cancellationRefund.content')
+        },
+        {
+            title: t('sections.forceMajeure.title'),
+            content: t('sections.forceMajeure.content')
+        },
+        {
+            title: t('sections.disputeResolution.title'),
+            content: t('sections.disputeResolution.content')
+        },
+        {
+            title: t('sections.modifications.title'),
+            content: t('sections.modifications.content')
+        },
+        {
+            title: t('sections.severability.title'),
+            content: t('sections.severability.content')
+        },
+        {
+            title: t('sections.entireAgreement.title'),
+            content: t('sections.entireAgreement.content')
+        },
+        {
+            title: t('sections.contact.title'),
+            content: t('sections.contact.content')
         }
     ];
 
     return (
-        <div className="min-h-screen text-white py-16 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
                 {/* Header */}
-                <MotionFade delay={0.05} immediate={true}>
-                    <div className="text-center mb-16">
-                        <h1 className="text-5xl sm:text-6xl font-extrabold mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-600">
-                            Terms & Conditions
+                <div className="mb-12 pb-8 border-b border-slate-700">
+                    <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-white">
+                        {t('termsConditions')}
                         </h1>
-                        <p className="text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto">
-                            Please read our terms carefully to understand your rights and obligations.
+                    <p className="text-lg text-slate-400">
+                        {t('pleaseReadCarefully')}
+                    </p>
+                    <p className="text-sm text-slate-500 mt-4">
+                        {t('lastUpdated')} {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                     </div>
-                </MotionFade>
 
-                {/* Sections */}
+                {/* Document Content */}
+                <div className="prose prose-invert max-w-none">
                 {sections.map((section, index) => (
-                    <MotionFade key={index} delay={0.05 + index * 0.05}>
-                        <div className="bg-slate-800/40 backdrop-blur-md p-8 rounded-2xl shadow-xl mb-8 hover:scale-[1.02] transition-transform duration-200">
-                            <h2 className="text-2xl sm:text-3xl font-semibold mb-4 text-indigo-300">
-                                {section.title}
+                        <section key={index} className="mb-10 pb-10 border-b border-slate-800 last:border-b-0">
+                            <h2 className="text-2xl font-semibold mb-4 text-white">
+                                {index + 1}. {section.title}
                             </h2>
-                            <p className="text-slate-300 leading-relaxed">
+                            <div className="text-slate-300 leading-7 space-y-4">
+                                <p className="whitespace-pre-line">
                                 {section.content}
                             </p>
                         </div>
-                    </MotionFade>
-                ))}
+                        </section>
+                    ))}
+                </div>
 
-                {/* Footer Note */}
-                <MotionFade delay={0.3}>
-                    <p className="text-center text-slate-500 mt-12 italic">
-                        Last updated: November 2025
-                    </p>
-                </MotionFade>
+                {/* Footer */}
+                <div className="mt-16 pt-8 border-t border-slate-700">
+                    <div className="text-center text-slate-500 text-sm">
+                        <p className="mb-2">
+                            {t('forQuestions')}{' '}
+                            <a href="mailto:contact@mlkphone.com" className="text-indigo-400 hover:text-indigo-300 underline">
+                                contact@mlkphone.com
+                            </a>
+                        </p>
+                        <p>
+                            MobileShopRepair | MLK Paris, France
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     );

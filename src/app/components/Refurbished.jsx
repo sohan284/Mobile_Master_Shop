@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button, CustomButton } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import Image from 'next/image';
 import { Shield, Smartphone, TrendingDown } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 // Custom styles for swiper
 const swiperStyles = `
@@ -57,114 +58,34 @@ const swiperStyles = `
 `;
 
 export default function Refurbished() {
+  const t = useTranslations('phones');
   const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
     ['new-phone-models'],
     () => apiFetcher.get('/api/brandnew/models/')
   );
   const models = modelsResponse?.data || [];
 
-  const images = [
+
+  const features = useMemo(() => [
     {
-      id: 1,
-      name: 'iphone-11-noir.png',
-      path: '/iphone-11-noir.png',
-      price: 299,
-      brand: 'Apple',
-      condition: 'Excellent',
-    },
-    {
-      id: 2,
-      name: 'iPhone-12.png',
-      path: '/iPhone-12.png',
-      price: 399,
-      brand: 'Apple',
-      condition: 'Like New',
-    },
-    {
-      id: 3,
-      name: 'iphone-13.png',
-      path: '/iphone-13.png',
-      price: 499,
-      brand: 'Apple',
-      condition: 'Excellent',
-    },
-    {
-      id: 4,
-      name: 'Iphone14.png',
-      path: '/Iphone14.png',
-      price: 599,
-      brand: 'Apple',
-      condition: 'Like New',
-    },
-    {
-      id: 5,
-      name: 'Iphone14-Pro-Max.png',
-      path: '/Iphone14-Pro-Max.png',
-      price: 799,
-      brand: 'Apple',
-      condition: 'Excellent',
-    },
-    {
-      id: 6,
-      name: 'iphone-se-2020.png',
-      path: '/iphone-se-2020.png',
-      price: 199,
-      brand: 'Apple',
-      condition: 'Good',
-    },
-    {
-      id: 7,
-      name: 'iphone-xr.png',
-      path: '/iphone-xr.png',
-      price: 249,
-      brand: 'Apple',
-      condition: 'Good',
-    },
-    {
-      id: 8,
-      name: 'SAMSUNG_GalaxyS23Ultra.png',
-      path: '/SAMSUNG_GalaxyS23Ultra.png',
-      price: 899,
-      brand: 'Samsung',
-      condition: 'Like New',
-    },
-    {
-      id: 9,
-      name: 'samsung-galaxy-a40.png',
-      path: '/samsung-galaxy-a40.png',
-      price: 149,
-      brand: 'Samsung',
-      condition: 'Good',
-    },
-    {
-      id: 10,
-      name: 'samsung-galaxy-s22.png',
-      path: '/samsung-galaxy-s22.png',
-      price: 699,
-      brand: 'Samsung',
-      condition: 'Excellent',
-    },
-  ];
-  const features = [
-    {
-      title: '24 Month Warranty',
-      description: 'Full coverage for peace of mind',
+      title: t('monthWarranty'),
+      description: t('fullCoverage'),
       icon: Shield,
       gradient: 'from-blue-500 to-cyan-500',
     },
     {
-      title: 'Latest Models',
-      description: 'Brand new, never used',
+      title: t('latestModels'),
+      description: t('brandNewNeverUsed'),
       icon: Smartphone,
       gradient: 'from-purple-500 to-pink-500',
     },
     {
-      title: 'Best Prices',
-      description: 'Competitive pricing guaranteed',
+      title: t('bestPrices'),
+      description: t('competitivePricing'),
       icon: TrendingDown,
       gradient: 'from-green-500 to-emerald-500',
     },
-  ];
+  ], [t]);
   return (
     <div className="relative  text-white py-20 overflow-hidden">
       <style dangerouslySetInnerHTML={{ __html: swiperStyles }} />
@@ -177,7 +98,7 @@ export default function Refurbished() {
             transition={{ duration: 0.5 }}
             className="text-4xl md:text-6xl font-extrabold tracking-wider"
           >
-            LATEST PHONES
+            {t('latestPhones')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -185,8 +106,7 @@ export default function Refurbished() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="mt-4 text-lg md:text-xl text-gray-300"
           >
-            Discover our selection of new phones with a wide choice of Apple,
-            Samsung, Xiaomi models and much more!
+            {t('discoverSelection')}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -196,7 +116,7 @@ export default function Refurbished() {
           >
             <Link href="/phones">
               <CustomButton className="bg-secondary text-primary hover:bg-secondary/90">
-                Browse All Phones
+                {t('browseAllPhones')}
               </CustomButton>
             </Link>
           </motion.div>
@@ -210,9 +130,9 @@ export default function Refurbished() {
           className="relative mb-16"
         >
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4">Featured New Phones</h3>
+            <h3 className="text-3xl font-bold mb-4">{t('featuredNewPhones')}</h3>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Handpicked selection of the latest smartphones from top brands.
+              {t('handpickedSelection')}
             </p>
           </div>
 
@@ -269,7 +189,7 @@ export default function Refurbished() {
 
                     {/* Condition Badge */}
                     <div className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
-                                            New
+                                            {t('new')}
                                         </div>
 
                     <div className="mb-4 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
@@ -298,7 +218,7 @@ export default function Refurbished() {
                       <div className="space-y-2">
                         <div className="text-center">
                           <p className="text-sm text-gray-300 mb-1">
-                            Starting from
+                            {t('startingFrom')}
                           </p>
                           <p className="font-bold text-3xl text-secondary mb-2">
                               €{model.main_amount}
@@ -361,8 +281,8 @@ export default function Refurbished() {
           className="mb-16"
         >
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4 text-white">Why Choose Our New Phones?</h3>
-            <p className="text-gray-300 text-lg">Premium quality phones with comprehensive warranty and support.</p>
+            <h3 className="text-3xl font-bold mb-4 text-white">{t('whyChooseOurPhones')}</h3>
+            <p className="text-gray-300 text-lg">{t('premiumQualityPhones')}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">

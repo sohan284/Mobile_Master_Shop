@@ -8,12 +8,14 @@ import GridSection from "@/components/common/GridSection";
 import FeaturesSection from "@/components/common/FeaturesSection";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
+import { useTranslations } from 'next-intl';
 
 // Memoized static sections to prevent re-render
 const MemoHeroSection = memo(HeroSection);
 const MemoFeaturesSection = memo(FeaturesSection);
 
 export default function RepairPage() {
+  const t = useTranslations('repair');
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: brandsResponse, isLoading, error } = useApiGet(
@@ -45,13 +47,13 @@ export default function RepairPage() {
 
             {/* Hero Section */}
             <MemoHeroSection
-              title="Choose Your"
-              subtitle="Brand"
-              description="Select your phone brand to get started with professional repair services and expert support."
+              title={t('chooseYour')}
+              subtitle={t('brand')}
+              description={t('selectBrandDescription')}
               image="/1.png"
-              imageAlt="Phone Repair"
-              badgeText="Professional Repair Services"
-              backButtonText="← Back to Home"
+              imageAlt={t('phoneRepair')}
+              badgeText={t('professionalRepairServices')}
+              backButtonText={t('backToHome')}
               showBackButton={true}
               backButtonHref="/"
             />
@@ -61,11 +63,11 @@ export default function RepairPage() {
       </PageTransition>
 
       {/* Search section */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-14">
         <SearchSection
-          title="Find Your Phone Brand"
-          description="Search for your phone brand or browse our supported manufacturers below."
-          placeholder="Search brand..."
+          title={t('findYourPhoneBrand')}
+          description={t('searchBrandDescription')}
+          placeholder={t('searchBrand')}
           searchTerm={searchTerm}
           onSearchChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -86,17 +88,17 @@ export default function RepairPage() {
             }
           }}
           gridCols="grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-          notFoundTitle="No Brands Found"
-          notFoundDescription={`No brands found matching "${searchTerm}". Try a different search term.`}
+          notFoundTitle={t('noBrandsFound')}
+          notFoundDescription={t('noBrandsMatching', { searchTerm })}
           searchTerm={searchTerm}
           onClearSearch={() => setSearchTerm("")}
           primaryAction={{
-            text: "Clear Search",
+            text: t('clearSearch'),
             href: "#",
             onClick: () => setSearchTerm(""),
           }}
           secondaryAction={{
-            text: "View All Brands",
+            text: t('viewAllBrands'),
             href: "#",
             onClick: () => setSearchTerm(""),
           }}
@@ -106,13 +108,13 @@ export default function RepairPage() {
       {/* Features Section (moved below search + grid) */}
       <div className="container mx-auto px-4 py-8">
         <MemoFeaturesSection
-          title="Why Choose Our Repair Services?"
-          description="Professional repair services with guaranteed quality and customer satisfaction."
+          title={t('whyChooseOurRepairServices')}
+          description={t('professionalRepairServicesDescription')}
           features={[
-            { title: "Fast Service", description: "Quick turnaround with same-day service available", icon: "⚡" },
-            { title: "12 Month Warranty", description: "Full coverage for peace of mind on all repairs", icon: "🛡️" },
-            { title: "Expert Technicians", description: "Certified professionals with years of experience", icon: "🔧" },
-            { title: "Free Diagnosis", description: "Device assessment before any repair work", icon: "🔍" },
+            { title: t('fastService'), description: t('quickTurnaroundSameDay'), icon: "⚡" },
+            { title: t('twelveMonthWarranty'), description: t('fullCoveragePeaceOfMind'), icon: "🛡️" },
+            { title: t('expertTechniciansRepair'), description: t('certifiedProfessionalsYears'), icon: "🔧" },
+            { title: t('freeDiagnosis'), description: t('deviceAssessmentBeforeRepair'), icon: "🔍" },
           ]}
         />
       </div>
@@ -122,7 +124,7 @@ export default function RepairPage() {
         <MotionFade delay={0.15}>
           <div className="text-center py-12">
             <div className="text-red-500 mb-4">
-              Failed to load brands. Using fallback data.
+              {t('failedToLoadBrands')}
             </div>
           </div>
         </MotionFade>

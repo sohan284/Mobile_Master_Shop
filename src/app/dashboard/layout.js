@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Sidebar from './global-discount/components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserInfo from '@/components/UserInfo';
+import Sidebar from './components/Sidebar';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);

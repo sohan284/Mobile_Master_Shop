@@ -525,7 +525,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.brand || !formData.main_amount}
+              disabled={isSubmitting || !formData.name.trim() || !formData.brand || !formData.main_amount || !formData.ram || !formData.memory || formData.stock_quantity === ''}
               className="text-secondary cursor-pointer"
             >
               {isSubmitting ? 'Creating...' : 'Create Model'}

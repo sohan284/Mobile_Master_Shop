@@ -10,8 +10,10 @@ import { apiFetcher } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomButton } from "@/components/ui/button";
 import ReviewsSection from '@/components/common/ReviewsSection';
+import { useTranslations } from 'next-intl';
 
 export default function AccessoryDetailsPage() {
+  const t = useTranslations('accessories');
   const params = useParams();
   const router = useRouter();
   const id = params?.id;
@@ -37,7 +39,7 @@ export default function AccessoryDetailsPage() {
   // Fetch reviews
   const { data: reviewsData, isLoading: reviewsLoading, refetch: refetchReviews } = useApiGet(
     ['accessory-reviews', id],
-    () => apiFetcher.get(`/api/accessories/review/`),
+    () => apiFetcher.get(`/api/accessories/review/?product_id=${id}`),
     { enabled: !!id }
   );
   
@@ -101,7 +103,7 @@ export default function AccessoryDetailsPage() {
               onClick={() => router.back()}
               className="text-accent hover:text-secondary transition-colors cursor-pointer"
             >
-              ← Back
+              {t('back')}
             </button>
           </div>
 
@@ -160,16 +162,16 @@ export default function AccessoryDetailsPage() {
                       )}
                     </p>
                     <div className="text-accent/80 text-sm mt-1">
-                        Total: <span className="font-semibold text-secondary">€{(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
+                        {t('total')}: <span className="font-semibold text-secondary">€{(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
                     <span className={`px-2 py-1 rounded-full ${accessory.is_in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {accessory.is_in_stock ? 'In Stock' : 'Out of Stock'}
+                      {accessory.is_in_stock ? t('inStock') : t('outOfStock')}
                     </span>
                     {typeof accessory.stock_quantity === 'number' && (
-                      <span className="text-accent/80">Qty: {accessory.stock_quantity}</span>
+                      <span className="text-accent/80">{t('qty')}: {accessory.stock_quantity}</span>
                     )}
                   </div>
 
@@ -207,7 +209,7 @@ export default function AccessoryDetailsPage() {
                       onClick={() => router.push(`/accessories/${id}/breakdown`)}
                       className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
                     >
-                      Proceed to Checkout
+                      {t('proceedToCheckout')}
                     </CustomButton>
                   </div>
                 </div>
@@ -216,7 +218,7 @@ export default function AccessoryDetailsPage() {
 
           {!isLoading && !accessory && (
             <div className="text-center text-accent/80 py-24">
-              Could not load this accessory.
+              {t('couldNotLoad')}
             </div>
           )}
 

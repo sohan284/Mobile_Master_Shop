@@ -552,27 +552,21 @@ export default function OrdersPage() {
                                             payload = {
                                                 rating: reviewForm.rating,
                                                 review: reviewForm.comment.trim(),
-                                                customer_name: user?.name || user?.username || 'Anonymous',
-                                                customer_email: user?.email || '',
-                                                phone_model_id: selectedOrder?.id
+                                                order_id: selectedOrder?.id
                                             };
                                         } else if (selectedOrder.orderType === 'phone') {
                                             endpoint = '/api/brandnew/review/';
                                             payload = {
                                                 rating: reviewForm.rating,
-                                                review: reviewForm.comment.trim(),
-                                                customer_name: user?.name || user?.username || 'Anonymous',
-                                                customer_email: user?.email || '',
-                                                phone_model: selectedOrder?.id
+                                                    review: reviewForm.comment.trim(),
+                                                order_id: selectedOrder?.id
                                             };
                                         } else if (selectedOrder.orderType === 'accessory') {
                                             endpoint = '/api/accessories/review/';
                                             payload = {
                                                 rating: reviewForm.rating,
                                                 review: reviewForm.comment.trim(),
-                                                customer_name: user?.name || user?.username || 'Anonymous',
-                                                customer_email: user?.email || '',
-                                                product_id: selectedOrder?.id
+                                                order_id: selectedOrder?.id
                                             };
                                         }
 
@@ -586,7 +580,8 @@ export default function OrdersPage() {
                                         setSelectedOrder(null);
                                     } catch (error) {
                                         toast.dismiss(loadingToast);
-                                        toast.error(error.response?.data?.message || 'Failed to submit review. Please try again.');
+                                        console.log(error.response?.data.order_id);
+                                        toast.error(error.response?.data?.message ||error.response?.data.order_id || 'Failed to submit review. Please try again.');
                                     } finally {
                                         setIsSubmittingReview(false);
                                     }

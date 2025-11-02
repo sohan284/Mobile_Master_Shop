@@ -14,8 +14,11 @@ import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
 import { useAuth } from "@/contexts/AuthContext";
 import CartIcon from "@/components/accessories/CartIcon";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslations } from 'next-intl';
 
 export default function Header() {
+  const t = useTranslations('header');
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -124,7 +127,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        className={`bg-primary text-secondary w-full pt-4 pb-1 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
           }`}
       >
         <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
@@ -146,6 +149,7 @@ export default function Header() {
             </Link>
 
             <div className="flex items-center space-x-3">
+              <LanguageSwitcher />
               {/* <CartIcon /> */}
               {isAuthenticated() ? (
                 <div className="relative" ref={mobileProfileDropdownRef}>
@@ -167,7 +171,7 @@ export default function Header() {
                         className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                       >
                         <UserCircle size={16} className="mr-2" />
-                        Profile
+                        {t('profile')}
                       </Link>
                       <Link
                         href="/orders"
@@ -175,7 +179,7 @@ export default function Header() {
                         className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                       >
                         <Package size={16} className="mr-2" />
-                        Orders
+                        {t('orders')}
                       </Link>
                       {isAdmin() && (
                         <Link
@@ -184,7 +188,7 @@ export default function Header() {
                           className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                         >
                           <LayoutDashboard size={16} className="mr-2" />
-                          Dashboard
+                          {t('dashboard')}
                         </Link>
                       )}
                       <button
@@ -192,7 +196,7 @@ export default function Header() {
                         className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
                       >
                         <LogOut size={16} className="mr-2" />
-                        Logout
+                        {t('logout')}
                       </button>
                     </div>
                   )}
@@ -220,28 +224,27 @@ export default function Header() {
             {/* Navigation */}
             <div className="flex items-center justify-center space-x-8 lg:space-x-12 xl:space-x-20 text-base xl:text-lg">
               <Link href="/repair" className="hover:underline hover:text-white transition">
-                Repair
+                {t('repair')}
               </Link>
               <Link href="/phones" className="hover:underline hover:text-white transition">
-                Phones
+                {t('phones')}
               </Link>
               <Link href="/accessories" className="hover:underline hover:text-white transition">
-                Accessories
+                {t('accessories')}
               </Link>
               <Link href="/contact" className="hover:underline hover:text-white transition">
-                Contact
+                {t('contact')}
               </Link>
-              <div className="flex items-center space-x-4 relative">
-                <Language />
-              </div>
+           
               {/* Cart and User */}
               <div className="flex items-center space-x-4">
+                <LanguageSwitcher />
                 {/* <CartIcon /> */}
                 {isAuthenticated() ? (
                   <div className="relative" ref={desktopProfileDropdownRef}>
                     <button
                       onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                      className="flex items-center space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
+                      className="flex items-center cursor-pointer space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
                       aria-label="Profile menu"
                     >
                       <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
@@ -258,7 +261,7 @@ export default function Header() {
                           className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                         >
                           <UserCircle size={16} className="mr-2" />
-                          Profile
+                          {t('profile')}
                         </Link>
                         <Link
                           href="/orders"
@@ -266,7 +269,7 @@ export default function Header() {
                           className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                         >
                           <Package size={16} className="mr-2" />
-                          Orders
+                          {t('orders')}
                         </Link>
                         {isAdmin() && (
                           <Link
@@ -275,7 +278,7 @@ export default function Header() {
                             className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
                           >
                             <LayoutDashboard size={16} className="mr-2" />
-                            Dashboard
+                            {t('dashboard')}
                           </Link>
                         )}
                         <button
@@ -283,7 +286,7 @@ export default function Header() {
                           className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
                         >
                           <LogOut size={16} className="mr-2" />
-                          Logout
+                          {t('logout')}
                         </button>
                       </div>
                     )}
@@ -313,32 +316,30 @@ export default function Header() {
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Repair
+                    {t('repair')}
                   </Link>
                   <Link
                     href="/phones"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Phones
+                    {t('phones')}
                   </Link>
                   <Link
                     href="/accessories"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Accessories
+                    {t('accessories')}
                   </Link>
                   <Link
                     href="/contact"
                     className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Contact
+                    {t('contact')}
                   </Link>
-                  <div className="flex items-center space-x-4">
-                    <Language />
-                  </div>
+                 
                 </div>
 
 

@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 import { X, Mail, User, Lock, Eye, EyeOff } from 'lucide-react';
 import { createAccount } from '@/lib/api.js';
 import toast from 'react-hot-toast';
+import { useTranslations } from 'next-intl';
 
 export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
+  const t = useTranslations('auth');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,30 +15,30 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const validateUsername = (username) => {
-    if (username.length < 6) {
-      return 'Username must be at least 3 characters long';
+    if (username.length < 3) {
+      return t('usernameMustBeAtLeast');
     }
     if (username.length > 20) {
-      return 'Username must be less than 20 characters';
+      return t('usernameMustBeLessThan');
     }
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-      return 'Username can only contain letters, numbers, and underscores';
+      return t('usernameOnlyLettersNumbers');
     }
     return null;
   };
 
   const validatePassword = (password) => {
     if (password.length < 8) {
-      return 'Password must be at least 8 characters long';
+      return t('passwordMustBeAtLeast');
     }
     if (!/(?=.*[a-z])/.test(password)) {
-      return 'Password must contain at least one lowercase letter';
+      return t('passwordMustContainLowercase');
     }
     if (!/(?=.*[A-Z])/.test(password)) {
-      return 'Password must contain at least one uppercase letter';
+      return t('passwordMustContainUppercase');
     }
     if (!/(?=.*\d)/.test(password)) {
-      return 'Password must contain at least one number';
+      return t('passwordMustContainNumber');
     }
     return null;
   };
@@ -60,12 +62,12 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
 
     // Validate confirm password
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('passwordsDoNotMatch'));
       return;
     }
 
     setIsLoading(true);
-    const loadingToast = toast.loading('Creating your account...');
+    const loadingToast = toast.loading(t('creatingYourAccount'));
 
     try {
       await createAccount({
@@ -77,7 +79,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
       onSubmit();
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || 'Failed to create account. Please try again.');
+      toast.error(error.response?.data?.message || t('failedToCreateAccount'));
     } finally {
       setIsLoading(false);
     }
@@ -89,8 +91,8 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-accent">Complete Your Account</h2>
-            <p className="text-sm text-accent/80">Set up your username and password</p>
+            <h2 className="text-xl font-bold text-accent">{t('completeYourAccount')}</h2>
+            <p className="text-sm text-accent/80">{t('setUpUsernamePassword')}</p>
           </div>
           <button
             onClick={onClose}
@@ -105,7 +107,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
           <div className="flex items-center">
             <Mail className="text-accent/60 mr-2" size={16} />
             <div>
-              <p className="text-sm text-accent/80">Email address</p>
+              <p className="text-sm text-accent/80">{t('emailAddressLabel')}</p>
               <p className="font-medium text-accent">{email}</p>
             </div>
           </div>
@@ -116,7 +118,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
           {/* Username Field */}
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-accent mb-2">
-              Username
+              {t('username')}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
@@ -127,20 +129,20 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                placeholder="Choose a username"
+                placeholder={t('chooseUsername')}
                 autoComplete="off"
                 required
               />
             </div>
             <p className="mt-1 text-xs text-accent/60">
-              3-20 characters, letters, numbers, and underscores only
+              {t('usernameRequirements')}
             </p>
           </div>
 
           {/* Password Field */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-accent mb-2">
-              Password
+              {t('password')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
@@ -151,7 +153,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                placeholder="Create a strong password"
+                placeholder={t('createStrongPassword')}
                 autoComplete="new-password"
                 required
               />
@@ -164,14 +166,14 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
               </button>
             </div>
             <p className="mt-1 text-xs text-accent/60">
-              At least 8 characters with uppercase, lowercase, and number
+              {t('passwordRequirements')}
             </p>
           </div>
 
           {/* Confirm Password Field */}
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-accent mb-2">
-              Confirm Password
+              {t('confirmPassword')}
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
@@ -182,7 +184,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
-                placeholder="Confirm your password"
+                placeholder={t('confirmYourPassword')}
                 autoComplete="new-password"
                 required
               />
@@ -205,7 +207,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
             {isLoading ? (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
             ) : (
-              'Create Account'
+              t('createAccount')
             )}
           </button>
         </form>

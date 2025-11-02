@@ -8,11 +8,13 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { decryptBkp } from '@/lib/utils';
+import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-function CheckoutForm({ clientSecret, amount, currency }) {
+function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -40,22 +42,67 @@ function CheckoutForm({ clientSecret, amount, currency }) {
             return;
         }
 
-        // Payment successful - redirect to orders page
+        // Payment successful - confirm payment with backend API
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            toast.success('Payment confirmed successfully!', {
-                duration: 3000,
-                position: 'top-right',
-            });
-            sessionStorage.removeItem('bkp');
-            // Small delay to show the toast before redirecting
-            setTimeout(() => {
-                router.push('/orders');
-            }, 1500);
+            try {
+                // Determine API endpoint based on booking type
+                const orderId = bookingPayment?.orderId;
+                let confirmPaymentEndpoint;
+
+                if (!orderId) {
+                    throw new Error('Order ID not found');
+                }
+
+                if (bookingPayment?.type === 'repair') {
+                    confirmPaymentEndpoint = `/api/repair/orders/${orderId}/confirm_payment/`;
+                } else if (bookingPayment?.type === 'phone') {
+                    confirmPaymentEndpoint = `/api/brandnew/orders/${orderId}/confirm_payment/`;
+                } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                    confirmPaymentEndpoint = `/api/accessories/orders/${orderId}/confirm_payment/`;
+                } else {
+                    throw new Error(`Unknown booking type: ${bookingPayment?.type}`);
+                }
+
+                // Call payment confirmation API
+                await apiFetcher.post(confirmPaymentEndpoint, {
+                    payment_intent_id: paymentIntent.id
+                });
+
+                toast.success('Payment confirmed successfully!', {
+                    duration: 3000,
+                    position: 'top-right',
+                });
+                
+                // Clear booking data
+                sessionStorage.removeItem('bkp');
+                localStorage.removeItem('bkp');
+                localStorage.removeItem('bookingPayment');
+                sessionStorage.removeItem('bookingPayment');
+
+                // Small delay to show the toast before redirecting
+                setTimeout(() => {
+                    router.push('/orders');
+                }, 1500);
+                // Don't set submitting to false here - we're redirecting
+                return;
+            } catch (error) {
+                console.error('Payment confirmation API error:', error);
+                toast.error(
+                    error?.response?.data?.message || 
+                    error?.message || 
+                    'Payment succeeded but confirmation failed. Please contact support.',
+                    {
+                        duration: 5000,
+                        position: 'top-right',
+                    }
+                );
+                setSubmitting(false);
+                return;
+            }
         } else {
             setMessage('Payment processing...');
+            setSubmitting(false);
         }
-
-        setSubmitting(false);
     };
 
     return (
@@ -70,6 +117,7 @@ function CheckoutForm({ clientSecret, amount, currency }) {
 }
 
 export default function BookingPage() {
+    const t = useTranslations('booking');
     const [bookingPayment, setBookingPayment] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [clientSecret, setClientSecret] = useState(null);
@@ -123,8 +171,8 @@ export default function BookingPage() {
                 <div className="min-h-screen relative overflow-hidden bg-primary">
                     <div className="container mx-auto px-4 py-8">
                         <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8">
-                            <h2 className="text-2xl font-bold text-secondary mb-4">No booking details found</h2>
-                            <p className="text-accent/80 mb-6">Please start from a product or repair flow again.</p>
+                            <h2 className="text-2xl font-bold text-secondary mb-4">{t('noBookingDetails')}</h2>
+                            <p className="text-accent/80 mb-6">{t('startFromFlow')}</p>
                         </div>
                     </div>
                 </div>
@@ -138,26 +186,26 @@ export default function BookingPage() {
                 <div className="container mx-auto px-4 py-8">
                     <MotionFade delay={0.1} immediate={true}>
                         <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
-                            <h2 className="text-2xl font-bold text-secondary mb-6">Booking & Payment</h2>
+                            <h2 className="text-2xl font-bold text-secondary mb-6">{t('title')}</h2>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2 space-y-6">
                                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4">
-                                        <h3 className="text-lg font-semibold text-accent mb-3">Details</h3>
+                                        <h3 className="text-lg font-semibold text-accent mb-3">{t('details')}</h3>
                                         <div className="text-accent/80 text-sm">
-                                            <div><span className="font-medium text-accent">Type:</span> {bookingPayment.type}</div>
+                                            <div><span className="font-medium text-accent">{t('type')}:</span> {bookingPayment.type}</div>
                                             {bookingPayment.display?.phone_model && (
-                                                <div><span className="font-medium text-accent">Model:</span> {bookingPayment.display.phone_model}</div>
+                                                <div><span className="font-medium text-accent">{t('model')}:</span> {bookingPayment.display.phone_model}</div>
                                             )}
                                             {bookingPayment.display?.brand && (
-                                                <div><span className="font-medium text-accent">Brand:</span> {bookingPayment.display.brand}</div>
+                                                <div><span className="font-medium text-accent">{t('brand')}:</span> {bookingPayment.display.brand}</div>
                                             )}
                                         </div>
                                     </div>
 
                                     {Array.isArray(bookingPayment.items) && bookingPayment.items.length > 0 && (
                                         <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4">
-                                            <h3 className="text-lg font-semibold text-accent mb-3">Items</h3>
+                                            <h3 className="text-lg font-semibold text-accent mb-3">{t('items')}</h3>
                                             <div className="space-y-2">
                                                 {bookingPayment.items.map((item, idx) => (
                                                     <div key={idx} className="flex justify-between items-center p-3 bg-white/5 rounded">
@@ -187,33 +235,33 @@ export default function BookingPage() {
 
                                 <div className="lg:col-span-1">
                                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-accent/20 sticky top-8">
-                                        <h3 className="text-lg font-semibold text-accent mb-4">Order Summary</h3>
+                                        <h3 className="text-lg font-semibold text-accent mb-4">{t('orderSummary')}</h3>
                                         <div className="space-y-3 mb-6 text-accent">
                                             <div className="flex justify-between">
-                                                <span>Subtotal</span>
+                                                <span>{t('subtotal')}</span>
                                                 <span>{(bookingPayment.summary?.subtotal ?? bookingPayment.amount ?? 0).toFixed(2)}</span>
                                             </div>
                                             {bookingPayment.summary?.itemDiscount > 0 && (
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>Item Discount</span>
+                                                    <span>{t('itemDiscount')}</span>
                                                     <span>-{bookingPayment.summary.itemDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
                                             {bookingPayment.summary?.websiteDiscount > 0 && (
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>Website Discount</span>
+                                                    <span>{t('websiteDiscount')}</span>
                                                     <span>-{bookingPayment.summary.websiteDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
                                             {bookingPayment.summary?.shippingCost > 0 && (
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>Shipping Cost</span>
+                                                    <span>{t('shippingCost')}</span>
                                                     <span>{bookingPayment.summary.shippingCost.toFixed(2)}</span>
                                                 </div>
                                             )}
                                             <div className="border-t border-accent/20 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
-                                                    <span>Total</span>
+                                                    <span>{t('total')}</span>
                                                     <span>{currency} {amount.toFixed(2)}</span>
                                                 </div>
                                             </div>
@@ -221,7 +269,12 @@ export default function BookingPage() {
 
                                         {clientSecret && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
                                             <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
-                                                <CheckoutForm clientSecret={clientSecret} amount={amount} currency={currency} />
+                                                <CheckoutForm 
+                                                    clientSecret={clientSecret} 
+                                                    amount={amount} 
+                                                    currency={currency}
+                                                    bookingPayment={bookingPayment}
+                                                />
                                             </Elements>
                                         ) : (
                                             <CustomButton disabled className="w-full bg-secondary text-primary/60 py-3 opacity-60">Loading Payment</CustomButton>

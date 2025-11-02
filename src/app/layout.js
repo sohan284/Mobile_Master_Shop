@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import ClientLayout from "./components/ClientLayout";
 import QueryProvider from "../../providers/QueryProvider";
 import SafeDOMPatch from "@/components/SafeDOMPatch";
+import NextIntlClientProviderWrapper from "@/components/NextIntlClientProviderWrapper";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -30,12 +31,13 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
         className={`${roboto.variable} ${nunito.variable} antialiased`}
       >
-        <QueryProvider>
-          <AuthProvider>
-            <SafeDOMPatch />
-            <ClientLayout>
-              {children}
-            </ClientLayout>
+        <NextIntlClientProviderWrapper>
+          <QueryProvider>
+            <AuthProvider>
+              <SafeDOMPatch />
+              <ClientLayout>
+                {children}
+              </ClientLayout>
             <Toaster
               position="top-right"
               toastOptions={{
@@ -66,8 +68,9 @@ export default function RootLayout({ children }) {
                 },
               }}
             />
-          </AuthProvider>
-        </QueryProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </NextIntlClientProviderWrapper>
       </body>
     </html>
   );

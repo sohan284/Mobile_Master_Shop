@@ -12,8 +12,10 @@ import AuthModal from '@/components/AuthModal';
 import { Home, ShoppingCart, Settings } from 'lucide-react';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export default function AccessoryBreakdownPage({ params }) {
+  const t = useTranslations('accessories');
   const { id } = use(params);
   const router = useRouter();
   const { isAuthenticated, user } = useAuth();
@@ -52,13 +54,13 @@ export default function AccessoryBreakdownPage({ params }) {
         const data = res?.data || res;
         setPriceData(data);
       } catch (e) {
-        setError('Failed to calculate price');
+        setError(t('failedToCalculatePrice'));
       } finally {
         setIsLoading(false);
       }
     };
     calc();
-  }, [id, accessory?.quantity, accessory?.id]);
+  }, [id, accessory?.quantity, accessory?.id, t]);
 
   const quantity = accessory?.quantity || 1;
   const unitPrice = parseFloat(accessory?.final_price || '0');
@@ -127,7 +129,7 @@ export default function AccessoryBreakdownPage({ params }) {
       if (enc) sessionStorage.setItem('bkp', enc);
       router.push('/booking');
     } catch (e) {
-      setError('Failed to create accessory order. Please try again.');
+      setError(t('failedToCreateOrder'));
     }
   };
 
@@ -157,7 +159,7 @@ export default function AccessoryBreakdownPage({ params }) {
       <PageTransition>
         <div className="min-h-screen relative overflow-hidden bg-primary">
           <div className="container mx-auto px-4 py-8 text-center text-accent/80">
-            Accessory not found.
+            {t('accessoryNotFound')}
           </div>
         </div>
       </PageTransition>
@@ -180,7 +182,7 @@ export default function AccessoryBreakdownPage({ params }) {
                 className="mb-6"
               />
 
-              <h2 className="text-2xl font-bold text-secondary mb-6">Order Breakdown</h2>
+              <h2 className="text-2xl font-bold text-secondary mb-6">{t('orderBreakdown')}</h2>
 
               <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
                 <div className="flex items-center">
@@ -191,7 +193,7 @@ export default function AccessoryBreakdownPage({ params }) {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg text-accent">{accessory.title}</h3>
-                    <p className="text-accent/80">Quantity: {quantity}</p>
+                    <p className="text-accent/80">{t('quantity')}: {quantity}</p>
                   </div>
                 </div>
               </div>
@@ -201,13 +203,13 @@ export default function AccessoryBreakdownPage({ params }) {
               )}
 
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-accent mb-4">Selected Items</h3>
+                <h3 className="text-lg font-semibold text-accent mb-4">{t('selectedItems')}</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
                     <div>
                       <h4 className="font-medium text-accent">{accessory.title}</h4>
-                      <p className="text-sm text-accent/80">Unit Price: <span className="font-medium">€{unitPrice.toFixed(2)}</span></p>
-                      <p className="text-sm text-accent/80">Quantity: <span className="font-medium">{quantity}</span></p>
+                      <p className="text-sm text-accent/80">{t('unitPrice')}: <span className="font-medium">€{unitPrice.toFixed(2)}</span></p>
+                      <p className="text-sm text-accent/80">{t('quantity')}: <span className="font-medium">{quantity}</span></p>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold text-secondary">€{(unitPrice * quantity).toFixed(2)}</div>
@@ -219,40 +221,40 @@ export default function AccessoryBreakdownPage({ params }) {
               <div className="border-t border-accent/20 pt-6">
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-accent/80">Subtotal:</span>
+                    <span className="text-accent/80">{t('subtotal')}:</span>
                     <span className="font-medium text-accent">€{subtotal.toFixed(2)}</span>
                   </div>
                   {itemDiscount > 0 && (
                     <div className="flex justify-between text-secondary">
-                      <span>Item Discount:</span>
+                      <span>{t('itemDiscount')}:</span>
                       <span>-€{itemDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span className="text-accent/80">Price after item discount:</span>
+                    <span className="text-accent/80">{t('priceAfterItemDiscount')}:</span>
                     <span className="font-medium text-accent">€{priceAfterItemDiscount.toFixed(2)}</span>
                   </div>
                   {websiteDiscount > 0 && (
                     <div className="flex justify-between text-secondary">
-                      <span>Website Discount:</span>
+                      <span>{t('websiteDiscount')}:</span>
                       <span>-€{websiteDiscount.toFixed(2)}</span>
                     </div>
                   )}
                   {shippingCost > 0 && (
                     <div className="flex justify-between text-secondary">
-                      <span>Shipping Cost:</span>
+                      <span>{t('shippingCost')}:</span>
                       <span>€{shippingCost.toFixed(2)}</span>
                     </div>
                   )}
                   <div className="border-t border-accent/20 pt-3">
                     <div className="flex justify-between text-lg font-bold">
-                      <span className="text-accent">Total Amount:</span>
+                      <span className="text-accent">{t('totalAmount')}:</span>
                       <span className="text-secondary">€{totalAmount.toFixed(2)}</span>
                     </div>
                   </div>
                   {totalDiscount > 0 && (
                     <div className="text-center text-secondary font-medium">
-                      You saved €{totalDiscount.toFixed(2)}!
+                      {t('youSaved', { amount: totalDiscount.toFixed(2) })}
                     </div>
                   )}
                 </div>
@@ -263,10 +265,10 @@ export default function AccessoryBreakdownPage({ params }) {
           <MotionFade delay={0.2} immediate={true}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <CustomButton onClick={handleBack} className="bg-accent/20 text-accent hover:bg-accent/30 px-8 py-3">
-                ← Back to Product
+                {t('backToProduct')}
               </CustomButton>
               <CustomButton onClick={handleProceedToBooking} className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3">
-                Proceed to Booking →
+                {t('proceedToBooking')}
               </CustomButton>
             </div>
           </MotionFade>
