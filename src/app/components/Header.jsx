@@ -14,7 +14,6 @@ import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
 import { useAuth } from "@/contexts/AuthContext";
 import CartIcon from "@/components/accessories/CartIcon";
-import Language from "@/components/Language";
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
