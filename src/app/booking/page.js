@@ -8,11 +8,12 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/navigation';
 import { decryptBkp } from '@/lib/utils';
+import { apiFetcher } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
-function CheckoutForm({ clientSecret, amount, currency }) {
+function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -40,22 +41,67 @@ function CheckoutForm({ clientSecret, amount, currency }) {
             return;
         }
 
-        // Payment successful - redirect to orders page
+        // Payment successful - confirm payment with backend API
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            toast.success('Payment confirmed successfully!', {
-                duration: 3000,
-                position: 'top-right',
-            });
-            sessionStorage.removeItem('bkp');
-            // Small delay to show the toast before redirecting
-            setTimeout(() => {
-                router.push('/orders');
-            }, 1500);
+            try {
+                // Determine API endpoint based on booking type
+                const orderId = bookingPayment?.orderId;
+                let confirmPaymentEndpoint;
+
+                if (!orderId) {
+                    throw new Error('Order ID not found');
+                }
+
+                if (bookingPayment?.type === 'repair') {
+                    confirmPaymentEndpoint = `/api/repair/orders/${orderId}/confirm_payment/`;
+                } else if (bookingPayment?.type === 'phone') {
+                    confirmPaymentEndpoint = `/api/brandnew/orders/${orderId}/confirm_payment/`;
+                } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                    confirmPaymentEndpoint = `/api/accessories/orders/${orderId}/confirm_payment/`;
+                } else {
+                    throw new Error(`Unknown booking type: ${bookingPayment?.type}`);
+                }
+
+                // Call payment confirmation API
+                await apiFetcher.post(confirmPaymentEndpoint, {
+                    payment_intent_id: paymentIntent.id
+                });
+
+                toast.success('Payment confirmed successfully!', {
+                    duration: 3000,
+                    position: 'top-right',
+                });
+                
+                // Clear booking data
+                sessionStorage.removeItem('bkp');
+                localStorage.removeItem('bkp');
+                localStorage.removeItem('bookingPayment');
+                sessionStorage.removeItem('bookingPayment');
+
+                // Small delay to show the toast before redirecting
+                setTimeout(() => {
+                    router.push('/orders');
+                }, 1500);
+                // Don't set submitting to false here - we're redirecting
+                return;
+            } catch (error) {
+                console.error('Payment confirmation API error:', error);
+                toast.error(
+                    error?.response?.data?.message || 
+                    error?.message || 
+                    'Payment succeeded but confirmation failed. Please contact support.',
+                    {
+                        duration: 5000,
+                        position: 'top-right',
+                    }
+                );
+                setSubmitting(false);
+                return;
+            }
         } else {
             setMessage('Payment processing...');
+            setSubmitting(false);
         }
-
-        setSubmitting(false);
     };
 
     return (
@@ -221,7 +267,12 @@ export default function BookingPage() {
 
                                         {clientSecret && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
                                             <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
-                                                <CheckoutForm clientSecret={clientSecret} amount={amount} currency={currency} />
+                                                <CheckoutForm 
+                                                    clientSecret={clientSecret} 
+                                                    amount={amount} 
+                                                    currency={currency}
+                                                    bookingPayment={bookingPayment}
+                                                />
                                             </Elements>
                                         ) : (
                                             <CustomButton disabled className="w-full bg-secondary text-primary/60 py-3 opacity-60">Loading Payment</CustomButton>

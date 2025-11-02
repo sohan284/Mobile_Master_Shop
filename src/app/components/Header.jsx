@@ -124,7 +124,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`bg-primary text-secondary w-full pt-4 pb-2 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        className={`bg-primary text-secondary w-full pt-4 pb-1 z-50 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] sticky top-0  ${isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
           }`}
       >
         <div className="container  mx-auto px-4 sm:px-6 lg:px-8 flex flex-col space-y-3 md:space-y-4 items-center lg:justify-center relative z-10">
@@ -334,9 +334,7 @@ export default function Header() {
                   >
                     Contact
                   </Link>
-                  <div className="flex items-center space-x-4">
-                    <Language />
-                  </div>
+                 
                 </div>
 
 

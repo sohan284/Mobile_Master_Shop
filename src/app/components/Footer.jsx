@@ -21,8 +21,6 @@ const storesLinks = [
 const usefulLinks = [
     { href: "/terms-and-conditions", text: "Terms and Conditions" },
     { href: "/privacy-policy", text: "Privacy Policy" },
-    { href: "/refund-return-policy", text: "Refund / Return Policy" },
-    { href: "/api-terms-of-use", text: "API Terms of Use" },
     { href: "/contact", text: "Contact Us" },
 ];
 
