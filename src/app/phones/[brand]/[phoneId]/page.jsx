@@ -233,16 +233,16 @@ export default function PhoneIndividualPage({ params }) {
                  {/* Pricing */}
                  <div className="">
                   <div className="text-3xl font-bold text-secondary">
-                    ${parseFloat(phone.final_price).toLocaleString()}
+                   {t('price')}: €{parseFloat(phone.final_price).toLocaleString()}
                   </div>
                   {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                    <div className="text-accent/60 line-through text-lg">
-                      ${parseFloat(phone.main_amount).toLocaleString()}
+                    <div className="text-accent/60 line-through text-xl">
+                      €{parseFloat(phone.main_amount).toLocaleString()}
                     </div>
                   )}
                   {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                    <div className="text-secondary text-sm">
-                      {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                    <div className="text-green-500 text-sm">
+                      {parseFloat(phone.discount_percentage).toFixed(1)}% {t('off')}
                     </div>
                   )}
                 </div>

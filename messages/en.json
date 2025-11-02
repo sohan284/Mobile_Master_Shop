@@ -291,7 +291,9 @@
     "phoneNotFoundError": "Phone not found.",
     "failedToCalculatePrice": "Failed to calculate price",
     "failedToCreateOrder": "Failed to create phone order. Please try again.",
-    "browseAllBrands": "Browse All Brands"
+    "browseAllBrands": "Browse All Brands",
+    "price": "Price",
+    "off": "off"
   },
   "accessories": {
     "premiumAccessories": "Premium Accessories",
