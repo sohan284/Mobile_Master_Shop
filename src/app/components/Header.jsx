@@ -14,7 +14,6 @@ import Image from "next/image";
 import logo from "@/assets/logoMlk.png";
 import { useAuth } from "@/contexts/AuthContext";
 import CartIcon from "@/components/accessories/CartIcon";
-import Language from "@/components/Language";
 
 export default function Header() {
   const [isVisible, setIsVisible] = useState(true);
@@ -233,9 +232,6 @@ export default function Header() {
             <Link href="/contact" className="hover:underline hover:text-white transition">
               Contact
             </Link>
-            <div className="flex items-center space-x-4 relative">
-              <Language />
-            </div>
             {/* Cart and User */}
             <div className="flex items-center space-x-4">
               {/* <CartIcon /> */}
@@ -338,9 +334,6 @@ export default function Header() {
                   >
                     Contact
                   </Link>
-                  <div className="flex items-center space-x-4">
-                    <Language />
-                  </div>
                   {/* User Menu in Mobile */}
                   {isAuthenticated() && (
                     <div className="flex flex-col space-y-2 pt-4 border-t border-secondary/20">

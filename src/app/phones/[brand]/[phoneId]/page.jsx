@@ -65,10 +65,26 @@ export default function PhoneIndividualPage({ params }) {
     return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
   };
 
+  // Helper function to get initial color from sessionStorage
+  const getInitialColor = (id) => {
+    if (typeof window !== 'undefined' && id) {
+      try {
+        const raw = sessionStorage.getItem('selectedPhone');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && String(parsed.id) === String(id) && parsed.color) {
+            return parsed.color;
+          }
+        }
+      } catch {}
+    }
+    return null;
+  };
+
   // Update the state to include pricing
   const [selectedOptions, setSelectedOptions] = useState({
     storage: "256GB",
-    color: "Black",
+    color: getInitialColor(phoneId),
     condition: "Perfect condition",
     pricing: {
       price: "€239.90",
@@ -78,10 +94,14 @@ export default function PhoneIndividualPage({ params }) {
 
   // Ensure initial selected color is first available color (must be before any early returns)
   useEffect(() => {
-    if (phone?.colors?.length && !selectedOptions.color) {
-      setSelectedOptions(prev => ({ ...prev, color: phone.colors[0].name }));
+    if (phone?.colors?.length) {
+      // If no color is selected, or the selected color doesn't exist in available colors, set to first color
+      const availableColorNames = phone.colors.map(c => c.name);
+      if (!selectedOptions.color || !availableColorNames.includes(selectedOptions.color)) {
+        setSelectedOptions(prev => ({ ...prev, color: phone.colors[0].name }));
+      }
     }
-  }, [phone?.colors, selectedOptions.color]);
+  }, [phone?.colors]);
 
   // Save phone data to sessionStorage
   useEffect(() => {
@@ -104,27 +124,6 @@ export default function PhoneIndividualPage({ params }) {
     }
   }, [phone, phoneId, quantity, selectedOptions.color]);
 
-  // Handler for option selection
-  const handleOptionSelect = (category, option) => {
-    setSelectedOptions(prev => {
-      const newState = {
-        ...prev,
-        [category]: typeof option === 'object' ? option.name : option
-      };
-
-      // Update pricing when condition changes
-      if (category === 'condition') {
-        const selectedCondition = motorolaEdge50FusionData.selections.condition.options.find(
-          opt => opt.name === option.name
-        );
-        if (selectedCondition) {
-          newState.pricing = selectedCondition.pricing;
-        }
-      }
-
-      return newState;
-    });
-  };
 
   const handleProceedToCheckout = () => {
     router.push(`/phones/${brand}/${phoneId}/breakdown`);
@@ -179,20 +178,6 @@ export default function PhoneIndividualPage({ params }) {
     );
   }
 
-  // Mock data for features and sections (you can replace with API data later)
-  const features = [
-    {
-      icon: "Check",
-      text: "Guarantee",
-      value: "2 years"
-    },
-    {
-      icon: "Pay10",
-      text: "Payment in",
-      value: "10 times interest-free"
-    }
-  ];
-
   const availability = {
     title: `Your ${phone.name} is available at`,
     store: {
@@ -209,46 +194,6 @@ export default function PhoneIndividualPage({ params }) {
     }
   };
 
-  const refurbishmentProcess = {
-    title: `At Save, every ${phone.name} goes through a meticulous process to ensure optimal quality and performance.`,
-    steps: [
-      {
-        number: 1,
-        title: "Initial Inspection",
-        description: `Every ${phone.name} undergoes a thorough inspection. Our qualified technicians assess the overall condition of the phone, including checking the screen, chassis, battery, internal components, and features.`
-      },
-      {
-        number: 2,
-        title: "Diagnosis and Testing",
-        description: `After the initial inspection, the ${phone.name} undergoes a comprehensive diagnosis. We use specialized tools to evaluate the phone's performance, testing all its features, including the camera, touch, network connectivity, and sensors.`
-      },
-      {
-        number: 3,
-        title: "Repair and Replacement of Parts",
-        description: "Once the problems are identified, our team of experienced technicians will carry out the necessary repairs. Defective parts will be replaced with original parts or parts of equivalent quality."
-      },
-      {
-        number: 4,
-        title: "Grade Definition",
-        description: `When its repair is complete, our expert technicians define the grade of the refurbished ${phone.name} according to the following criteria:`,
-        criteria: [
-          "Grade A: The product is in excellent condition and its performance is equivalent to a new product.",
-          "Grade B: The product is in good condition, but may show some barely visible micro-scratches.",
-          "Grade C: the product is perfectly functional but shows more visible signs of wear such as scratches or micro-impacts."
-        ]
-      },
-      {
-        number: 5,
-        title: "Deep Cleaning",
-        description: `After repairs, the ${phone.name} undergoes a deep cleaning process. All traces of dirt, dust, and residue are removed, ensuring a flawless aesthetic appearance.`
-      },
-      {
-        number: 6,
-        title: "Final Test and Certification",
-        description: `Before being put on sale, each refurbished ${phone.name} undergoes a final quality test. We ensure that all the phone's features work perfectly and that its performance meets SAVE's high standards.`
-      }
-    ]
-  };
 
   // Determine if description has actual content (not just empty tags)
   const hasDescription = Boolean(
@@ -358,12 +303,12 @@ export default function PhoneIndividualPage({ params }) {
                     <h3 className="font-semibold text-accent">Choose the color</h3>
                     <div className="flex flex-wrap gap-2">
                       {(phone.colors || []).map((color) => {
-                        const isSelected = (selectedOptions.color || phone.colors?.[0]?.name) === color.name;
+                        const isSelected = selectedOptions.color === color.name;
                         return (
                           <button
                             key={color.name}
                             onClick={() => setSelectedOptions(prev => ({ ...prev, color: color.name }))}
-                            className={`px-3 py-2 rounded-full border transition-all duration-200 flex items-center gap-2 ${
+                            className={`px-3 py-2 cursor-pointer rounded-full border transition-all duration-200 flex items-center gap-2 ${
                               isSelected
                                 ? 'bg-secondary text-primary border-secondary hover:shadow-md'
                                 : 'border-accent/30 text-accent hover:shadow-md'
@@ -414,33 +359,6 @@ export default function PhoneIndividualPage({ params }) {
                 )}
               </div>
             </div>
-          </MotionFade>
-
-          {/* Refurbishment Process */}
-          <MotionFade delay={0.3} immediate={true}>
-            <section className="my-16">
-              <h2 className="text-2xl font-bold mb-8 text-secondary">{refurbishmentProcess.title}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {refurbishmentProcess.steps.map((step) => (
-                  <div key={step.number} className="bg-white/10 backdrop-blur-sm border border-accent/20 rounded-lg p-6">
-                    <div className="text-2xl font-bold text-secondary mb-4">
-                      Step {step.number}
-                    </div>
-                    <h3 className="font-semibold mb-2 text-accent">{step.title}</h3>
-                    <p className="text-accent/80">{step.description}</p>
-                    {step.criteria && (
-                      <ul className="mt-4 space-y-2">
-                        {step.criteria.map((criterion, index) => (
-                          <li key={index} className="text-sm text-accent/80">
-                            • {criterion}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
           </MotionFade>
 
           {/* Reviews Section */}

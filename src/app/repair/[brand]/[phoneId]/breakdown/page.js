@@ -421,11 +421,11 @@ export default function PriceBreakdownPage({ params }) {
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="text-lg font-bold text-secondary">
-                                                        {parseFloat(item.final_price).toFixed(2)}
+                                                        €{parseFloat(item.final_price).toFixed(2)}
                                                     </div>
                                                     {parseFloat(item.discount) > 0 && (
                                                         <div className="text-sm text-secondary/80">
-                                                            -{parseFloat(item.discount).toFixed(2)} discount
+                                                            -€{parseFloat(item.discount).toFixed(2)} discount
                                                         </div>
                                                     )}
                                                 </div>
@@ -439,44 +439,44 @@ export default function PriceBreakdownPage({ params }) {
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
                                             <span className="text-accent/80">Subtotal:</span>
-                                            <span className="font-medium text-accent">{parseFloat(priceData.subtotal).toFixed(2)}</span>
+                                            <span className="font-medium text-accent">€{parseFloat(priceData.subtotal).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.item_discount) > 0 && (
                                             <div className="flex justify-between text-secondary">
                                                 <span>Item Discount:</span>
-                                                <span>-{parseFloat(priceData.item_discount).toFixed(2)}</span>
+                                                <span>-€{parseFloat(priceData.item_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
                                         <div className="flex justify-between">
                                             <span className="text-accent/80">Price after item discount:</span>
-                                            <span className="font-medium text-accent">{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
+                                            <span className="font-medium text-accent">€{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.website_discount) > 0 && (
                                             <div className="flex justify-between text-secondary">
                                                 <span>Website Discount ({priceData.website_discount_percentage}%):</span>
-                                                <span>-{parseFloat(priceData.website_discount).toFixed(2)}</span>
+                                                <span>-€{parseFloat(priceData.website_discount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         {parseFloat(priceData.website_discount_amount) > 0 && (
                                             <div className="flex justify-between text-secondary">
                                                 <span>Website Discount Amount:</span>
-                                                <span>-{parseFloat(priceData.website_discount_amount).toFixed(2)}</span>
+                                                <span>-€{parseFloat(priceData.website_discount_amount).toFixed(2)}</span>
                                             </div>
                                         )}
                                         
                                         <div className="border-t border-accent/20 pt-3">
                                             <div className="flex justify-between text-lg font-bold">
                                                 <span className="text-accent">Total Amount:</span>
-                                                <span className="text-secondary">{parseFloat(priceData.total_amount).toFixed(2)}</span>
+                                                <span className="text-secondary">€{parseFloat(priceData.total_amount).toFixed(2)}</span>
                                             </div>
                                         </div>
                                         
                                         {parseFloat(priceData.total_discount) > 0 && (
                                             <div className="text-center text-secondary font-medium">
-                                                You saved {parseFloat(priceData.total_discount).toFixed(2)}!
+                                                You saved €{parseFloat(priceData.total_discount).toFixed(2)}!
                                             </div>
                                         )}
                                     </div>
