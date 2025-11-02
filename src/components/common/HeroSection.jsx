@@ -95,7 +95,7 @@ export default function HeroSection({
   );
 
   return (
-    <div className="relative mb-20">
+    <div className="relative">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
         {layout === "image-left" ? (
           <>

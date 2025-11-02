@@ -176,7 +176,7 @@ export default function ContactPage() {
             <button
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="cursor-pointer w-full px-8 py-3 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu active:scale-95"
+              className="cursor-pointer w-full px-8 py-3 bg-white/90 text-slate-900 hover:text-white font-semibold rounded-lg hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transform-gpu active:scale-95"
             >
               {isSubmitting ? (
                 'Sending...'
@@ -199,8 +199,8 @@ export default function ContactPage() {
               const Icon = info.icon;
               return (
                 <div key={info.title} className="flex flex-col items-center text-center group">
-                  <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-amber-500/10 transition-colors duration-200 mb-3 transform-gpu group-hover:scale-105">
-                    <Icon className="w-6 h-6 text-amber-500" />
+                  <div className="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center group-hover:bg-white/15 transition-colors duration-200 mb-3 transform-gpu group-hover:scale-105">
+                    <Icon className="w-6 h-6 text-secondary" />
                   </div>
                   <h3 className="font-semibold text-white mb-1 text-sm">
                     {info.title}

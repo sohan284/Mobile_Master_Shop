@@ -164,7 +164,7 @@ export default function AccessoriesPage() {
                 <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
                   <div className="p-6 text-center h-full flex flex-col">
                     {/* Image container with hover effect */}
-                    <div className="mb-6 bg-white backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
+                    <div className="mb-6 bg-white/40 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
                       <Image
                         src={item.picture || '/Accessories.png'}
                         alt={item.title}
