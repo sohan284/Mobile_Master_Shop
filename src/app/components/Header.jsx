@@ -231,9 +231,7 @@ export default function Header() {
               <Link href="/contact" className="hover:underline hover:text-white transition">
                 Contact
               </Link>
-              <div className="flex items-center space-x-4 relative">
-                <Language />
-              </div>
+           
               {/* Cart and User */}
               <div className="flex items-center space-x-4">
                 {/* <CartIcon /> */}

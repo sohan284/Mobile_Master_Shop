@@ -115,8 +115,8 @@ export default function ReviewsSection({
       <section className="my-16">
         <div className=" gap-6">
           {/* Main Reviews Section */}
-          <div className=" bg-white/10 backdrop-blur-sm rounded-2xl border border-accent/20 p-6 md:p-8">
-            <div className={showReviewForm ? 'grid grid-cols-1 md:grid-cols-2 gap-8' : ''}>
+          <div className=" bg-white/10 backdrop-blur-sm rounded-2xl border border-accent/20 p-6 md:p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className={showReviewForm ? 'grid grid-cols-1 md:grid-cols-2 gap-8 col-span-1 mt-8' : 'mt-10'}>
               <div>
                 <h2 className="text-2xl font-bold mb-6 text-secondary">Reviews</h2>
                 {/* Overall Rating */}
@@ -239,7 +239,7 @@ export default function ReviewsSection({
             </div>
 
             {/* Individual Reviews List */}
-            <div className="space-y-6">
+            <div className="space-y-6 col-span-2">
               {isLoading ? (
                 <div className="flex justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
