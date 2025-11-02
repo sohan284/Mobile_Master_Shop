@@ -1,11 +1,7 @@
 "use client";
 import React from 'react';
-import MotionFade from '@/components/animations/MotionFade';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import HeroSection from '@/components/common/HeroSection';
-import FeaturesSection from '@/components/common/FeaturesSection';
-import CTASection from '@/components/common/CTASection';
 import Image from 'next/image'; 
 import { CustomButton } from '@/components/ui/button';
 import { Award, Clock, ShieldCheck, Wrench } from 'lucide-react';
@@ -143,7 +139,7 @@ export default function Repair() {
                         <p className="text-gray-300 max-w-2xl mx-auto">Professional repairs for all your device needs with premium parts and expert service.</p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                         {repairServices.map((service, idx) => (
                          <motion.div
                          key={service.id}
@@ -239,7 +235,7 @@ export default function Repair() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-6 lg:gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
         {features.map((feature, index) => {
           const Icon = feature.icon;
           return (

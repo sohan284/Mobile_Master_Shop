@@ -46,7 +46,7 @@ export default function PhonesPage() {
     <>
       {/* ✅ PageTransition handles route changes only */}
       <PageTransition>
-        <div className="min-h-screen relative overflow-hidden bg-primary text-secondary">
+        <div className="relative overflow-hidden bg-primary text-secondary">
           <div className="container mx-auto px-4 py-8">
 
             {/* ✅ Memoized HeroSection */}

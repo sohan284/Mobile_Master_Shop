@@ -312,7 +312,7 @@ export default function BrandPage({ params }) {
                 <GridSection
                   items={filteredPhones}
                   isLoading={false}
-                  gridCols="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                  gridCols="grid-cols-2 lg:grid-cols-4"
                   renderItem={(phone, index) => (
                     <Link href={`/phones/${brand}/${phone.id}`} key={phone.id}>
                       <MotionFade delay={0.3 + index * 0.1} immediate={true}>

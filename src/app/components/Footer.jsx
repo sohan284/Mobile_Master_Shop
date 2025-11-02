@@ -29,7 +29,7 @@ const usefulLinks = [
 export default function Footer() {
     return (
         <footer className="bg-primary text-secondary py-10 px-6 md:px-20 relative overflow-hidden">
-            <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+            <div className="container mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
                 <FooterColumn title="Repair" links={repairLinks} />
                 <FooterColumn title="Services" links={servicesLinks} />
                 <FooterColumn title="Our Stores" links={storesLinks} />
