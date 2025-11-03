@@ -24,9 +24,9 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, params }) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body
         suppressHydrationWarning
         className={`${roboto.variable} ${nunito.variable} antialiased`}
