@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { Calendar, Clock } from 'lucide-react';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51SKt7eIzTYoXma53SGBAyxwQuu3rWCWKF1b73aSuCmAdePLZTJHybIrnNNLqaeLNkqDyuURchGShP1Nd3iwIt0TH008bzQlKpY');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
 function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
     const stripe = useStripe();
