@@ -11,24 +11,91 @@ import {  Settings, Save, RefreshCw, Smartphone, ShoppingBag } from 'lucide-reac
 import toast from 'react-hot-toast';
 import { apiFetcher } from '@/lib/api';
 
+// Move DiscountCard outside to prevent re-creation on each render
+const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isLoading, isSaving, onUpdate, discountSettings, updateDiscountSetting }) => (
+  <Card>
+    <CardHeader className="p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Icon className={`h-5 w-5 ${iconColor}`} />
+          <div>
+            <CardTitle className="text-base">{title}</CardTitle>
+            <CardDescription className="text-xs mt-0.5">{description}</CardDescription>
+          </div>
+        </div>
+        <Button
+          onClick={onUpdate}
+          disabled={isSaving || isLoading}
+          size="sm"
+          className="h-8 px-3 text-secondary cursor-pointer"
+        >
+          <Save className="h-3.5 w-3.5 mr-1.5" />
+          {isSaving ? 'Saving...' : 'Save'}
+        </Button>
+      </div>
+    </CardHeader>
+    <CardContent className="p-4 pt-0">
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-3">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-full" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="relative">
+            <Input
+              type="number"
+              value={discountSettings[category].percentage}
+              onChange={(e) => updateDiscountSetting(category, 'percentage', e.target.value)}
+              placeholder="Percentage"
+              min="0"
+              step="0.01"
+              className="h-9 pr-7"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+          </div>
+          <div className="relative">
+            <Input
+              type="number"
+              value={discountSettings[category].amount || ''}
+              onChange={(e) => updateDiscountSetting(category, 'amount', e.target.value)}
+              onBlur={(e) => {
+                // Set to 0 if empty on blur
+                if (!e.target.value || e.target.value.trim() === '') {
+                  updateDiscountSetting(category, 'amount', '0');
+                }
+              }}
+              placeholder="Amount"
+              min="0"
+              step="0.01"
+              className="h-9 pr-7"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
+          </div>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+);
+
 export default function GlobalDiscountPage() {
   const [discountSettings, setDiscountSettings] = useState({
     repairServices: {
       id: null,
       percentage: '',
-      amount: '',
+      amount: '0',
       is_active: true
     },
     newPhones: {
       id: null,
       percentage: '',
-      amount: '',
+      amount: '0',
       is_active: true
     },
     accessories: {
       id: null,
       percentage: '',
-      amount: '',
+      amount: '0',
       is_active: true
     }
   });
@@ -59,10 +126,10 @@ export default function GlobalDiscountPage() {
         setDiscountSettings(prev => ({
           ...prev,
           repairServices: {
-            id: repairResponse[0]?.id,
-            percentage: repairResponse[0]?.percentage || '',
-            amount: repairResponse[0]?.amount || '',
-            is_active: repairResponse[0]?.is_active || true
+            id: repairResponse?.data[0]?.id,
+            percentage: repairResponse?.data[0]?.percentage || '',
+            amount: repairResponse?.data[0]?.amount || '',
+            is_active: repairResponse?.data[0]?.is_active || true
           }
         }));
       }
@@ -81,11 +148,7 @@ export default function GlobalDiscountPage() {
             is_active: newPhonesResponse?.data[0]?.is_active
           }
         }));
-        console.log('Updated new phones state:', {
-          id: newPhonesResponse?.data[0]?.id,
-          percentage: newPhonesResponse?.data[0]?.percentage,
-          amount: newPhonesResponse?.data[0]?.amount
-        });
+   
       }
       setIsLoadingNewPhones(false);
 
@@ -115,14 +178,38 @@ export default function GlobalDiscountPage() {
     }
   };
 
+  const validateAndPrepareData = (category) => {
+    const data = discountSettings[category];
+    
+    // Check if percentage is empty
+    if (!data.percentage || data.percentage.trim() === '') {
+      toast.error(`${category === 'repairServices' ? 'Repair Services' : category === 'newPhones' ? 'New Phones' : 'Accessories'}: Percentage field cannot be empty`);
+      return null;
+    }
+    
+    // Set amount to 0 if empty
+    const amount = (!data.amount || data.amount.trim() === '') ? '0' : data.amount;
+    
+    return {
+      percentage: parseFloat(data.percentage) || 0,
+      amount: parseFloat(amount) || 0
+    };
+  };
+
   const handleUpdateRepairServices = async () => {
+    const validatedData = validateAndPrepareData('repairServices');
+    if (!validatedData) {
+      return;
+    }
+
     setIsSavingRepairServices(true);
     try {
       if (discountSettings.repairServices?.id) {
-        await apiFetcher.patch(`/api/repair/discounts/${discountSettings.repairServices?.id}/`, {
-          percentage: discountSettings.repairServices.percentage,
-          amount: discountSettings.repairServices.amount
-        });
+        await apiFetcher.patch(`/api/repair/discount/${discountSettings.repairServices?.id}/`, validatedData);
+        // Update local state with amount set to 0 if it was empty
+        if (!discountSettings.repairServices.amount || discountSettings.repairServices.amount.trim() === '') {
+          updateDiscountSetting('repairServices', 'amount', '0');
+        }
         toast.success('Repair services discount updated successfully!');
       }
     } catch (error) {
@@ -134,14 +221,19 @@ export default function GlobalDiscountPage() {
   };
 
   const handleUpdateNewPhones = async () => {
-    console.log('Updating new phones discount:', discountSettings.newPhones);
+    const validatedData = validateAndPrepareData('newPhones');
+    if (!validatedData) {
+      return;
+    }
+
     setIsSavingNewPhones(true);
     try {
       if (discountSettings.newPhones?.id) {
-        await apiFetcher.patch(`/api/brandnew/discount/${discountSettings.newPhones?.id}/`, {
-          percentage: discountSettings.newPhones.percentage,
-          amount: discountSettings.newPhones.amount
-        });
+        await apiFetcher.patch(`/api/brandnew/discount/${discountSettings.newPhones?.id}/`, validatedData);
+        // Update local state with amount set to 0 if it was empty
+        if (!discountSettings.newPhones.amount || discountSettings.newPhones.amount.trim() === '') {
+          updateDiscountSetting('newPhones', 'amount', '0');
+        }
         toast.success('New phones discount updated successfully!');
       }
     } catch (error) {
@@ -153,14 +245,19 @@ export default function GlobalDiscountPage() {
   };
 
   const handleUpdateAccessories = async () => {
-    console.log('Updating accessories discount:', discountSettings.accessories);
+    const validatedData = validateAndPrepareData('accessories');
+    if (!validatedData) {
+      return;
+    }
+
     setIsSavingAccessories(true);
     try {
       if (discountSettings.accessories?.id) {
-        await apiFetcher.patch(`/api/accessories/discount/${discountSettings.accessories?.id}/`, {
-          percentage: discountSettings.accessories.percentage,
-          amount: discountSettings.accessories.amount
-        });
+        await apiFetcher.patch(`/api/accessories/discount/${discountSettings.accessories?.id}/`, validatedData);
+        // Update local state with amount set to 0 if it was empty
+        if (!discountSettings.accessories.amount || discountSettings.accessories.amount.trim() === '') {
+          updateDiscountSetting('accessories', 'amount', '0');
+        }
         toast.success('Accessories discount updated successfully!');
       }
     } catch (error) {
@@ -190,66 +287,6 @@ export default function GlobalDiscountPage() {
     }
     return 0;
   };
-
-  const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isLoading, isSaving, onUpdate }) => (
-    <Card>
-      <CardHeader className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon className={`h-5 w-5 ${iconColor}`} />
-            <div>
-              <CardTitle className="text-base">{title}</CardTitle>
-              <CardDescription className="text-xs mt-0.5">{description}</CardDescription>
-            </div>
-          </div>
-          <Button
-            onClick={onUpdate}
-            disabled={isSaving || isLoading}
-            size="sm"
-            className="h-8 px-3 text-secondary cursor-pointer"
-          >
-            <Save className="h-3.5 w-3.5 mr-1.5" />
-            {isSaving ? 'Saving...' : 'Save'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-9 w-full" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            <div className="relative">
-              <Input
-                type="number"
-                value={discountSettings[category].percentage}
-                onChange={(e) => updateDiscountSetting(category, 'percentage', e.target.value)}
-                placeholder="Percentage"
-                min="0"
-                step="0.01"
-                className="h-9 pr-7"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
-            </div>
-            <div className="relative">
-              <Input
-                type="number"
-                value={discountSettings[category].amount}
-                onChange={(e) => updateDiscountSetting(category, 'amount', e.target.value)}
-                placeholder="Amount"
-                min="0"
-                step="0.01"
-                className="h-9 pr-7"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="space-y-4">
@@ -283,6 +320,8 @@ export default function GlobalDiscountPage() {
         isLoading={isLoadingRepairServices}
         isSaving={isSavingRepairServices}
         onUpdate={handleUpdateRepairServices}
+        discountSettings={discountSettings}
+        updateDiscountSetting={updateDiscountSetting}
       />
 
       <DiscountCard
@@ -294,6 +333,8 @@ export default function GlobalDiscountPage() {
         isLoading={isLoadingNewPhones}
         isSaving={isSavingNewPhones}
         onUpdate={handleUpdateNewPhones}
+        discountSettings={discountSettings}
+        updateDiscountSetting={updateDiscountSetting}
       />
 
       <DiscountCard
@@ -305,6 +346,8 @@ export default function GlobalDiscountPage() {
         isLoading={isLoadingAccessories}
         isSaving={isSavingAccessories}
         onUpdate={handleUpdateAccessories}
+        discountSettings={discountSettings}
+        updateDiscountSetting={updateDiscountSetting}
       />
      </div>
     </div>

@@ -13,6 +13,8 @@ import { Home, Smartphone, Settings } from 'lucide-react';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function PhoneBreakdownPage({ params }) {
   const t = useTranslations('phones');
@@ -26,6 +28,7 @@ export default function PhoneBreakdownPage({ params }) {
   const [error, setError] = useState('');
   const [selectedColor, setSelectedColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -37,6 +40,7 @@ export default function PhoneBreakdownPage({ params }) {
           setPhone(parsed);
           setSelectedColor(parsed.selectedColor || parsed.color || null);
           setQuantity(parsed.quantity || 1);
+          setDeliveryAddress(parsed.deliveryAddress || parsed.address || '');
         }
       } catch {}
     }
@@ -69,15 +73,14 @@ console.log(selectedColor);
     calc();
   }, [phoneId, phone?.id, quantity, selectedColor, t]);
 
-  const unitPrice = parseFloat(phone?.final_price || '0');
-  // Prefer server response if available
-  const subtotal = priceData?.subtotal ? parseFloat(priceData.subtotal) : unitPrice * quantity;
-  const itemDiscount = priceData?.item_discount ? parseFloat(priceData.item_discount) : 0;
-  const priceAfterItemDiscount = priceData?.price_after_item_discount ? parseFloat(priceData.price_after_item_discount) : subtotal;
-  const websiteDiscount = priceData?.website_discount ? parseFloat(priceData.website_discount) : 0;
-  const totalAmount = priceData?.total_amount ? parseFloat(priceData.total_amount) : priceAfterItemDiscount - websiteDiscount;
-  const totalDiscount = priceData?.total_discount ? parseFloat(priceData.total_discount) : (itemDiscount + websiteDiscount);
+  // Use API response directly - don't calculate from frontend
+  const unitPrice = priceData?.unit_price ? parseFloat(priceData.unit_price) : parseFloat(phone?.final_price || '0');
+  const subtotal = priceData?.subtotal ? parseFloat(priceData.subtotal) : 0;
+  const discountPercentage = priceData?.discount_percentage ? parseFloat(priceData.discount_percentage) : 0;
+  const discountAmount = priceData?.discount_amount ? parseFloat(priceData.discount_amount) : 0;
+  const totalDiscount = priceData?.total_discount ? parseFloat(priceData.total_discount) : 0;
   const shippingCost = priceData?.shipping_cost ? parseFloat(priceData.shipping_cost) : 0;
+  const totalAmount = priceData?.total_amount ? parseFloat(priceData.total_amount) : 0;
 
   const handleBack = () => router.back();
 
@@ -95,7 +98,8 @@ console.log(selectedColor);
         customer_email: user?.email || '',
         customer_phone: user?.phone || '01788175088',
         color_id: selectedColor?.id || null,
-        shipping_address: phone?.shipping_address || 'a',
+        address: deliveryAddress || '',
+        shipping_address: phone?.shipping_address || deliveryAddress || 'a',
         city: phone?.city || 'a',
         postal_code: phone?.postal_code || 'aa',
         country: phone?.country || 'a',
@@ -122,9 +126,8 @@ console.log(selectedColor);
         client_secret: order?.payment?.client_secret || order?.payment_intent_client_secret || null,
         summary: {
           subtotal,
-          itemDiscount,
-          priceAfterItemDiscount,
-          websiteDiscount,
+          discountPercentage,
+          discountAmount,
           totalDiscount,
           shippingCost
         },
@@ -178,9 +181,9 @@ console.log(selectedColor);
   return (
     <PageTransition>
       <div className="min-h-screen relative overflow-hidden bg-primary">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-4">
           <MotionFade delay={0.1} immediate={true}>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-5 mb-4">
               <Breadcrumb
                 items={[
                   { label: 'Home', href: '/', icon: Home },
@@ -189,120 +192,167 @@ console.log(selectedColor);
                   { label: phone.name || t('phoneNotFound'), href: `/phones/${brand}/${phoneId}`, icon: Smartphone },
                   { label: 'Breakdown', icon: Settings }
                 ]}
-                className="mb-6"
+                className="mb-3"
               />
 
-              <h2 className="text-2xl font-bold text-secondary mb-6">{t('orderBreakdown')}</h2>
+              <h2 className="text-xl font-bold text-secondary mb-4">{t('orderBreakdown')}</h2>
 
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mr-4">
-                    {(() => {
-                      const imageSrc = phone.icon || phone.picture || `/SAMSUNG_GalaxyS23Ultra.png`;
-                      const getImageSrc = (src) => {
-                        if (!src) return '/SAMSUNG_GalaxyS23Ultra.png';
-                        if (src.startsWith('http')) return src;
-                        return src.startsWith('/') ? src : `/${src}`;
-                      };
-                      return (
-                        <Image 
-                          src={getImageSrc(imageSrc)} 
-                          alt={phone.name || phone.title} 
-                          width={48} 
-                          height={48} 
-                          className="rounded"
-                        />
-                      );
-                    })()}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                {/* Left Column - Product Info & Selected Items */}
+                <div className="md:col-span-2 space-y-4">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {(() => {
+                          const imageSrc = phone.icon || phone.picture || `/SAMSUNG_GalaxyS23Ultra.png`;
+                          const getImageSrc = (src) => {
+                            if (!src) return '/SAMSUNG_GalaxyS23Ultra.png';
+                            if (src.startsWith('http')) return src;
+                            return src.startsWith('/') ? src : `/${src}`;
+                          };
+                          return (
+                            <Image 
+                              src={getImageSrc(imageSrc)} 
+                              alt={phone.name || phone.title} 
+                              width={40} 
+                              height={40} 
+                              className="rounded"
+                            />
+                          );
+                        })()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base text-accent truncate">{phone.name || phone.title}</h3>
+                        <div className="flex flex-wrap gap-2 mt-1 text-xs text-accent/80">
+                          <span>{phone.brand_name || brand}</span>
+                          {selectedColor && (
+                            <>
+                              <span>•</span>
+                              <span>{t('color')}: {typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</span>
+                            </>
+                          )}
+                          <span>•</span>
+                          <span>{t('quantity')}: {quantity}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg text-accent">{phone.name || phone.title}</h3>
-                    <p className="text-accent/80">{phone.brand_name || brand}</p>
-                    {selectedColor && (
-                      <p className="text-accent/80">{t('color')}: {typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</p>
-                    )}
-                    <p className="text-accent/80">{t('quantity')}: {quantity}</p>
+
+                  {error && (
+                    <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-2 text-red-400 text-sm">{error}</div>
+                  )}
+
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                    <h3 className="text-sm font-semibold text-accent mb-2">{t('selectedItems')}</h3>
+                    <div className="flex justify-between items-center">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm text-accent">{phone.name || phone.title}</h4>
+                        <div className="flex flex-wrap gap-3 mt-1 text-xs text-accent/80">
+                          <span>{t('unitPrice')}: <span className="font-medium">€{unitPrice.toFixed(2)}</span></span>
+                          <span>•</span>
+                          <span>{t('quantity')}: <span className="font-medium">{quantity}</span></span>
+                          {selectedColor && (
+                            <>
+                              <span>•</span>
+                              <span>{t('color')}: <span className="font-medium">{typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</span></span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-base font-bold text-secondary">€{subtotal.toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                    <Label 
+                      htmlFor="deliveryAddress" 
+                      className="text-accent text-sm font-semibold mb-2 block"
+                    >
+                      {t('deliveryAddress') || 'Delivery Address'} *
+                    </Label>
+                    <Input
+                      id="deliveryAddress"
+                      type="text"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      placeholder={t('enterDeliveryAddress') || 'Enter your delivery address'}
+                      className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm transition-all duration-200 hover:bg-white/15 hover:border-accent/50 px-3 py-2 rounded-lg"
+                      required
+                    />
                   </div>
                 </div>
-              </div>
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 text-red-700">{error}</div>
-              )}
-
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-accent mb-4">{t('selectedItems')}</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                    <div>
-                      <h4 className="font-medium text-accent">{phone.name || phone.title}</h4>
-                      <p className="text-sm text-accent/80">{t('unitPrice')}: <span className="font-medium">€{unitPrice.toFixed(2)}</span></p>
-                      <p className="text-sm text-accent/80">{t('quantity')}: <span className="font-medium">{quantity}</span></p>
-                      {selectedColor && (
-                        <p className="text-sm text-accent/80">{t('color')}: <span className="font-medium">{typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</span></p>
+                {/* Right Column - Price Summary */}
+                <div className="md:col-span-1">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-accent/20 sticky top-4">
+                    <h3 className="text-sm font-semibold text-accent mb-3">{t('priceSummary')}</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-accent/80">{t('subtotal')}:</span>
+                        <span className="font-medium text-accent">€{subtotal.toFixed(2)}</span>
+                      </div>
+                      
+                      {discountPercentage > 0 && (
+                        <div className="flex justify-between text-secondary">
+                          <span>{t('discount')} ({discountPercentage.toFixed(2)}%):</span>
+                          <span>-€{totalDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      {discountAmount > 0 && (
+                        <div className="flex justify-between text-secondary">
+                          <span>{t('discount')}:</span>
+                          <span>-€{discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      {totalDiscount > 0 && discountAmount === 0 && discountPercentage === 0 && (
+                        <div className="flex justify-between text-secondary">
+                          <span>{t('discount')}:</span>
+                          <span>-€{totalDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between">
+                        <span className="text-accent/80">{t('shippingCost')}:</span>
+                        <span className="font-medium text-accent">€{shippingCost.toFixed(2)}</span>
+                      </div>
+                      
+                      <div className="border-t border-accent/20 pt-2 mt-2">
+                        <div className="flex justify-between text-base font-bold">
+                          <span className="text-accent">{t('totalAmount')}:</span>
+                          <span className="text-secondary">€{totalAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      
+                      {totalDiscount > 0 && (
+                        <div className="text-center text-secondary font-medium text-xs pt-1">
+                          {t('youSaved', { amount: totalDiscount.toFixed(2) })}
+                        </div>
                       )}
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-secondary">€{(unitPrice * quantity).toFixed(2)}</div>
-                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="border-t border-accent/20 pt-6">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-accent/80">{t('subtotal')}:</span>
-                    <span className="font-medium text-accent">€{subtotal.toFixed(2)}</span>
-                  </div>
-                  {itemDiscount > 0 && (
-                    <div className="flex justify-between text-secondary">
-                      <span>{t('itemDiscount')}:</span>
-                      <span>-€{itemDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-accent/80">{t('priceAfterItemDiscount')}:</span>
-                    <span className="font-medium text-accent">€{priceAfterItemDiscount.toFixed(2)}</span>
-                  </div>
-                  {websiteDiscount > 0 && (
-                    <div className="flex justify-between text-secondary">
-                      <span>{t('websiteDiscount')}:</span>
-                      <span>-€{websiteDiscount.toFixed(2)}</span>
-                    </div>
-                  )}
-                  {shippingCost > 0 && (
-                    <div className="flex justify-between text-secondary">
-                      <span>{t('shippingCost')}:</span>
-                      <span>€{shippingCost.toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="border-t border-accent/20 pt-3">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span className="text-accent">{t('totalAmount')}:</span>
-                      <span className="text-secondary">€{totalAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-                  {totalDiscount > 0 && (
-                    <div className="text-center text-secondary font-medium">
-                      {t('youSaved', { amount: totalDiscount.toFixed(2) })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </MotionFade>
-
-          <MotionFade delay={0.2} immediate={true}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <CustomButton onClick={handleBack} className="bg-accent/20 text-accent hover:bg-accent/30 px-8 py-3">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
+              <CustomButton onClick={handleBack} className="bg-accent/20 text-accent hover:bg-accent/30 px-6 py-2 text-sm">
                 {t('backToProduct')}
               </CustomButton>
-              <CustomButton onClick={handleProceedToBooking} className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3">
+              <CustomButton 
+                onClick={handleProceedToBooking} 
+                disabled={!deliveryAddress.trim()}
+                className="bg-secondary text-primary hover:bg-secondary/90 px-6 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary"
+              >
                 {t('proceedToBooking')}
               </CustomButton>
             </div>
+                </div>
+              </div>
+            </div>
           </MotionFade>
+
+          
         </div>
       </div>
 

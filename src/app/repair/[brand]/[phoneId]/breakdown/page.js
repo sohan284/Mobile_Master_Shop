@@ -12,8 +12,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import AuthModal from '@/components/AuthModal';
 import Link from 'next/link';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { Home, Wrench, Smartphone, Settings } from 'lucide-react';
+import { Home, Wrench, Smartphone, Settings, Calendar, Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import SafeImage from '@/components/ui/SafeImage';
+
+import { format } from 'date-fns';
 
 export default function PriceBreakdownPage({ params }) {
     const t = useTranslations('repair');
@@ -27,6 +32,9 @@ export default function PriceBreakdownPage({ params }) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [scheduleDate, setScheduleDate] = useState('');
+    const [scheduleTime, setScheduleTime] = useState('');
+    const [scheduleError, setScheduleError] = useState('');
 
     // Get phone info and selected services from sessionStorage
     useEffect(() => {
@@ -156,17 +164,53 @@ export default function PriceBreakdownPage({ params }) {
         }
     }, [selectedServices, servicePartTypes, phoneId, brand, phoneInfo?.brand, phoneInfo?.name]);
 
+    // Format date from YYYY-MM-DD to DD-MM-YYYY
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const [year, month, day] = dateString.split('-');
+        return `${day}-${month}-${year}`;
+    };
+
+    // Format time from HH:MM (24h) to HH:MM AM/PM (12h)
+    const formatTime = (timeString) => {
+        if (!timeString) return '';
+        const [hours, minutes] = timeString.split(':');
+        const hour24 = parseInt(hours, 10);
+        const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
+        const ampm = hour24 >= 12 ? 'PM' : 'AM';
+        return `${hour12.toString().padStart(2, '0')}:${minutes}${ampm}`;
+    };
+
+    // Format schedule for API: "DD-MM-YYYY, HH:MM AM/PM"
+    const formatScheduleForAPI = (date, time) => {
+        if (!date || !time) return '';
+        return `${formatDate(date)}, ${formatTime(time)}`;
+    };
+
     const handleBackToServices = () => {
         router.back();
     };
 
     const handleProceedToBooking = async () => {
+        // Validate schedule selection
+        if (!scheduleDate || !scheduleTime) {
+            setScheduleError(t('scheduleRequired'));
+            return;
+        }
+        setScheduleError('');
+
         // Check if user is authenticated
         if (!isAuthenticated()) {
             setShowAuthModal(true);
             return;
         }
         try {
+            // Combine date and time into format: YYYY-MM-DD HH:MM
+            // scheduleDate is in YYYY-MM-DD format, scheduleTime is in HH:MM format
+            const scheduledDateTime = scheduleDate && scheduleTime 
+                ? `${scheduleDate} ${scheduleTime}` 
+                : null;
+
             // Build order body for backend
             const orderBody = {
                 phone_model_id: parseInt(phoneId),
@@ -177,6 +221,7 @@ export default function PriceBreakdownPage({ params }) {
                     problem_id: serviceId,
                     part_type: servicePartTypes[serviceId] || 'original'
                 })),
+                schedule: scheduledDateTime,
                 notes: ''
             };
 
@@ -194,6 +239,7 @@ export default function PriceBreakdownPage({ params }) {
                     orderId: order?.order?.id,
                     payment_intent_id: order?.payment?.payment_intent_id || order?.payment_intent || null,
                     client_secret: order?.payment?.client_secret || order?.payment_intent_client_secret || null,
+                    schedule: scheduledDateTime,
                     summary: {
                         subtotal: parseFloat(priceData.subtotal || '0'),
                         itemDiscount: parseFloat(priceData.item_discount || '0'),
@@ -347,31 +393,16 @@ export default function PriceBreakdownPage({ params }) {
     return (
         <PageTransition>
             <div className="min-h-screen relative overflow-hidden bg-primary">
-                <div className="container mx-auto px-4 py-8">
-                    
-                    {/* Hero Section */}
-                    {/* <HeroSection
-                        title="Price"
-                        subtitle="Breakdown"
-                        description={`Review your repair costs for ${phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1)}`}
-                        image={phoneInfo?.image || phoneInfo?.phone_image || phoneInfo?.model_image || phoneInfo?.logo || `/${brand.charAt(0).toUpperCase() + brand.slice(1)}.png`}
-                        imageAlt={phoneInfo?.name || `${brand.charAt(0).toUpperCase() + brand.slice(1)} Phone`}
-                        badgeText="Step 4: Review Pricing"
-                        showBackButton={true}
-                        backButtonText="← Back to Services"
-                        backButtonHref={`/repair/${brand}/${phoneId}`}
-                        layout="image-left"
-                    /> */}
-
+                <div className="container mx-auto px-4 py-4">
                     {/* Warning for fallback pricing */}
                     {error && priceData && (
                         <MotionFade delay={0.1} immediate={true}>
-                            <div className="bg-secondary/20 border border-secondary rounded-lg p-4 mb-6">
-                                <div className="flex items-center">
-                                    <div className="text-secondary text-xl mr-3">⚠️</div>
+                            <div className="bg-secondary/20 border border-secondary rounded-lg p-3 mb-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="text-secondary text-lg">⚠️</div>
                                     <div>
-                                        <h3 className="font-semibold text-accent">{t('estimatedPricing')}</h3>
-                                        <p className="text-accent/80 text-sm">{error}</p>
+                                        <h3 className="font-semibold text-sm text-accent">{t('estimatedPricing')}</h3>
+                                        <p className="text-accent/80 text-xs">{error}</p>
                                     </div>
                                 </div>
                             </div>
@@ -381,7 +412,7 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Price Breakdown */}
                     {priceData && (
                         <MotionFade delay={0.2} immediate={true}>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+                            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-5 mb-4">
                                 {/* Breadcrumb Navigation */}
                                 <Breadcrumb
                                     items={[
@@ -391,54 +422,183 @@ export default function PriceBreakdownPage({ params }) {
                                         { label: phoneInfo?.name || t('phoneModel'), href: `/repair/${brand}/${phoneId}`, icon: Smartphone },
                                         { label: t('breakdown'), icon: Settings }
                                     ]}
-                                    className="mb-6"
+                                    className="mb-3"
                                 />
-                                <h2 className="text-2xl font-bold text-secondary mb-6">{t('repairCostBreakdown')}</h2>
+                                <h2 className="text-xl font-bold text-secondary mb-4">{t('repairCostBreakdown')}</h2>
                                 
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    {/* Left Column - Device & Services */}
+                                    <div className="md:col-span-2 space-y-4">
                                 {/* Device Info */}
-                                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
-                                    <div className="flex items-center">
-                                        <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mr-4">
-                                            <span className="text-2xl">📱</span>
+                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    {phoneInfo?.image ? (
+                                                        <SafeImage
+                                                            src={phoneInfo.image}
+                                                            alt={phoneInfo?.name || priceData.phone_model}
+                                                            width={40}
+                                                            height={40}
+                                                            className="w-full h-full object-contain p-1"
+                                                            fallbackSrc={`/${brand.charAt(0).toUpperCase() + brand.slice(1)}.png`}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-xl">📱</span>
+                                                    )}
                                         </div>
-                                        <div>
-                                            <h3 className="font-semibold text-lg text-accent">{priceData.phone_model}</h3>
-                                            <p className="text-accent/80">{priceData.brand}</p>
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-semibold text-base text-accent truncate">{priceData.phone_model}</h3>
+                                                    <p className="text-xs text-accent/80">{priceData.brand}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Selected Services */}
-                                <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-accent mb-4">{t('selectedServices')}</h3>
-                                    <div className="space-y-3">
+                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                                            <h3 className="text-sm font-semibold text-accent mb-2">{t('selectedServices')}</h3>
+                                            <div className="space-y-2">
                                         {priceData.items.map((item, index) => (
-                                            <div key={index} className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
-                                                <div>
-                                                    <h4 className="font-medium text-accent">{item.problem_name}</h4>
-                                                    <p className="text-sm text-accent/80">
-                                                        {t('partType')}: <span className="font-medium capitalize">{item.part_type}</span>
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-lg font-bold text-secondary">
-                                                        €{parseFloat(item.final_price).toFixed(2)}
+                                                    <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="font-medium text-sm text-accent truncate">{item.problem_name}</h4>
+                                                            <p className="text-xs text-accent/80">
+                                                                {t('partType')}: <span className="font-medium capitalize">{item.part_type}</span>
+                                                            </p>
+                                                            {parseFloat(item.discount) > 0 && (
+                                                                <p className="text-xs text-secondary/80 mt-0.5">
+                                                                    -€{parseFloat(item.discount).toFixed(2)} discount
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-right ml-2">
+                                                            <div className="text-base font-bold text-secondary">
+                                                                €{parseFloat(item.final_price).toFixed(2)}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    {parseFloat(item.discount) > 0 && (
-                                                        <div className="text-sm text-secondary/80">
-                                                            -€{parseFloat(item.discount).toFixed(2)} discount
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Schedule Selection */}
+                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                                            <h3 className="text-sm font-semibold text-accent mb-3 flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-secondary" />
+                                                {t('selectSchedule')}
+                                            </h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {/* Schedule Date */}
+                                                <div>
+                                                    <Label 
+                                                        htmlFor="scheduleDate" 
+                                                        className="text-accent text-xs font-medium mb-1 block"
+                                                    >
+                                                        {t('scheduleDate')} *
+                                                    </Label>
+                                                    <div className="relative group">
+                                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                                                            <Calendar className="w-4 h-4 text-accent/60 group-focus-within:text-secondary transition-colors duration-200" />
+                                                        </div>
+                                                        <Input
+                                                            id="scheduleDate"
+                                                            type="date"
+                                                            value={scheduleDate}
+                                                            onChange={(e) => {
+                                                                setScheduleDate(e.target.value);
+                                                                setScheduleError('');
+                                                                setTimeout(() => {
+                                                                    e.target.blur();
+                                                                }, 100);
+                                                            }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const input = e.target;
+                                                                if (input.showPicker) {
+                                                                    try {
+                                                                        input.showPicker();
+                                                                    } catch (err) {
+                                                                        input.focus();
+                                                                    }
+                                                                }
+                                                            }}
+                                                            min={new Date().toISOString().split('T')[0]}
+                                                            className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:bg-white/15 hover:border-accent/50 pl-10 pr-3 py-2 rounded-lg"
+                                                            required
+                                                        />
+                                                        {scheduleDate && (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                                                <span className="text-xs text-secondary/80 font-medium">
+                                                                    {formatDate(scheduleDate)}
+                                                                </span>
+                                                </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Schedule Time */}
+                                                <div>
+                                                    <Label 
+                                                        htmlFor="scheduleTime" 
+                                                        className="text-accent text-xs font-medium mb-1 block"
+                                                    >
+                                                        {t('scheduleTime')} *
+                                                    </Label>
+                                                    <div className="relative group">
+                                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                                                            <Clock className="w-4 h-4 text-accent/60 group-focus-within:text-secondary transition-colors duration-200" />
+                                                        </div>
+                                                        <Input
+                                                            id="scheduleTime"
+                                                            type="time"
+                                                            value={scheduleTime}
+                                                            onChange={(e) => {
+                                                                setScheduleTime(e.target.value);
+                                                                setScheduleError('');
+                                                                setTimeout(() => {
+                                                                    e.target.blur();
+                                                                }, 100);
+                                                            }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const input = e.target;
+                                                                if (input.showPicker) {
+                                                                    try {
+                                                                        input.showPicker();
+                                                                    } catch (err) {
+                                                                        input.focus();
+                                                                    }
+                                                                }
+                                                            }}
+                                                            className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:bg-white/15 hover:border-accent/50 pl-10 pr-3 py-2 rounded-lg"
+                                                            required
+                                                        />
+                                                        {scheduleTime && (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                                                <span className="text-xs text-secondary/80 font-medium">
+                                                                    {formatTime(scheduleTime)}
+                                                                </span>
                                                         </div>
                                                     )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
+                                            {scheduleError && (
+                                                <div className="mt-2 p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
+                                                    <p className="text-red-400 text-xs font-medium flex items-center gap-2">
+                                                        <span>⚠️</span>
+                                                        {scheduleError}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
                                 </div>
 
-                                {/* Price Summary */}
-                                <div className="border-t border-accent/20 pt-6">
-                                    <h3 className="text-lg font-semibold text-accent mb-4">{t('priceSummary')}</h3>
-                                    <div className="space-y-3">
+                                    {/* Right Column - Price Summary */}
+                                  <div  className="md:col-span-1">
+                                  <div>
+                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-accent/20 sticky top-4">
+                                            <h3 className="text-sm font-semibold text-accent mb-3">{t('priceSummary')}</h3>
+                                            <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-accent/80">{t('subtotalBreakdown')}:</span>
                                             <span className="font-medium text-accent">€{parseFloat(priceData.subtotal).toFixed(2)}</span>
@@ -450,11 +610,6 @@ export default function PriceBreakdownPage({ params }) {
                                                 <span>-€{parseFloat(priceData.item_discount).toFixed(2)}</span>
                                             </div>
                                         )}
-                                        
-                                        <div className="flex justify-between">
-                                            <span className="text-accent/80">{t('priceAfterDiscount')}:</span>
-                                            <span className="font-medium text-accent">€{parseFloat(priceData.price_after_item_discount).toFixed(2)}</span>
-                                        </div>
                                         
                                         {parseFloat(priceData.website_discount) > 0 && (
                                             <div className="flex justify-between text-secondary">
@@ -469,42 +624,44 @@ export default function PriceBreakdownPage({ params }) {
                                             </div>
                                         )}
                                         
-                                        <div className="border-t border-accent/20 pt-3">
-                                            <div className="flex justify-between text-lg font-bold">
+                                                <div className="border-t border-accent/20 pt-2 mt-2">
+                                                    <div className="flex justify-between text-base font-bold">
                                                 <span className="text-accent">{t('totalBreakdown')}:</span>
                                                 <span className="text-secondary">€{parseFloat(priceData.total_amount).toFixed(2)}</span>
                                             </div>
                                         </div>
                                         
                                         {parseFloat(priceData.total_discount) > 0 && (
-                                            <div className="text-center text-secondary font-medium">
+                                                    <div className="text-center text-secondary font-medium text-xs pt-1">
                                                 You saved €{parseFloat(priceData.total_discount).toFixed(2)}!
                                             </div>
                                         )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        </MotionFade>
-                    )}
-
-                    {/* Action Buttons */}
-                    <MotionFade delay={0.4} immediate={true}>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
                             <CustomButton 
                                 onClick={handleBackToServices}
-                                className="bg-accent/20 text-accent hover:bg-accent/30 px-8 py-3"
+                                className="bg-accent/20 text-accent hover:bg-accent/30 px-6 py-2 text-sm"
                             >
                                 {t('backToServices')}
                             </CustomButton>
                             
                             <CustomButton 
                                 onClick={handleProceedToBooking}
-                                className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
+                                disabled={!scheduleDate || !scheduleTime}
+                                className="bg-secondary text-primary hover:bg-secondary/90 px-6 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary"
                             >
                                 {t('proceedToBooking')}
                             </CustomButton>
                         </div>
-                    </MotionFade>
+                                  </div>
+                                </div>
+                            </div>
+                        </MotionFade>
+                    )}
+
+                    
                 </div>
             </div>
             

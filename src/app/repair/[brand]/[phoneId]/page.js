@@ -21,7 +21,7 @@ export default function PhoneModelPage({ params }) {
     const t = useTranslations('repair');
     const { brand, phoneId } = use(params);
     const [selectedServices, setSelectedServices] = useState([]);
-    const [servicePartTypes, setServicePartTypes] = useState({"1":"original"}); // Store part type for each service
+    const [servicePartTypes, setServicePartTypes] = useState({}); // Store part type for each service
     const [searchTerm, setSearchTerm] = useState('');
     const [phoneInfo, setPhoneInfo] = useState(null);
 
@@ -125,6 +125,38 @@ export default function PhoneModelPage({ params }) {
             } else {
                 // If not selected and we have less than 3, add it
                 if (prev.length < 3) {
+                    // Find the service data to check prices
+                    const service = repairServices.find(s => s.problem_id === serviceId);
+                    
+                    // Determine initial part type based on price availability
+                    let initialPartType = 'original';
+                    const originalPrice = service?.original?.base_price || service?.original?.final_price;
+                    const duplicatePrice = service?.duplicate?.base_price || service?.duplicate?.final_price;
+                    
+                    // Check if original price is N/A, null, undefined, or empty string
+                    const isOriginalNA = !originalPrice || 
+                                         originalPrice === 'N/A' || 
+                                         originalPrice === 'n/a' || 
+                                         originalPrice === null || 
+                                         originalPrice === undefined ||
+                                         String(originalPrice).trim() === '';
+                    
+                    // If original is N/A but duplicate is available, select duplicate
+                    if (isOriginalNA && duplicatePrice && duplicatePrice !== 'N/A' && duplicatePrice !== 'n/a') {
+                        initialPartType = 'duplicate';
+                    } else if (!isOriginalNA) {
+                        initialPartType = 'original';
+                    } else if (duplicatePrice && duplicatePrice !== 'N/A' && duplicatePrice !== 'n/a') {
+                        // Fallback to duplicate if original not available
+                        initialPartType = 'duplicate';
+                    }
+                    
+                    // Set the part type
+                    setServicePartTypes(prevTypes => ({
+                        ...prevTypes,
+                        [serviceId]: initialPartType
+                    }));
+                    
                     return [...prev, serviceId];
                 }
                 // If already 3 selected, don't add more

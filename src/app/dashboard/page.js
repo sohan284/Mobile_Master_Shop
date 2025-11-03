@@ -51,6 +51,9 @@ export default function Dashboard() {
       paymentStatus: order.payment_status || 'unknown',
       paymentStatusDisplay: order.payment_status_display || order.payment_status || 'Unknown',
       createdAt: order.created_at || null,
+      // Color information for phone orders
+      colorName: order.color_name || order.color?.name || order.color || null,
+      colorCode: order.color_code || order.color?.hex_code || order.color?.code || null,
     };
     // Force orderType to be correct (in case original order had conflicting property)
     normalized.orderType = type;
@@ -172,8 +175,23 @@ export default function Dashboard() {
           {order.brandName && order.brandName !== 'N/A' && (
             <span className="text-xs text-gray-500">Brand: {order.brandName}</span>
           )}
+          {order.orderType === 'phone' && order.colorName && (
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-xs text-gray-500">Color:</span>
+              <div className="flex items-center gap-1">
+                {order.colorCode && (
+                  <span 
+                    className="inline-block w-3 h-3 rounded-full border border-gray-300"
+                    style={{ backgroundColor: order.colorCode }}
+                    title={order.colorName}
+                  />
+                )}
+                <span className="text-xs font-medium text-gray-700">{order.colorName}</span>
+              </div>
+            </div>
+          )}
         </div>
-      ),
+      ),  
     },
     {
       header: 'Customer',
@@ -184,6 +202,9 @@ export default function Dashboard() {
           <span>{order.customerName}</span>
           {order.customerPhone && order.customerPhone !== 'N/A' && (
             <span className="text-xs text-gray-500">{order.customerPhone}</span>
+          )}
+          {order?.shipping_address && (
+            <span className="text-xs text-gray-500">Address: {order.shipping_address}</span>
           )}
         </div>
       ),
