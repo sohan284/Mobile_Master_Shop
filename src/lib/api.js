@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://save-co.lumivancelabs.com';
+const BASE_URL =process.env.NEXT_PUBLIC_API_URL || 'https://save-co.lumivancelabs.com';
 
 // Create axios instance
 const apiClient = axios.create({
