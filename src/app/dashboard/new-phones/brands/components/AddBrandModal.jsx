@@ -87,7 +87,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       }
 
       // Make API call using apiFetcher
-      await apiFetcher.post('https://save-co.lumivancelabs.com/api/brandnew/brands/', submitData, {
+      await apiFetcher.post('/api/brandnew/brands/', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
