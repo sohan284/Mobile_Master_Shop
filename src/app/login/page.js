@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -50,18 +50,18 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     console.log('Login attempt started');
-    
+
     // Prevent any default behavior
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     // Prevent multiple submissions
     if (isSubmitting || isLoading) {
       return;
     }
-    
+
     setIsSubmitting(true);
     setIsLoading(true);
 
@@ -87,7 +87,7 @@ export default function LoginPage() {
       const result = await login(userName, password);
       console.log('Login result:', result);
       toast.dismiss(loadingToast);
-      
+
       if (result.success) {
         toast.success(t('welcomeBack'));
         // Use setTimeout to ensure toast is visible before redirect
@@ -102,7 +102,7 @@ export default function LoginPage() {
       } else {
         const errorMessage = result.error || t('loginFailed');
         console.log('Login failed:', errorMessage);
-        
+
         toast.error(errorMessage, {
           duration: 5000, // 5 seconds
           position: 'top-center',
@@ -116,13 +116,13 @@ export default function LoginPage() {
       }
     } catch (error) {
       toast.dismiss(loadingToast);
-      
+
       // Show error toast with longer duration
       const errorMessage = error.response?.data?.message || error.message || t('loginFailedTryAgain');
-     
+
       // Temporary alert to test if error is caught
       alert(`Login Error: ${errorMessage}`);
-      
+
       toast.error(errorMessage, {
         duration: 5000, // 5 seconds
         position: 'top-center',
@@ -136,7 +136,7 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
       setIsSubmitting(false);
-    } 
+    }
   };
 
   return (
@@ -145,20 +145,20 @@ export default function LoginPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-          <div className="text-2xl font-bold text-center">
-           <Link href="/">
-           <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
-           </Link>
+            <div className="text-2xl font-bold text-center">
+              <Link href="/">
+                <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
+              </Link>
+            </div>
           </div>
-          </div>
-         
+
         </div>
 
         {/* Login Form */}
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <div className="space-y-6" role="form" aria-label="Login form">
             {/* Username or Email Field */}
-             <h1 className="text-3xl font-bold text-accent mb-2">{t('login')}</h1>
+            <h1 className="text-3xl font-bold text-accent mb-2">{t('login')}</h1>
             <div>
               <label htmlFor="userName" className="block text-sm font-medium text-accent mb-2">
                 {t('usernameOrEmail')}
@@ -246,7 +246,7 @@ export default function LoginPage() {
           </div>
 
           {/* Admin Access Info */}
-         
+
         </div>
 
         {/* Footer */}

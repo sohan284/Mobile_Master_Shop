@@ -18,7 +18,7 @@ export default function SignupPage() {
   const [showOTPPopup, setShowOTPPopup] = useState(false);
   const [showCredentialsPopup, setShowCredentialsPopup] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  
+
   const router = useRouter();
 
   const validateEmail = (email) => {
@@ -28,7 +28,7 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email.trim()) {
       toast.error(t('pleaseEnterEmail'));
       return;
@@ -41,7 +41,7 @@ export default function SignupPage() {
 
     setIsLoading(true);
     const loadingToast = toast.loading(t('sendingVerificationCode'));
-    
+
     try {
       await sendOTP(email);
       toast.dismiss(loadingToast);
@@ -76,11 +76,9 @@ export default function SignupPage() {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-          <Link href="/" className="group relative text-secondary">
-          <Link href="/">
-           <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
-           </Link>
-          </Link>
+            <Link href="/" className="group relative text-secondary">
+              <Image className="cursor-pointer" src={logo} alt="MLKPHONE" width={100} height={100} />
+            </Link>
           </div>
 
         </div>
@@ -88,8 +86,8 @@ export default function SignupPage() {
         {/* Signup Form */}
         <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="signup-form">
-          <h1 className="text-3xl font-bold text-accent mb-2">{t('createAccountTitle')}</h1>
-          <p className="text-secondary">{t('getStarted')}</p>
+            <h1 className="text-3xl font-bold text-accent mb-2">{t('createAccountTitle')}</h1>
+            <p className="text-secondary">{t('getStarted')}</p>
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-accent mb-2">
