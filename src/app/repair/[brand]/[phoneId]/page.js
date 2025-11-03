@@ -158,7 +158,6 @@ export default function PhoneModelPage({ params }) {
                     {/* Hero Section */}
                     {React.useMemo(() => (
                         <HeroSection
-                            title={t('chooseYour')}
                             subtitle={t('chooseYourRepairService')}
                             description={t('selectRepairServicesDescription', { phoneName: phoneInfo?.name || brand.charAt(0).toUpperCase() + brand.slice(1) })}
                             image={heroImage}
@@ -171,14 +170,16 @@ export default function PhoneModelPage({ params }) {
                         />
                     ), [phoneInfo?.name, heroImage, brand, t])}
                     
-                    {/* Search Section */}
-                    <SearchSection
+              <div className='mt-20'>
+                      {/* Search Section */}
+                      <SearchSection
                         title={t('findYourRepairService')}
                         description={t('searchRepairServicesDescription')}
                         placeholder={t('searchRepairServices')}
                         searchTerm={searchTerm}
                         onSearchChange={(e) => setSearchTerm(e.target.value)}
                     />
+              </div>
 
                         {/* Warning Message */}
                         {!servicesLoading && repairServices.length > 0 && selectedServices.length >= 3 && (
