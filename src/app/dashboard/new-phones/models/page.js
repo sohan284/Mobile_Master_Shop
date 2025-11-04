@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DataTable from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, Eye, ArrowLeft } from 'lucide-react';
-import { useApiGet } from '@/hooks/useApi';
+import { Plus, Edit, Trash2, Eye, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { useApiGet, useApiPatch } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
 import AddModelModal from './components/AddModelModal';
 import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function NewPhoneModelsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,6 +21,9 @@ export default function NewPhoneModelsPage() {
   const [selectedModel, setSelectedModel] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [movingModels, setMovingModels] = useState({}); // Track which models are being moved
+  
+  const queryClient = useQueryClient();
   
   // Fetch brands for the dropdown
   const { data: brandsResponse, isLoading: brandsLoading } = useApiGet(
@@ -40,7 +44,16 @@ export default function NewPhoneModelsPage() {
     ['new-phone-models'],
     () => apiFetcher.get('/api/brandnew/models/')
   );
-  const models = modelsResponse?.data || [];
+  
+  // Sort models by rank (if available) or by id as fallback
+  const models = useMemo(() => {
+    const modelsData = modelsResponse?.data || [];
+    return [...modelsData].sort((a, b) => {
+      const rankA = a.rank !== undefined && a.rank !== null ? a.rank : a.id || 0;
+      const rankB = b.rank !== undefined && b.rank !== null ? b.rank : b.id || 0;
+      return rankA - rankB;
+    });
+  }, [modelsResponse?.data]);
 
   const columns = [
     {
@@ -185,6 +198,94 @@ export default function NewPhoneModelsPage() {
     setIsDeleting(false);
   };
 
+  // Mutation for updating model rank
+  const updateRankMutation = useApiPatch({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['new-phone-models'] });
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to update model rank');
+    }
+  });
+
+  // Handle move up
+  const handleMoveUp = async (model, currentIndex) => {
+    // currentIndex is the index in the full sorted dataset from DataTable
+    if (currentIndex === 0) {
+      toast.error('Cannot move up: Already at the top');
+      return;
+    }
+
+    const previousModel = models[currentIndex - 1];
+    if (!previousModel) return;
+
+    // Get current ranks (use index + 1 as fallback if rank doesn't exist)
+    const currentRank = model.rank !== undefined && model.rank !== null ? model.rank : currentIndex + 1;
+    const previousRank = previousModel.rank !== undefined && previousModel.rank !== null ? previousModel.rank : currentIndex;
+
+    setMovingModels(prev => ({ ...prev, [model.id]: true, [previousModel.id]: true }));
+
+    try {
+      // Update both models' ranks with PATCH API calls - swap the ranks
+      await Promise.all([
+        apiFetcher.patch(`/api/brandnew/models/${model.id}/`, { rank: previousRank }),
+        apiFetcher.patch(`/api/brandnew/models/${previousModel.id}/`, { rank: currentRank })
+      ]);
+      
+      toast.success('Model moved up successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error moving model up:', error);
+      toast.error(error.response?.data?.message || 'Failed to move model');
+    } finally {
+      setMovingModels(prev => {
+        const newState = { ...prev };
+        delete newState[model.id];
+        delete newState[previousModel.id];
+        return newState;
+      });
+    }
+  };
+
+  // Handle move down
+  const handleMoveDown = async (model, currentIndex) => {
+    // currentIndex is the index in the full sorted dataset from DataTable
+    if (currentIndex === models.length - 1) {
+      toast.error('Cannot move down: Already at the bottom');
+      return;
+    }
+
+    const nextModel = models[currentIndex + 1];
+    if (!nextModel) return;
+
+    // Get current ranks (use index + 1 as fallback if rank doesn't exist)
+    const currentRank = model.rank !== undefined && model.rank !== null ? model.rank : currentIndex + 1;
+    const nextRank = nextModel.rank !== undefined && nextModel.rank !== null ? nextModel.rank : currentIndex + 2;
+
+    setMovingModels(prev => ({ ...prev, [model.id]: true, [nextModel.id]: true }));
+
+    try {
+      // Update both models' ranks with PATCH API calls - swap the ranks
+      await Promise.all([
+        apiFetcher.patch(`/api/brandnew/models/${model.id}/`, { rank: nextRank }),
+        apiFetcher.patch(`/api/brandnew/models/${nextModel.id}/`, { rank: currentRank })
+      ]);
+      
+      toast.success('Model moved down successfully');
+      refetch();
+    } catch (error) {
+      console.error('Error moving model down:', error);
+      toast.error(error.response?.data?.message || 'Failed to move model');
+    } finally {
+      setMovingModels(prev => {
+        const newState = { ...prev };
+        delete newState[model.id];
+        delete newState[nextModel.id];
+        return newState;
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
     
@@ -201,10 +302,13 @@ export default function NewPhoneModelsPage() {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onMoveUp={handleMoveUp}
+        onMoveDown={handleMoveDown}
         searchable={true}
         pagination={true}
         itemsPerPage={10}
         loading={isLoading}
+        movingItems={movingModels}
       />
 
       {/* Add Model Modal */}

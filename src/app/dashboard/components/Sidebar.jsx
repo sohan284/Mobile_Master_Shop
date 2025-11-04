@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import {
-  LayoutDashboard,
   Wrench,
   Smartphone,
   LogOut,
@@ -21,11 +20,12 @@ import {
   Users,
   Package,
   X,
-  Home
+  Home,
+  ShoppingBag
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Order Management', href: '/dashboard', icon: ShoppingBag },
   { name: 'Users', href: '/dashboard/users', icon: Users },
   {
     name: 'Repair Services',

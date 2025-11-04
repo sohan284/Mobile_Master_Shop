@@ -6,7 +6,7 @@ export default function DataTableSkeleton({
   showHeader = true,
   showSearch = true,
   showPagination = true,
-  height = "75vh"
+  height = "80vh"
 }) {
   return (
     <div className="bg-white/10 rounded-lg border flex flex-col" style={{ height: height }}>

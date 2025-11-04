@@ -38,12 +38,17 @@ export default function DataTable({
   onDelete,
   onView,
   onRowClick,
+  onMoveUp,
+  onMoveDown,
   searchable = true,
   pagination = true,
   itemsPerPage = 10,
   className = "",
   loading = false,
-  height = "76vh"
+  height = "80vh",
+  orderTypeFilter, // JSX component
+  statusFilter, // JSX component
+  movingItems = {} // Track which items are being moved
 }) {
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
@@ -53,6 +58,7 @@ export default function DataTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
   // Reset pagination and search when data changes
   useEffect(() => {
@@ -67,6 +73,7 @@ export default function DataTable({
 
   // Filter data based on search term
   const filteredData = safeData.filter(item => {
+    // Apply search term filter
     if (!searchTerm) return true;
     return columns.some(column => {
       const value = column.accessor ? item[column.accessor] : '';
@@ -128,6 +135,7 @@ export default function DataTable({
 
   // Check if any actions are provided
   const hasActions = !!(onView || onEdit || onDelete);
+  const hasMoveActions = !!(onMoveUp || onMoveDown);
 
   // Show skeleton loader when loading
   if (loading) {
@@ -151,6 +159,8 @@ export default function DataTable({
             <p className="text-lg font-semibold text-gray-900">{title}</p>
           </div>
           <div className="flex items-center space-x-2">
+            {orderTypeFilter && orderTypeFilter}
+            {statusFilter && statusFilter}
             {searchable && (
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -163,6 +173,7 @@ export default function DataTable({
                 />
               </div>
             )}
+           
             {onAdd && (
               <Button onClick={onAdd} className="gap-2 text-secondary cursor-pointer">
                 <Plus className="h-4 w-4" />
@@ -183,34 +194,42 @@ export default function DataTable({
                 <TableHead
                   key={index}
                   className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
-                  onClick={() => column.sortable && handleSort(column.accessor)}
+                  onClick={() => column.sortable && !column.filterable && handleSort(column.accessor)}
                 >
-                  <div className="flex items-center space-x-2">
-                    <span>{column.header}</span>
-                    {column.sortable && (
-                      <div className="flex flex-col">
-                        {sortField === column.accessor ? (
-                          sortDirection === 'asc' ? (
-                            <ArrowUp className="h-3 w-3" />
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span>{column.header}</span>
+                      {column.sortable && (
+                        <div className="flex flex-col">
+                          {sortField === column.accessor ? (
+                            sortDirection === 'asc' ? (
+                              <ArrowUp className="h-3 w-3" />
+                            ) : (
+                              <ArrowDown className="h-3 w-3" />
+                            )
                           ) : (
-                            <ArrowDown className="h-3 w-3" />
-                          )
-                        ) : (
-                          <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
-                        )}
+                            <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {column.filterable && column.filterComponent && (
+                      <div onClick={(e) => e.stopPropagation()} className="mt-1">
+                        {column.filterComponent}
                       </div>
                     )}
                   </div>
                 </TableHead>
               ))}
               {hasActions && <TableHead>Actions</TableHead>}
+              {hasMoveActions && <TableHead className="w-2"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell 
-                  colSpan={columns.length + (hasActions ? 1 : 0)} 
+                  colSpan={columns.length + (hasActions ? 1 : 0) + (hasMoveActions ? 1 : 0)} 
                   className="h-full p-0"
                 >
                   <div className="flex flex-col items-center justify-center w-full h-full min-h-[400px] px-4">
@@ -228,6 +247,11 @@ export default function DataTable({
               </TableRow>
             ) : (
               paginatedData.map((item, index) => {
+                // Calculate actual index in the full dataset (before pagination)
+                const actualIndex = startIndex + index;
+                const isMoving = movingItems[item.id];
+                const isHovered = hoveredRowIndex === actualIndex;
+                
                 // Generate unique key based on item properties to prevent duplicates
                 const uniqueKey = item.id 
                   ? `${item.id}-${item.orderNumber || item.order_number || ''}-${startIndex + index}`
@@ -237,7 +261,9 @@ export default function DataTable({
                 <TableRow 
                   key={uniqueKey}
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
-                  className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                  onMouseEnter={() => setHoveredRowIndex(actualIndex)}
+                  onMouseLeave={() => setHoveredRowIndex(null)}
+                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''}`}
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
@@ -275,6 +301,42 @@ export default function DataTable({
                             className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
                           >
                             <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
+                  {hasMoveActions && (
+                    <TableCell className="relative">
+                      <div className={`flex items-center space-x-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                        {onMoveUp && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              onMoveUp(item, actualIndex); 
+                            }}
+                            disabled={actualIndex === 0 || isMoving}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                            title="Move up"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {onMoveDown && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              onMoveDown(item, actualIndex); 
+                            }}
+                            disabled={actualIndex === sortedData.length - 1 || isMoving}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                            title="Move down"
+                          >
+                            <ArrowDown className="h-4 w-4" />
                           </Button>
                         )}
                       </div>

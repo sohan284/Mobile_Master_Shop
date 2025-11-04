@@ -1,33 +1,137 @@
 'use client';
 import React, { useState, useMemo } from 'react';
 import { 
-  Package, 
   Wrench,
   Smartphone,
   ShoppingBag,
   Calendar
 } from 'lucide-react';
 import PageTransition from '@/components/animations/PageTransition';
-import { useApiGet } from '@/hooks/useApi';
+import { useApiGet, useApiPatch } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
-import { Skeleton } from '@/components/ui/skeleton';
 import DataTable from '@/components/ui/DataTable';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const [selectedFilter, setSelectedFilter] = useState('all'); // 'all', 'repair', 'phone', 'accessory'
+  const [selectedStatus, setSelectedStatus] = useState('all'); // 'all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
+  const [updatingStatus, setUpdatingStatus] = useState({}); // Track which order is being updated
+  
+  const queryClient = useQueryClient();
+
+  // Reset status filter when order type filter changes
+  React.useEffect(() => {
+    setSelectedStatus('all');
+  }, [selectedFilter]);
+
+  // Mutation for updating order status
+  const updateStatusMutation = useApiPatch({
+    onSuccess: (data, variables) => {
+      const { orderType } = variables;
+      // Invalidate and refetch the relevant query based on order type
+      let queryKey = '';
+      if (orderType === 'repair') {
+        queryKey = 'dashboardRepairOrders';
+      } else if (orderType === 'phone') {
+        queryKey = 'dashboardPhoneOrders';
+      } else if (orderType === 'accessory') {
+        queryKey = 'dashboardAccessoryOrders';
+      }
+      
+      if (queryKey) {
+        queryClient.invalidateQueries({ queryKey: [queryKey] });
+      }
+      
+      setUpdatingStatus(prev => {
+        const newState = { ...prev };
+        delete newState[variables.orderId];
+        return newState;
+      });
+      toast.success('Order status updated successfully');
+    },
+    onError: (error, variables) => {
+      setUpdatingStatus(prev => {
+        const newState = { ...prev };
+        delete newState[variables.orderId];
+        return newState;
+      });
+      toast.error(error.response?.data?.message || 'Failed to update order status');
+    }
+  });
+
+  // Function to handle status change
+  const handleStatusChange = async (order, newStatus) => {
+    const currentStatus = (order.status || '').toLowerCase();
+    if (currentStatus === newStatus.toLowerCase()) return; // No change needed
+    
+    // Ensure we have the order ID
+    const orderId = order.id;
+    if (!orderId) {
+      toast.error('Order ID not found');
+      return;
+    }
+    
+    setUpdatingStatus(prev => ({ ...prev, [orderId]: true }));
+    
+    // Determine API endpoint based on order type
+    let endpoint = '';
+    if (order.orderType === 'repair') {
+      endpoint = `/api/repair/orders/${orderId}/`;
+    } else if (order.orderType === 'phone') {
+      endpoint = `/api/brandnew/orders/${orderId}/`;
+    } else if (order.orderType === 'accessory') {
+      endpoint = `/api/accessories/orders/${orderId}/`;
+    } else {
+      toast.error('Unknown order type');
+      setUpdatingStatus(prev => {
+        const newState = { ...prev };
+        delete newState[orderId];
+        return newState;
+      });
+      return;
+    }
+
+    // Prepare the request body with status
+    const requestBody = {
+      status: newStatus
+    };
+
+    console.log('Updating order status:', {
+      endpoint,
+      orderId,
+      status: newStatus,
+      body: requestBody
+    });
+
+    // Call PATCH API with order ID in URL and status in body
+    updateStatusMutation.mutate({
+      url: endpoint,
+      data: requestBody,
+      orderId: orderId,
+      orderType: order.orderType
+    });
+  };
 
   // Fetch orders from all three APIs
   const { data: repairOrdersData, isLoading: isLoadingRepair, error: errorRepair } = useApiGet(
     ['dashboardRepairOrders'],
-    () => apiFetcher.get('/api/repair/orders/')
+    () => apiFetcher.get('/api/repair/admin/orders/')
   );
   const { data: phoneOrdersData, isLoading: isLoadingPhone, error: errorPhone } = useApiGet(
     ['dashboardPhoneOrders'],
-    () => apiFetcher.get('/api/brandnew/orders/')
+    () => apiFetcher.get('/api/brandnew/admin/orders/')
   );
   const { data: accessoryOrdersData, isLoading: isLoadingAccessory, error: errorAccessory } = useApiGet(
     ['dashboardAccessoryOrders'],
-    () => apiFetcher.get('/api/accessories/orders/')
+    () => apiFetcher.get('/api/accessories/admin/orders/')
   );
 
   // Normalize order data - ensure orderType is set correctly and cannot be overwritten
@@ -93,7 +197,7 @@ export default function Dashboard() {
   const isLoading = isLoadingRepair || isLoadingPhone || isLoadingAccessory;
   const error = errorRepair || errorPhone || errorAccessory;
 
-  // Filter orders based on selected filter with explicit type checking
+  // Filter orders based on selected filter
   const filteredOrders = useMemo(() => {
     // Combine all orders for filtering
     const allOrders = [
@@ -102,44 +206,64 @@ export default function Dashboard() {
       ...normalizedAccessoryOrders
     ];
     
+    // Filter by order type
+    let typeFiltered = [];
     switch(selectedFilter) {
       case 'repair':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'repair').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+        typeFiltered = allOrders.filter(order => order.orderType === 'repair');
+        break;
       case 'phone':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'phone').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+        typeFiltered = allOrders.filter(order => order.orderType === 'phone');
+        break;
       case 'accessory':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'accessory').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+        typeFiltered = allOrders.filter(order => order.orderType === 'accessory');
+        break;
       default:
-        // Return all orders sorted by date
-        return allOrders.sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+        typeFiltered = allOrders;
     }
+    
+    // Sort by date
+    return typeFiltered.sort((a, b) => {
+      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
   }, [selectedFilter, normalizedRepairOrders, normalizedPhoneOrders, normalizedAccessoryOrders]);
 
   // Get status badge styling
   const getStatusBadge = (status) => {
     const statusLower = status.toLowerCase();
-    if (statusLower === 'confirmed' || statusLower === 'completed') {
+    if (statusLower === 'confirmed' || statusLower === 'completed' || statusLower === 'delivered') {
       return 'bg-green-100 text-green-800';
     } else if (statusLower === 'pending' || statusLower === 'processing') {
       return 'bg-yellow-100 text-yellow-800';
-    } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
+    } else if (statusLower === 'cancelled' || statusLower === 'canceled' || statusLower === 'refunded') {
       return 'bg-red-100 text-red-800';
     } else if (statusLower === 'shipped') {
       return 'bg-blue-100 text-blue-800';
     }
     return 'bg-gray-100 text-gray-800';
   };
+
+  // Get status badge classes for Select component
+  const getStatusBadgeClasses = (status) => {
+    return getStatusBadge(status);
+  };
+
+  // Status options for dropdown
+  const statusOptions = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'processing', label: 'Processing' },
+    { value: 'shipped', label: 'Shipped' },
+    { value: 'delivered', label: 'Delivered' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'refunded', label: 'Refunded' },
+  ];
+
+  // Status options for filter dropdown (with 'all')
+  const filterStatusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    ...statusOptions,
+  ];
 
   // Define columns for DataTable
   const columns = [
@@ -223,11 +347,40 @@ export default function Dashboard() {
       header: 'Status',
       accessor: 'status',
       sortable: true,
-      render: (order) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.status)}`}>
-          {order.statusDisplay}
-        </span>
-      ),
+      render: (order) => {
+        const isUpdating = updatingStatus[order.id];
+        const currentStatus = order.status?.toLowerCase() || 'pending';
+        const badgeClasses = getStatusBadgeClasses(currentStatus);
+        
+        return (
+          <Select 
+            value={currentStatus} 
+            onValueChange={(newStatus) => handleStatusChange(order, newStatus)}
+            disabled={isUpdating}
+          >
+            <SelectTrigger 
+              className={`w-[140px] h-8 text-xs rounded-lg cursor-pointer border-0 ${badgeClasses} font-semibold hover:opacity-80`}
+            >
+              <SelectValue>
+                {isUpdating ? (
+                  <span className="text-xs">Updating...</span>
+                ) : (
+                  <span className="text-xs font-semibold capitalize">
+                    {statusOptions.find(opt => opt.value === currentStatus)?.label || order.statusDisplay}
+                  </span>
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <span className="capitalize">{option.label}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      },
     },
     {
       header: 'Payment',
@@ -262,80 +415,22 @@ export default function Dashboard() {
     },
   ];
 
-  // Order cards configuration
-  const orderCards = [
-    {
-      id: 'all',
-      name: 'All Orders',
-      count: totalOrders,
-      icon: Package,
-      color: 'bg-gray-200',
-      iconColor: 'text-gray-800',
-    },
-    {
-      id: 'repair',
-      name: 'All Repair Services',
-      count: normalizedRepairOrders.length,
-      icon: Wrench,
-      color: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    {
-      id: 'phone',
-      name: 'All New Phones',
-      count: normalizedPhoneOrders.length,
-      icon: Smartphone,
-      color: 'bg-green-50',
-      iconColor: 'text-green-600',
-    },
-    {
-      id: 'accessory',
-      name: 'All Accessories Orders',
-      count: normalizedAccessoryOrders.length,
-      icon: ShoppingBag,
-      color: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-    },
+  // Order type options for filter dropdown
+  const orderTypeOptions = [
+    { value: 'all', label: 'All Orders' },
+    { value: 'repair', label: 'Repair Orders' },
+    { value: 'phone', label: 'New Phone Orders' },
+    { value: 'accessory', label: 'Accessory Orders' },
   ];
 
   return (
     <PageTransition>
-      <div className="flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
-        {/* Fixed Header and Cards Section */}
-        <div className="flex-shrink-0 space-y-6 pb-6">
-   
-
-          {/* Order Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {orderCards.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => setSelectedFilter(card.id)}
-                className={`bg-white p-6 rounded-lg shadow-sm border-2 transition-all cursor-pointer hover:shadow-md ${
-                  selectedFilter === card.id 
-                    ? 'border-primary' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-            <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-600">{card.name}</p>
-                    {isLoading ? (
-                      <Skeleton className="h-8 w-20 mt-2" />
-                    ) : (
-                      <p className="text-2xl font-bold text-gray-900 mt-1">{card.count}</p>
-                    )}
-              </div>
-                  <div className={`p-3 ${card.color} rounded-lg`}>
-                    <card.icon className={`h-6 w-6 ${card.iconColor}`} />
-              </div>
-            </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
+      <div className="flex flex-col gap-6" style={{ height: 'calc(100vh - 10rem)' }}>
         {/* Scrollable Orders Table Section */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+          <p className="text-gray-600">List of all orders</p>
+        </div>
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex flex-col ">
             {error ? (
@@ -347,17 +442,41 @@ export default function Dashboard() {
                 key={selectedFilter}
                 data={filteredOrders}
                 columns={columns}
-                title={
-                  selectedFilter === 'all' ? 'All Orders' : 
-                  selectedFilter === 'repair' ? 'Repair Services Orders' :
-                  selectedFilter === 'phone' ? 'New Phone Orders' :
-                  'Accessories Orders'
-                }
+                title="Orders"
                 searchable={true}
                 pagination={true}
                 itemsPerPage={10}
                 loading={isLoading}
                 className="bg-white border-gray-200"
+                height="80vh"
+                orderTypeFilter={
+                  <Select className="cursor-pointer" value={selectedFilter} onValueChange={setSelectedFilter}>
+                    <SelectTrigger className="w-[180px] h-10">
+                      <SelectValue placeholder="Filter by order type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {orderTypeOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                }
+                statusFilter={
+                  <Select className="cursor-pointer" value={selectedStatus} onValueChange={setSelectedStatus}>
+                    <SelectTrigger className="w-[180px] h-10">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterStatusOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                }
               />
             )}
         </div>
