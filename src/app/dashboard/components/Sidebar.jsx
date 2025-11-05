@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { useApiGet } from '@/hooks/useApi';
+import { apiFetcher } from '@/lib/api';
 import {
   Wrench,
   Smartphone,
@@ -34,9 +36,9 @@ const navigation = [
     icon: ShoppingBag,
     hasSubmenu: true,
     submenu: [
-      { name: 'Repair Orders', href: '/dashboard/orders/repairs', icon: Wrench },
-      { name: 'New Phone Orders', href: '/dashboard/orders/phones', icon: Smartphone },
-      { name: 'Accessories Orders', href: '/dashboard/orders/accessories', icon: Package },
+      { name: 'Repair', href: '/dashboard/orders/repairs', icon: Wrench, unreadKey: 'repair_unread' },
+      { name: 'New Phone', href: '/dashboard/orders/phones', icon: Smartphone, unreadKey: 'phone_unread' },
+      { name: 'Accessories', href: '/dashboard/orders/accessories', icon: Package, unreadKey: 'acceessories_unread' },
     ]
   },
   { name: 'Users', href: '/dashboard/users', icon: Users },
@@ -72,6 +74,17 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { logout } = useAuth();
   const router = useRouter();
   const [expandedMenus, setExpandedMenus] = useState([]);
+
+  // Fetch statistics to get unread counts
+  const { data: ordersData } = useApiGet(
+    ['dashboardStatistics'],
+    () => apiFetcher.get('/api/admin/orders/'),
+    {
+      refetchInterval: 60000, // Refetch every 60 seconds
+    }
+  );
+
+  const statistics = ordersData?.statistics || {};
 
   const toggleSubmenu = (menuName) => {
     setExpandedMenus((prev) =>
@@ -170,6 +183,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         <ul className="ml-6 mt-2 space-y-1">
                           {item.submenu.map((subItem, index) => {
                             const isSubActive = pathname === subItem.href;
+                            const unreadCount = subItem.unreadKey ? (statistics[subItem.unreadKey] || 0) : 0;
                             return (
                               <li
                                 key={subItem.name}
@@ -184,15 +198,22 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                                 <Link
                                   href={subItem.href}
                                   className={`
-                                    flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
+                                    flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
                                     ${isSubActive
                                       ? 'bg-blue-50 text-primary border-l-2 border-primary'
                                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
                                   `}
                                   onClick={() => setSidebarOpen(false)}
                                 >
-                                  <subItem.icon className="mr-3 h-4 w-4" />
-                                  {subItem.name}
+                                  <div className="flex items-center">
+                                    <subItem.icon className="mr-3 h-4 w-4" />
+                                    {subItem.name}
+                                  </div>
+                                  {unreadCount > 0 && (
+                                    <span className="ml-2 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                      {unreadCount > 99 ? '99+' : unreadCount}
+                                    </span>
+                                  )}
                                 </Link>
                               </li>
                             );

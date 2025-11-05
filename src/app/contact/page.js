@@ -55,8 +55,8 @@ export default function ContactPage() {
         message: formData.message.trim(),
       };
 
-      // Make POST request to api/contact
-      await apiFetcher.post('/api/contact', requestBody);
+      // Make POST request to auth/contact
+      await apiFetcher.post('/auth/contact/', requestBody);
 
       toast.dismiss(loadingToast);
       toast.success(t('messageSent') || 'Message sent successfully!');
