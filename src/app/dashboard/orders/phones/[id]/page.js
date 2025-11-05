@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
+import ApiErrorMessage from '@/components/ui/ApiErrorMessage';
 
 export default function PhoneOrderDetailPage() {
   const params = useParams();
@@ -92,14 +93,16 @@ export default function PhoneOrderDetailPage() {
   if (error || !order) {
     return (
       <PageTransition>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-red-600">Error loading order: {error?.message || 'Order not found'}</p>
-            <Button onClick={() => router.back()} className="mt-4 cursor-pointer text-accent">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go Back
-            </Button>
-          </div>
+        <div className="min-h-[60vh]">
+          <ApiErrorMessage
+            error={error || { message: 'Order not found' }}
+            title="Error Loading Order"
+            onRetry={() => refetch()}
+            retryLabel="Retry"
+            showReload={false}
+            showGoBack={true}
+          />
+
         </div>
       </PageTransition>
     );

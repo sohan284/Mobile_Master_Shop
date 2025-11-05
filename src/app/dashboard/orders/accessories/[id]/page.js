@@ -29,6 +29,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
+import ApiErrorMessage from '@/components/ui/ApiErrorMessage';
 
 export default function AccessoryOrderDetailPage() {
   const params = useParams();
@@ -38,7 +39,7 @@ export default function AccessoryOrderDetailPage() {
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
   // Fetch order details
-  const { data: orderData, isLoading, error } = useApiGet(
+  const { data: orderData, isLoading, error, refetch } = useApiGet(
     ['accessoryOrder', orderId],
     () => apiFetcher.get(`/api/accessories/orders/${orderId}/`)
   );
@@ -103,12 +104,17 @@ export default function AccessoryOrderDetailPage() {
   if (error || !order) {
     return (
       <PageTransition>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-red-600">
-              Error loading order: {error?.message || 'Order not found'}
-            </p>
-            <Button onClick={() => router.back()} className="mt-4 cursor-pointer text-accent">
+        <div className="min-h-[60vh]">
+          <ApiErrorMessage
+            error={error || { message: 'Order not found' }}
+            title="Error Loading Order"
+            onRetry={() => refetch()}
+            retryLabel="Retry"
+            showReload={false}
+            showGoBack={true}
+          />
+          <div className="flex justify-center mt-4">
+            <Button onClick={() => router.back()} className="cursor-pointer">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Go Back
             </Button>

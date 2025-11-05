@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { apiFetcher } from '@/lib/api';
+import toast from 'react-hot-toast';
 
 export default function ContactPage() {
   const t = useTranslations('contact');
@@ -37,16 +39,29 @@ export default function ContactPage() {
   const handleSubmit = async () => {
     if (!formData.name.trim() || !formData.email.trim() || !validateEmail(formData.email) ||
       !formData.subject.trim() || !formData.message.trim()) {
-      alert(t('fillAllFields'));
+      toast.error(t('fillAllFields') || 'Please fill all required fields');
       return;
     }
 
     setIsSubmitting(true);
+    const loadingToast = toast.loading(t('sending') || 'Sending message...');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      alert(t('messageSent'));
+      // Prepare the request body
+      const requestBody = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+      };
 
+      // Make POST request to api/contact
+      await apiFetcher.post('/api/contact', requestBody);
+
+      toast.dismiss(loadingToast);
+      toast.success(t('messageSent') || 'Message sent successfully!');
+
+      // Reset form
       setFormData({
         name: '',
         email: '',
@@ -55,7 +70,9 @@ export default function ContactPage() {
       });
 
     } catch (error) {
-      alert(t('messageFailed'));
+      toast.dismiss(loadingToast);
+      const errorMessage = error.response?.data?.message || error.message || t('messageFailed') || 'Failed to send message. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

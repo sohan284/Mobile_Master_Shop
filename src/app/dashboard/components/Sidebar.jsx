@@ -22,7 +22,8 @@ import {
   X,
   Home,
   ShoppingBag,
-  LayoutDashboard
+  LayoutDashboard,
+  MessageSquare
 } from 'lucide-react';
 
 const navigation = [
@@ -39,6 +40,7 @@ const navigation = [
     ]
   },
   { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Contacts', href: '/dashboard/contacts', icon: MessageSquare },
   {
     name: 'Repair Services',
     href: '/dashboard/repair-services',
