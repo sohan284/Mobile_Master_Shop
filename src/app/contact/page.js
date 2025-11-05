@@ -36,8 +36,8 @@ export default function ContactPage() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.name.trim() || !formData.email.trim() || !validateEmail(formData.email) || 
-        !formData.subject.trim() || !formData.message.trim()) {
+    if (!formData.name.trim() || !formData.email.trim() || !validateEmail(formData.email) ||
+      !formData.subject.trim() || !formData.message.trim()) {
       alert(t('fillAllFields'));
       return;
     }
@@ -47,14 +47,14 @@ export default function ContactPage() {
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
       alert(t('messageSent'));
-      
+
       setFormData({
         name: '',
         email: '',
         subject: '',
         message: '',
       });
-      
+
     } catch (error) {
       alert(t('messageFailed'));
     } finally {
@@ -66,22 +66,22 @@ export default function ContactPage() {
     {
       icon: MapPin,
       title: t('address'),
-      content: 'MLK Paris, France',
+      content: 'MLKPHONE\n11 Avenue of Marshal de Lattre de Tassigny\n88000 Épinal',
     },
     {
       icon: Phone,
       title: t('phone'),
-      content: '+33 1 XX XX XX XX',
+      content: '+33 06 46 08 53 80',
     },
     {
       icon: Mail,
       title: t('email'),
-      content: 'contact@mlkphone.com',
+      content: 'mlkphone.88000@gmail.com',
     },
     {
       icon: Clock,
       title: t('businessHours'),
-      content: t('monSat'),
+      content: 'day',
     },
   ];
 
@@ -93,8 +93,8 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        
+      <div className="max-w-7xl mx-auto px-4 sm:px-6  py-16 sm:py-24">
+
         {/* Hero Section */}
         <div className={`${baseEnter} ${heroAnim} delay-75 text-center mb-20`}>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
@@ -108,7 +108,7 @@ export default function ContactPage() {
         {/* Contact Form - Centered */}
         <div className={`max-w-2xl mx-auto mb-20 ${baseEnter} ${formAnim} delay-150`}>
           <div className="space-y-6">
-            
+
             {/* Name & Email Row */}
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="flex-1">
@@ -193,8 +193,8 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Info - Below Form */}
-        <div className={`max-w-4xl mx-auto ${baseEnter} ${cardsAnim} delay-200`}>
-          
+        <div className={` mx-auto ${baseEnter} ${cardsAnim} delay-200`}>
+
           {/* Contact Info Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             {contactInfo.map((info) => {
@@ -207,8 +207,13 @@ export default function ContactPage() {
                   <h3 className="font-semibold text-white mb-1 text-sm">
                     {info.title}
                   </h3>
-                  <p className="text-slate-400 text-sm">
-                    {info.content}
+                  <p className="text-slate-400 text-sm whitespace-pre-line leading-relaxed">
+                    {info.content === "day" ? <div className="flex flex-col gap-2">
+                      <p className="text-slate-400 text-nowrap">{t('monday')} : 2-7 pm</p>
+                      <p className="text-slate-400 text-nowrap">{t('tuesday')} to {t('saturday')}: </p>
+                      <p>10 am-1 pm and 2-7 pm</p>
+                      <p className="text-slate-400 text-nowrap">{t('sunday')} : 10 am-1 pm</p>
+                    </div> : info.content}
                   </p>
                 </div>
               );

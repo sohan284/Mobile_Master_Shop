@@ -20,36 +20,49 @@ export default function ModelsPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [modelsList, setModelsList] = useState([]);
+  const [movingItems, setMovingItems] = useState({});
+
   const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
     ['models'],
     () => apiFetcher.get('/api/repair/models/')
   );
-  const { data: brandsResponse, isLoading: brandsLoading, error: brandsError, refetch: refetchBrands } = useApiGet(
+
+  const { data: brandsResponse } = useApiGet(
     ['brands'],
     () => apiFetcher.get('/api/repair/brands/')
   );
   const brands = brandsResponse?.data || [];
-  const models = modelsResponse || [];
+
+  // Initialize local models list - maintain API order
+  useEffect(() => {
+    if (modelsResponse) {
+      // Keep models in the exact order from API
+      const modelsData = Array.isArray(modelsResponse) ? modelsResponse : [];
+      setModelsList(modelsData);
+    }
+  }, [modelsResponse]);
+
   const columns = [
     {
       header: 'Image',
       accessor: 'image',
       render: (item) => (
         <div className="flex items-center">
-          <Image 
-            src={item?.image || '/Apple.png'} 
+          <Image
+            src={item?.image || '/Apple.png'}
             alt={item?.name}
-            className="h-8 w-8 object-contain"
-            width={32}
-            height={32}
+            className="h-11 w-11 object-contain"
+            width={40}
+            height={40}
           />
         </div>
-      )
+      ),
     },
     {
       header: 'Model Name',
       accessor: 'name',
-      sortable: true
+      sortable: true,
     },
     {
       header: 'Brand',
@@ -59,30 +72,19 @@ export default function ModelsPage() {
           <span className="text-sm font-medium">{item.brand || 'N/A'}</span>
         </div>
       ),
-      sortable: true
-    },  
+      sortable: true,
+    },
   ];
 
-  const handleAdd = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
+  const handleAdd = () => setIsModalOpen(true);
+  const handleModalClose = () => setIsModalOpen(false);
   const handleEditModalClose = () => {
     setIsEditModalOpen(false);
     setSelectedModel(null);
   };
 
-  const handleModalSuccess = () => {
-    refetch(); // Refresh the data after successful creation
-  };
-
-  const handleEditModalSuccess = () => {
-    refetch(); // Refresh the data after successful update
-  };
+  const handleModalSuccess = () => refetch();
+  const handleEditModalSuccess = () => refetch();
 
   const handleEdit = (model) => {
     setSelectedModel(model);
@@ -96,12 +98,11 @@ export default function ModelsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!selectedModel) return;
-
     setIsDeleting(true);
     try {
       await deleteModel(selectedModel.id);
       toast.success(`${selectedModel.name} deleted successfully`);
-      refetch(); // Refresh the data after successful deletion
+      refetch();
       setIsDeleteDialogOpen(false);
       setSelectedModel(null);
     } catch (error) {
@@ -121,6 +122,90 @@ export default function ModelsPage() {
     router.push(`/dashboard/repair-services/models/${model.id}`);
   };
 
+  // Move up - API calls
+  const handleMoveUp = async (model, currentIndex) => {
+    if (currentIndex === 0) {
+      toast.error('Already at the top');
+      return;
+    }
+
+    const modelAbove = modelsList[currentIndex - 1];
+    if (!modelAbove || !model) {
+      toast.error('Cannot move item');
+      return;
+    }
+
+    // Use existing rank fields from the models
+    if (model.rank === undefined || modelAbove.rank === undefined) {
+      toast.error('Rank information is missing');
+      return;
+    }
+
+    const currentRank = model.rank;
+    const aboveRank = modelAbove.rank;
+
+    // Mark both items as moving
+    setMovingItems({ [model.id]: true, [modelAbove.id]: true });
+    
+    try {
+      // Update current model: rank + 1
+      // Update model above: rank - 1
+      await Promise.all([
+        apiFetcher.patch(`/api/repair/models/${model.id}/`, { rank: currentRank + 1 }),
+        apiFetcher.patch(`/api/repair/models/${modelAbove.id}/`, { rank: aboveRank - 1 })
+      ]);
+      
+      toast.success('Model moved up successfully');
+      refetch();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
+    } finally {
+      setMovingItems({});
+    }
+  };
+
+  // Move down - API calls
+  const handleMoveDown = async (model, currentIndex) => {
+    if (currentIndex === modelsList.length - 1) {
+      toast.error('Already at the bottom');
+      return;
+    }
+
+    const modelBelow = modelsList[currentIndex + 1];
+    if (!modelBelow || !model) {
+      toast.error('Cannot move item');
+      return;
+    }
+
+    // Use existing rank fields from the models
+    if (model.rank === undefined || modelBelow.rank === undefined) {
+      toast.error('Rank information is missing');
+      return;
+    }
+
+    const currentRank = model.rank;
+    const belowRank = modelBelow.rank;
+
+    // Mark both items as moving
+    setMovingItems({ [model.id]: true, [modelBelow.id]: true });
+    
+    try {
+      // Update current model: rank - 1
+      // Update model below: rank + 1
+      await Promise.all([
+        apiFetcher.patch(`/api/repair/models/${model.id}/`, { rank: currentRank - 1 }),
+        apiFetcher.patch(`/api/repair/models/${modelBelow.id}/`, { rank: belowRank + 1 })
+      ]);
+      
+      toast.success('Model moved down successfully');
+      refetch();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
+    } finally {
+      setMovingItems({});
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -129,7 +214,7 @@ export default function ModelsPage() {
       </div>
 
       <DataTable
-        data={models}
+        data={modelsList}
         columns={columns}
         title="Phone Models"
         onAdd={handleAdd}
@@ -137,10 +222,13 @@ export default function ModelsPage() {
         onDelete={handleDelete}
         onView={handleView}
         onRowClick={handleView}
+        onMoveUp={handleMoveUp}
+        onMoveDown={handleMoveDown}
         searchable={true}
         pagination={true}
         itemsPerPage={10}
         loading={isLoading}
+        movingItems={movingItems}
       />
 
       {/* Add Model Modal */}

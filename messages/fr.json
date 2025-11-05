@@ -206,7 +206,11 @@
     "selectTime": "Sélectionner une heure",
     "scheduleRequired": "Veuillez sélectionner une date et une heure pour continuer",
     "scheduleDescription": "Choisissez une date et une heure préférées pour votre service de réparation",
-    "selectedSchedule": "Horaire sélectionné"
+    "selectedSchedule": "Horaire sélectionné",
+    "timeNotAvailable": "L'heure sélectionnée n'est pas disponible. Veuillez sélectionner une heure pendant les heures d'ouverture.",
+    "mondayHours": "Lundi : 14h-19h",
+    "tuesdayToSaturdayHours": "Mardi au samedi : 10h-13h et 14h-19h",
+    "sundayHours": "Dimanche : 10h-13h"
   },
   "phones": {
     "latestPhones": "DERNIERS TÉLÉPHONES",
@@ -598,7 +602,14 @@
     "emailPlaceholder": "jean@exemple.com",
     "fillAllFields": "Veuillez remplir tous les champs correctement",
     "messageSent": "Message envoyé avec succès ! Nous vous répondrons dès que possible.",
-    "messageFailed": "Échec de l'envoi du message. Veuillez réessayer."
+    "messageFailed": "Échec de l'envoi du message. Veuillez réessayer.",
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche"
   },
   "profile": {
     "pleaseLogin": "Veuillez vous connecter pour voir votre profil",

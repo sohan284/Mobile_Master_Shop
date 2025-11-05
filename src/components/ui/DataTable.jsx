@@ -48,30 +48,43 @@ export default function DataTable({
   height = "80vh",
   orderTypeFilter, // JSX component
   statusFilter, // JSX component
-  movingItems = {} // Track which items are being moved
+  movingItems = {}, // Track which items are being moved
+  // Server-side pagination props
+  totalCount = null,
+  totalPages = null,
+  currentPage = null,
+  onPageChange = null
 }) {
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
   const dataRef = useRef(safeData);
   
+  // Determine if using server-side pagination
+  const isServerSidePagination = totalCount !== null && totalPages !== null && currentPage !== null && onPageChange !== null;
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [clientCurrentPage, setClientCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
-  // Reset pagination and search when data changes
+  // Use server-side or client-side pagination
+  const effectiveCurrentPage = isServerSidePagination ? currentPage : clientCurrentPage;
+  const effectiveTotalPages = isServerSidePagination ? totalPages : null;
+  const effectiveTotalCount = isServerSidePagination ? totalCount : null;
+
+  // Reset pagination and search when data changes (only for client-side)
   useEffect(() => {
-    if (dataRef.current !== safeData) {
-      setCurrentPage(1);
+    if (!isServerSidePagination && dataRef.current !== safeData) {
+      setClientCurrentPage(1);
       setSearchTerm('');
       setSortField('');
       setSortDirection('asc');
       dataRef.current = safeData;
     }
-  }, [safeData]);
+  }, [safeData, isServerSidePagination]);
 
-  // Filter data based on search term
+  // Filter data based on search term (status filtering is handled by API)
   const filteredData = safeData.filter(item => {
     // Apply search term filter
     if (!searchTerm) return true;
@@ -93,19 +106,24 @@ export default function DataTable({
     return 0;
   });
 
-  // Pagination - ensure we always show exactly itemsPerPage items
-  const totalPages = Math.max(1, Math.ceil(sortedData.length / itemsPerPage));
-  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
-  const paginatedData = pagination ? sortedData.slice(startIndex, endIndex) : sortedData;
-
-  // Sync currentPage with validCurrentPage if they differ
-  useEffect(() => {
-    if (currentPage !== validCurrentPage) {
-      setCurrentPage(validCurrentPage);
-    }
-  }, [currentPage, validCurrentPage]);
+  // Pagination - server-side or client-side
+  let paginatedData, validCurrentPage, startIndex, endIndex, calculatedTotalPages;
+  
+  if (isServerSidePagination) {
+    // Server-side pagination: data is already paginated from API
+    paginatedData = sortedData;
+    validCurrentPage = Math.min(Math.max(1, effectiveCurrentPage), effectiveTotalPages);
+    startIndex = (validCurrentPage - 1) * itemsPerPage;
+    endIndex = Math.min(startIndex + paginatedData.length, effectiveTotalCount);
+    calculatedTotalPages = effectiveTotalPages;
+  } else {
+    // Client-side pagination: paginate the data locally
+    calculatedTotalPages = Math.max(1, Math.ceil(sortedData.length / itemsPerPage));
+    validCurrentPage = Math.min(Math.max(1, effectiveCurrentPage), calculatedTotalPages);
+    startIndex = (validCurrentPage - 1) * itemsPerPage;
+    endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
+    paginatedData = pagination ? sortedData.slice(startIndex, endIndex) : sortedData;
+  }
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -117,7 +135,11 @@ export default function DataTable({
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (isServerSidePagination) {
+      onPageChange(page);
+    } else {
+      setClientCurrentPage(page);
+    }
   };
 
   const renderCell = (item, column) => {
@@ -356,13 +378,21 @@ export default function DataTable({
         <div className="px-6 py-4 border-t flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              {sortedData.length > 0 ? (
-                `Showing ${startIndex + 1} to ${endIndex} of ${sortedData.length} ${sortedData.length === 1 ? 'result' : 'results'}`
+              {isServerSidePagination ? (
+                effectiveTotalCount > 0 ? (
+                  `Showing ${startIndex + 1} to ${endIndex} of ${effectiveTotalCount} ${effectiveTotalCount === 1 ? 'result' : 'results'}`
+                ) : (
+                  'No results'
+                )
               ) : (
-                'No results'
+                sortedData.length > 0 ? (
+                  `Showing ${startIndex + 1} to ${endIndex} of ${sortedData.length} ${sortedData.length === 1 ? 'result' : 'results'}`
+                ) : (
+                  'No results'
+                )
               )}
             </div>
-            {totalPages > 1 && (
+            {calculatedTotalPages > 1 && (
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -374,7 +404,7 @@ export default function DataTable({
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {Array.from({ length: calculatedTotalPages }, (_, i) => i + 1).map(page => (
                   <Button
                     key={page}
                     variant={validCurrentPage === page ? "default" : "outline"}
@@ -390,7 +420,7 @@ export default function DataTable({
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage + 1)}
-                  disabled={validCurrentPage === totalPages}
+                  disabled={validCurrentPage === calculatedTotalPages}
                   className="h-8 w-8 p-0 cursor-pointer"
                 >
                   <ChevronRight className="h-4 w-4" />

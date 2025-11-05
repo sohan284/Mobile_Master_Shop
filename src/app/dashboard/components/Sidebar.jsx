@@ -21,11 +21,23 @@ import {
   Package,
   X,
   Home,
-  ShoppingBag
+  ShoppingBag,
+  LayoutDashboard
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Order Management', href: '/dashboard', icon: ShoppingBag },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  {
+    name: 'Order Management',
+    href: '/dashboard/orders',
+    icon: ShoppingBag,
+    hasSubmenu: true,
+    submenu: [
+      { name: 'Repair Orders', href: '/dashboard/orders/repairs', icon: Wrench },
+      { name: 'New Phone Orders', href: '/dashboard/orders/phones', icon: Smartphone },
+      { name: 'Accessories Orders', href: '/dashboard/orders/accessories', icon: Package },
+    ]
+  },
   { name: 'Users', href: '/dashboard/users', icon: Users },
   {
     name: 'Repair Services',
@@ -116,8 +128,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.submenu && item.submenu.some((sub) => pathname === sub.href));
-              const isExpanded = expandedMenus.includes(item.name);
+                (item.submenu && item.submenu.some((sub) => pathname === sub.href)) ||
+                (item.hasSubmenu && pathname.startsWith(item.href + '/'));
+              const isExpanded = expandedMenus.includes(item.name) || isActive;
 
               return (
                 <li key={item.name}>
