@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react';
 import DataTable from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, Eye, ArrowLeft } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
-import Link from 'next/link';
 import AddModelModal from './components/AddModelModal';
 import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -20,6 +19,7 @@ export default function NewPhoneModelsPage() {
   const [selectedModel, setSelectedModel] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [movingModels, setMovingModels] = useState({}); // Track which models are being moved
   
   // Fetch brands for the dropdown
   const { data: brandsResponse, isLoading: brandsLoading } = useApiGet(
@@ -40,7 +40,17 @@ export default function NewPhoneModelsPage() {
     ['new-phone-models'],
     () => apiFetcher.get('/api/brandnew/models/')
   );
-  const models = modelsResponse?.data || [];
+  
+  const [modelsList, setModelsList] = useState([]);
+
+  // Initialize local models list - maintain API order
+  useEffect(() => {
+    if (modelsResponse) {
+      // Keep models in the exact order from API
+      const modelsData = modelsResponse?.data || [];
+      setModelsList(modelsData);
+    }
+  }, [modelsResponse]);
 
   const columns = [
     {
@@ -185,6 +195,90 @@ export default function NewPhoneModelsPage() {
     setIsDeleting(false);
   };
 
+  // Move up - API calls
+  const handleMoveUp = async (model, currentIndex) => {
+    if (currentIndex === 0) {
+      toast.error('Already at the top');
+      return;
+    }
+
+    const modelAbove = modelsList[currentIndex - 1];
+    if (!modelAbove || !model) {
+      toast.error('Cannot move item');
+      return;
+    }
+
+    // Use existing rank fields from the models
+    if (model.rank === undefined || modelAbove.rank === undefined) {
+      toast.error('Rank information is missing');
+      return;
+    }
+
+    const currentRank = model.rank;
+    const aboveRank = modelAbove.rank;
+
+    // Mark both items as moving
+    setMovingModels({ [model.id]: true, [modelAbove.id]: true });
+    
+    try {
+      // Update current model: rank + 1
+      // Update model above: rank - 1
+      await Promise.all([
+        apiFetcher.patch(`/api/brandnew/models/${model.id}/`, { rank: currentRank + 1 }),
+        apiFetcher.patch(`/api/brandnew/models/${modelAbove.id}/`, { rank: aboveRank - 1 })
+      ]);
+      
+      toast.success('Model moved up successfully');
+      refetch();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
+    } finally {
+      setMovingModels({});
+    }
+  };
+
+  // Move down - API calls
+  const handleMoveDown = async (model, currentIndex) => {
+    if (currentIndex === modelsList.length - 1) {
+      toast.error('Already at the bottom');
+      return;
+    }
+
+    const modelBelow = modelsList[currentIndex + 1];
+    if (!modelBelow || !model) {
+      toast.error('Cannot move item');
+      return;
+    }
+
+    // Use existing rank fields from the models
+    if (model.rank === undefined || modelBelow.rank === undefined) {
+      toast.error('Rank information is missing');
+      return;
+    }
+
+    const currentRank = model.rank;
+    const belowRank = modelBelow.rank;
+
+    // Mark both items as moving
+    setMovingModels({ [model.id]: true, [modelBelow.id]: true });
+    
+    try {
+      // Update current model: rank - 1
+      // Update model below: rank + 1
+      await Promise.all([
+        apiFetcher.patch(`/api/brandnew/models/${model.id}/`, { rank: currentRank - 1 }),
+        apiFetcher.patch(`/api/brandnew/models/${modelBelow.id}/`, { rank: belowRank + 1 })
+      ]);
+      
+      toast.success('Model moved down successfully');
+      refetch();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
+    } finally {
+      setMovingModels({});
+    }
+  };
+
   return (
     <div className="space-y-6">
     
@@ -195,16 +289,19 @@ export default function NewPhoneModelsPage() {
       </div>
 
       <DataTable
-        data={models}
+        data={modelsList}
         columns={columns}
         title="Models"
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onMoveUp={handleMoveUp}
+        onMoveDown={handleMoveDown}
         searchable={true}
         pagination={true}
         itemsPerPage={10}
         loading={isLoading}
+        movingItems={movingModels}
       />
 
       {/* Add Model Modal */}

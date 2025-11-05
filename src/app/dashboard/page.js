@@ -1,365 +1,643 @@
 'use client';
-import React, { useState, useMemo } from 'react';
-import { 
-  Package, 
-  Wrench,
-  Smartphone,
-  ShoppingBag,
-  Calendar
-} from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
-import DataTable from '@/components/ui/DataTable';
+import {
+  ShoppingBag, 
+  Package, 
+  Smartphone, 
+  Wrench, 
+  DollarSign, 
+  Clock,
+  CheckCircle,
+  XCircle,
+  Truck,
+  RefreshCw
+} from 'lucide-react';
+
+// Dynamically import ApexCharts to avoid SSR issues
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function Dashboard() {
-  const [selectedFilter, setSelectedFilter] = useState('all'); // 'all', 'repair', 'phone', 'accessory'
+  const [hoveredOrderStatus, setHoveredOrderStatus] = useState(null);
 
-  // Fetch orders from all three APIs
-  const { data: repairOrdersData, isLoading: isLoadingRepair, error: errorRepair } = useApiGet(
-    ['dashboardRepairOrders'],
-    () => apiFetcher.get('/api/repair/orders/')
-  );
-  const { data: phoneOrdersData, isLoading: isLoadingPhone, error: errorPhone } = useApiGet(
-    ['dashboardPhoneOrders'],
-    () => apiFetcher.get('/api/brandnew/orders/')
-  );
-  const { data: accessoryOrdersData, isLoading: isLoadingAccessory, error: errorAccessory } = useApiGet(
-    ['dashboardAccessoryOrders'],
-    () => apiFetcher.get('/api/accessories/orders/')
+  // Fetch statistics from orders API without order_type parameter
+  const { data: ordersData, isLoading, error } = useApiGet(
+    ['dashboardStatistics'],
+    () => apiFetcher.get('/api/admin/orders/')
   );
 
-  // Normalize order data - ensure orderType is set correctly and cannot be overwritten
-  const normalizeOrder = (order, type) => {
-    const normalized = {
-      ...order,
-      // Explicitly set orderType after spread to ensure it's correct
-      orderType: type,
-      // Normalize common fields
-      productName: order.phone_model_name || order.product_title || 'N/A',
-      brandName: order.brand_name || order.phone_model_brand || 'N/A',
-      productImage: order.phone_image || order.product_image || null,
-      quantity: order.quantity || order.items_count || 1,
-      orderNumber: order.order_number || `#${order.id}`,
-      customerName: order.customer_name || 'N/A',
-      customerPhone: order.customer_phone || 'N/A',
-      totalAmount: parseFloat(order.total_amount) || 0,
-      currency: order.currency || 'EUR',
-      status: order.status || 'unknown',
-      statusDisplay: order.status_display || order.status || 'Unknown',
-      paymentStatus: order.payment_status || 'unknown',
-      paymentStatusDisplay: order.payment_status_display || order.payment_status || 'Unknown',
-      createdAt: order.created_at || null,
-      // Color information for phone orders
-      colorName: order.color_name || order.color?.name || order.color || null,
-      colorCode: order.color_code || order.color?.hex_code || order.color?.code || null,
-    };
-    // Force orderType to be correct (in case original order had conflicting property)
-    normalized.orderType = type;
-    return normalized;
+  const statistics = ordersData?.statistics || null;
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    if (!amount) return '0.00';
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  // Extract and normalize orders
-  const normalizedRepairOrders = useMemo(() => {
-    const repairOrders = Array.isArray(repairOrdersData?.data) ? repairOrdersData.data : 
-                         Array.isArray(repairOrdersData) ? repairOrdersData : 
-                         (repairOrdersData?.results || []);
-    return repairOrders.map(order => normalizeOrder(order, 'repair')).sort((a, b) => {
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-    });
-  }, [repairOrdersData]);
-  
-  const normalizedPhoneOrders = useMemo(() => {
-    const phoneOrders = Array.isArray(phoneOrdersData?.data) ? phoneOrdersData.data : 
-                       Array.isArray(phoneOrdersData) ? phoneOrdersData : 
-                       (phoneOrdersData?.results || []);
-    return phoneOrders.map(order => normalizeOrder(order, 'phone')).sort((a, b) => {
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-    });
-  }, [phoneOrdersData]);
-  
-  const normalizedAccessoryOrders = useMemo(() => {
-    const accessoryOrders = Array.isArray(accessoryOrdersData?.data) ? accessoryOrdersData.data : 
-                           Array.isArray(accessoryOrdersData) ? accessoryOrdersData : 
-                           (accessoryOrdersData?.results || []);
-    return accessoryOrders.map(order => normalizeOrder(order, 'accessory')).sort((a, b) => {
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-    });
-  }, [accessoryOrdersData]);
-
-  const totalOrders = normalizedRepairOrders.length + normalizedPhoneOrders.length + normalizedAccessoryOrders.length;
-
-  const isLoading = isLoadingRepair || isLoadingPhone || isLoadingAccessory;
-  const error = errorRepair || errorPhone || errorAccessory;
-
-  // Filter orders based on selected filter with explicit type checking
-  const filteredOrders = useMemo(() => {
-    // Combine all orders for filtering
-    const allOrders = [
-      ...normalizedRepairOrders,
-      ...normalizedPhoneOrders,
-      ...normalizedAccessoryOrders
-    ];
+  // Prepare data for bar chart - Revenue by Order Type
+  const barChartData = useMemo(() => {
+    if (!statistics?.revenue_by_type) return null;
     
-    switch(selectedFilter) {
+    const categories = [];
+    const series = [];
+    const barColors = [];
+
+    Object.entries(statistics.revenue_by_type).forEach(([type, revenue]) => {
+      switch (type.toLowerCase()) {
+        case 'phone':
+          categories.push('New Phones');
+          barColors.push('#10B981'); // green
+          break;
+        case 'repair':
+          categories.push('Repairs');
+          barColors.push('#3B82F6'); // blue
+          break;
+        case 'accessory':
+          categories.push('Accessories');
+          barColors.push('#8B5CF6'); // purple
+          break;
+        default:
+          categories.push(type);
+          barColors.push('#6B7280'); // gray
+      }
+      series.push(typeof revenue === 'string' ? parseFloat(revenue) : revenue);
+    });
+
+    return {
+      series: [{
+        name: 'Revenue',
+        data: series
+      }],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 250,
+          toolbar: { show: false },
+          fontFamily: 'inherit'
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 4,
+            horizontal: false,
+            columnWidth: '55%',
+            dataLabels: {
+              position: 'top'
+            },
+            distributed: true
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: (val) => `€${formatCurrency(val)}`,
+          offsetY: -20,
+          style: {
+            fontSize: '11px',
+            colors: ['#374151']
+          }
+        },
+        xaxis: {
+          categories: categories,
+          labels: {
+            style: {
+              fontSize: '11px',
+              colors: '#6B7280'
+            }
+          }
+        },
+        yaxis: {
+          labels: {
+            formatter: (val) => `€${formatCurrency(val)}`,
+            style: {
+              fontSize: '11px',
+              colors: '#6B7280'
+            }
+          }
+        },
+        colors: barColors,
+        tooltip: {
+          y: {
+            formatter: (val) => `€${formatCurrency(val)}`
+          }
+        },
+        grid: {
+          borderColor: '#E5E7EB',
+          strokeDashArray: 4
+        }
+      }
+    };
+  }, [statistics]);
+
+  // Prepare data for pie chart - Order Type Distribution
+  const pieChartData = useMemo(() => {
+    if (!statistics?.order_type_summary) return null;
+
+    const labels = [];
+    const series = [];
+    const colors = [];
+
+    Object.entries(statistics.order_type_summary).forEach(([type, count]) => {
+      switch (type.toLowerCase()) {
+        case 'phone':
+          labels.push('New Phones');
+          colors.push('#10B981');
+          break;
       case 'repair':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'repair').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
-      case 'phone':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'phone').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+          labels.push('Repairs');
+          colors.push('#3B82F6');
+        break;
       case 'accessory':
-        // Explicitly filter by orderType to ensure correct data
-        return allOrders.filter(order => order.orderType === 'accessory').sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
+          labels.push('Accessories');
+          colors.push('#8B5CF6');
+        break;
       default:
-        // Return all orders sorted by date
-        return allOrders.sort((a, b) => {
-          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        });
-    }
-  }, [selectedFilter, normalizedRepairOrders, normalizedPhoneOrders, normalizedAccessoryOrders]);
+          labels.push(type);
+          colors.push('#6B7280');
+      }
+      series.push(count || 0);
+    });
 
-  // Get status badge styling
-  const getStatusBadge = (status) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower === 'confirmed' || statusLower === 'completed') {
-      return 'bg-green-100 text-green-800';
-    } else if (statusLower === 'pending' || statusLower === 'processing') {
-      return 'bg-yellow-100 text-yellow-800';
-    } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
-      return 'bg-red-100 text-red-800';
-    } else if (statusLower === 'shipped') {
-      return 'bg-blue-100 text-blue-800';
-    }
-    return 'bg-gray-100 text-gray-800';
-  };
+    return {
+      series: series,
+      options: {
+        chart: {
+          type: 'pie',
+          height: 250,
+          fontFamily: 'inherit'
+        },
+        labels: labels,
+        colors: colors,
+        legend: {
+          position: 'bottom',
+          fontSize: '12px',
+          labels: {
+            colors: '#374151'
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: (val, opts) => {
+            return `${opts.w.globals.series[opts.seriesIndex]} (${val.toFixed(1)}%)`;
+          },
+          style: {
+            fontSize: '12px',
+            fontWeight: 600,
+            colors: ['#fff']
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: (val) => `${val} orders`
+          }
+        }
+      }
+    };
+  }, [statistics]);
 
-  // Define columns for DataTable
-  const columns = [
-    {
-      header: 'Order Number',
-      accessor: 'orderNumber',
-      sortable: true,
-    },
-    {
-      header: 'Type',
-      accessor: 'orderType',
-      sortable: true,
-      render: (order) => (
-        <span className="inline-flex items-center gap-1">
-          {order.orderType === 'repair' && <Wrench size={14} className="text-blue-600" />}
-          {order.orderType === 'phone' && <Smartphone size={14} className="text-green-600" />}
-          {order.orderType === 'accessory' && <ShoppingBag size={14} className="text-purple-600" />}
-          <span className="capitalize">
-            {order.orderType === 'phone' ? 'New Phone' : 
-             order.orderType === 'repair' ? 'Repair' : 
-             'Accessory'}
-          </span>
-        </span>
-      ),
-    },
-    {
-      header: 'Product',
-      accessor: 'productName',
-      sortable: true,
-      render: (order) => (
-        <div className="flex flex-col">
-          <span className="font-medium">{order.productName}</span>
-          {order.brandName && order.brandName !== 'N/A' && (
-            <span className="text-xs text-gray-500">Brand: {order.brandName}</span>
-          )}
-          {order.orderType === 'phone' && order.colorName && (
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-gray-500">Color:</span>
-              <div className="flex items-center gap-1">
-                {order.colorCode && (
-                  <span 
-                    className="inline-block w-3 h-3 rounded-full border border-gray-300"
-                    style={{ backgroundColor: order.colorCode }}
-                    title={order.colorName}
-                  />
-                )}
-                <span className="text-xs font-medium text-gray-700">{order.colorName}</span>
+  // Prepare data for pie chart - Order Status Distribution
+  const orderStatusChartData = useMemo(() => {
+    if (!statistics?.status_summary) return null;
+
+    const labels = [];
+    const series = [];
+    const colors = [];
+
+    Object.entries(statistics.status_summary).forEach(([status, count]) => {
+      labels.push(status.charAt(0).toUpperCase() + status.slice(1));
+      series.push(count || 0);
+      
+      switch (status.toLowerCase()) {
+        case 'pending':
+          colors.push('#FFA500'); // yellow
+          break;
+        case 'confirmed':
+          colors.push('#10B981'); // green
+          break;
+        case 'processing':
+          colors.push('#3B82F6'); // blue
+          break;
+        case 'shipped':
+          colors.push('#6366F1'); // indigo
+          break;
+        case 'delivered':
+          colors.push('#059669'); // emerald
+          break;
+        case 'cancelled':
+        case 'canceled':
+          colors.push('#EF4444'); // red
+          break;
+        case 'refunded':
+          colors.push('#F97316'); // orange
+          break;
+        default:
+          colors.push('#6B7280'); // gray
+      }
+    });
+
+    return {
+      series: series,
+      options: {
+        labels: labels,
+        colors: colors,
+        legend: {
+          position: 'bottom',
+          fontSize: '12px',
+          labels: {
+            colors: '#374151'
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: (val, opts) => {
+            return `${opts.w.globals.series[opts.seriesIndex]} (${val.toFixed(1)}%)`;
+          },
+          style: {
+            fontSize: '12px',
+            fontWeight: 600,
+            colors: ['#fff']
+          }
+        },
+        tooltip: {
+          y: {
+            formatter: (val) => `${val} orders`
+          }
+        },
+        chart: {
+          type: 'donut',
+          height: 250,
+          fontFamily: 'inherit',
+          events: {
+            dataPointMouseEnter: function(event, chartContext, config) {
+              const dataPointIndex = config.dataPointIndex;
+              const series = config.w.globals.series;
+              const labels = config.w.globals.labels;
+              if (series[dataPointIndex] !== undefined) {
+                setHoveredOrderStatus({
+                  label: labels[dataPointIndex],
+                  value: series[dataPointIndex]
+                });
+              }
+            },
+            dataPointMouseLeave: function() {
+              setHoveredOrderStatus(null);
+            }
+          }
+        },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '65%',
+              labels: {
+                show: true,
+                total: {
+                  show: true,
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  label: hoveredOrderStatus ? hoveredOrderStatus.label : 'Total',
+                  formatter: function() {
+                    if (hoveredOrderStatus) {
+                      return hoveredOrderStatus.value.toString();
+                    }
+                    const total = this.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                    return total.toString();
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  }, [statistics, hoveredOrderStatus]);
+
+  // Prepare data for bar chart - Payment Status Distribution
+  const paymentStatusChartData = useMemo(() => {
+    if (!statistics?.payment_summary) return null;
+
+    const categories = [];
+    const series = [];
+    const barColors = [];
+
+    Object.entries(statistics.payment_summary).forEach(([status, count]) => {
+      categories.push(status.charAt(0).toUpperCase() + status.slice(1));
+      series.push(count || 0);
+      
+      switch (status.toLowerCase()) {
+        case 'paid':
+          barColors.push('#10B981'); // green
+          break;
+        case 'pending':
+          barColors.push('#FFA500'); // yellow
+          break;
+        case 'failed':
+          barColors.push('#EF4444'); // red
+          break;
+        case 'refunded':
+          barColors.push('#F97316'); // orange
+          break;
+        default:
+          barColors.push('#6B7280'); // gray
+      }
+    });
+
+    return {
+      series: [{
+        name: 'Orders',
+        data: series
+      }],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 250,
+          toolbar: { show: false },
+          fontFamily: 'inherit'
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 4,
+            horizontal: false,
+            columnWidth: '55%',
+            dataLabels: {
+              position: 'top'
+            },
+            distributed: true
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: (val) => `${val} orders`,
+          offsetY: -20,
+          style: {
+            fontSize: '11px',
+            colors: ['#374151']
+          }
+        },
+        xaxis: {
+          categories: categories,
+          labels: {
+            style: {
+              fontSize: '11px',
+              colors: '#6B7280'
+            }
+          }
+        },
+        yaxis: {
+          labels: {
+            formatter: (val) => `${val}`,
+            style: {
+              fontSize: '11px',
+              colors: '#6B7280'
+            }
+          }
+        },
+        colors: barColors,
+        tooltip: {
+          y: {
+            formatter: (val) => `${val} orders`
+          }
+        },
+        grid: {
+          borderColor: '#E5E7EB',
+          strokeDashArray: 4
+        }
+      }
+    };
+  }, [statistics]);
+
+  if (isLoading) {
+    return (
+      <PageTransition>
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
+          <div className="mb-3">
+            <Skeleton className="h-7 w-32 mb-2" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            <div className="space-y-4">
+              {/* Summary Cards Skeleton */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <Skeleton className="h-3 w-20 mb-2" />
+                        <Skeleton className="h-6 w-24" />
+                      </div>
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Charts Skeleton - First Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <Skeleton className="h-5 w-40 mb-3" />
+                  <Skeleton className="h-[250px] w-full rounded" />
+                </div>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <Skeleton className="h-5 w-36 mb-3" />
+                  <div className="flex items-center justify-center">
+                    <Skeleton className="h-[250px] w-[250px] rounded-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Charts Skeleton - Second Row */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <Skeleton className="h-5 w-28 mb-3" />
+                  <div className="flex items-center justify-center">
+                    <Skeleton className="h-[250px] w-[250px] rounded-full" />
+                  </div>
+                </div>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                  <Skeleton className="h-5 w-32 mb-3" />
+                  <Skeleton className="h-[250px] w-full rounded" />
+                </div>
               </div>
             </div>
-          )}
-        </div>
-      ),  
-    },
-    {
-      header: 'Customer',
-      accessor: 'customerName',
-      sortable: true,
-      render: (order) => (
-        <div className="flex flex-col">
-          <span>{order.customerName}</span>
-          {order.customerPhone && order.customerPhone !== 'N/A' && (
-            <span className="text-xs text-gray-500">{order.customerPhone}</span>
-          )}
-          {order?.shipping_address && (
-            <span className="text-xs text-gray-500">Address: {order.shipping_address}</span>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: 'Amount',
-      accessor: 'totalAmount',
-      sortable: true,
-      render: (order) => (
-        <span className="font-medium">
-          {order.totalAmount.toFixed(2)} {order.currency}
-        </span>
-      ),
-    },
-    {
-      header: 'Status',
-      accessor: 'status',
-      sortable: true,
-      render: (order) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.status)}`}>
-          {order.statusDisplay}
-        </span>
-      ),
-    },
-    {
-      header: 'Payment',
-      accessor: 'paymentStatus',
-      sortable: true,
-      render: (order) => (
-        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(order.paymentStatus)}`}>
-          {order.paymentStatusDisplay}
-        </span>
-      ),
-    },
-    {
-      header: 'Date',
-      accessor: 'createdAt',
-      sortable: true,
-      render: (order) => (
-        order.createdAt ? (
-          <div className="flex items-center gap-1">
-            <Calendar size={14} />
-            <span>
-              {new Date(order.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </span>
           </div>
-        ) : (
-          'N/A'
-        )
-      ),
-    },
-  ];
+        </div>
+      </PageTransition>
+    );
+  }
 
-  // Order cards configuration
-  const orderCards = [
-    {
-      id: 'all',
-      name: 'All Orders',
-      count: totalOrders,
-      icon: Package,
-      color: 'bg-gray-200',
-      iconColor: 'text-gray-800',
-    },
-    {
-      id: 'repair',
-      name: 'All Repair Services',
-      count: normalizedRepairOrders.length,
-      icon: Wrench,
-      color: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    {
-      id: 'phone',
-      name: 'All New Phones',
-      count: normalizedPhoneOrders.length,
-      icon: Smartphone,
-      color: 'bg-green-50',
-      iconColor: 'text-green-600',
-    },
-    {
-      id: 'accessory',
-      name: 'All Accessories Orders',
-      count: normalizedAccessoryOrders.length,
-      icon: ShoppingBag,
-      color: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-    },
-  ];
+  if (error) {
+    return (
+      <PageTransition>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <p className="text-red-600">Error loading statistics: {error.message || 'Unknown error'}</p>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  if (!statistics) {
+    return (
+      <PageTransition>
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-gray-600">No statistics available</p>
+        </div>
+      </PageTransition>
+    );
+  }
 
   return (
     <PageTransition>
-      <div className="flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
-        {/* Fixed Header and Cards Section */}
-        <div className="flex-shrink-0 space-y-6 pb-6">
-   
-
-          {/* Order Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {orderCards.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => setSelectedFilter(card.id)}
-                className={`bg-white p-6 rounded-lg shadow-sm border-2 transition-all cursor-pointer hover:shadow-md ${
-                  selectedFilter === card.id 
-                    ? 'border-primary' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-            <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-600">{card.name}</p>
-                    {isLoading ? (
-                      <Skeleton className="h-8 w-20 mt-2" />
-                    ) : (
-                      <p className="text-2xl font-bold text-gray-900 mt-1">{card.count}</p>
-                    )}
-              </div>
-                  <div className={`p-3 ${card.color} rounded-lg`}>
-                    <card.icon className={`h-6 w-6 ${card.iconColor}`} />
-              </div>
-            </div>
-              </button>
-            ))}
-          </div>
+      <div className="flex flex-col">
+        <div className="mb-3">
+          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-600">Overview of your business statistics</p>
         </div>
 
-        {/* Scrollable Orders Table Section */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 flex flex-col ">
-            {error ? (
-              <div className="p-6 text-center bg-white rounded-lg shadow-sm border border-gray-200">
-                <p className="text-red-600">Error loading orders: {error.message || 'Unknown error'}</p>
+        <div className="flex-1 overflow-y-auto">
+          <div className="space-y-4">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Total Orders */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-600 mb-1">Total Orders</p>
+                    <p className="text-xl font-bold text-gray-900">{statistics.total_orders || 0}</p>
+                  </div>
+                  <div className="bg-blue-100 rounded-full p-2">
+                    <ShoppingBag className="h-4 w-4 text-blue-600" />
+                  </div>
+                </div>
               </div>
-            ) : (
-              <DataTable
-                key={selectedFilter}
-                data={filteredOrders}
-                columns={columns}
-                title={
-                  selectedFilter === 'all' ? 'All Orders' : 
-                  selectedFilter === 'repair' ? 'Repair Services Orders' :
-                  selectedFilter === 'phone' ? 'New Phone Orders' :
-                  'Accessories Orders'
-                }
-                searchable={true}
-                pagination={true}
-                itemsPerPage={10}
-                loading={isLoading}
-                className="bg-white border-gray-200"
-              />
-            )}
+
+              {/* Total Revenue */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-600 mb-1">Total Revenue</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      €{formatCurrency(statistics.total_revenue)}
+                    </p>
+                  </div>
+                  <div className="bg-green-100 rounded-full p-2">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pending Revenue */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-gray-600 mb-1">Pending Revenue</p>
+                    <p className="text-xl font-bold text-gray-900">
+                      €{formatCurrency(statistics.pending_revenue)}
+                    </p>
+                  </div>
+                  <div className="bg-yellow-100 rounded-full p-2">
+                    <Clock className="h-4 w-4 text-yellow-600" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Types Summary */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <p className="text-xs font-medium text-gray-600 mb-2">Order Types</p>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Smartphone className="h-3 w-3 text-green-600" />
+                    <span className="text-xs text-gray-700">Phones: {statistics.order_type_summary?.phone || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Wrench className="h-3 w-3 text-blue-600" />
+                    <span className="text-xs text-gray-700">Repairs: {statistics.order_type_summary?.repair || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Package className="h-3 w-3 text-purple-600" />
+                    <span className="text-xs text-gray-700">Accessories: {statistics.order_type_summary?.accessory || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Section - First Row: Bar (2 cols) + Pie (1 col) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              {/* Bar Chart - Revenue by Order Type - Takes 2 columns */}
+              <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">Revenue by Order Type</h2>
+                {barChartData && typeof window !== 'undefined' ? (
+                  <Chart
+                    options={barChartData.options}
+                    series={barChartData.series}
+                    type="bar"
+                    height={250}
+                  />
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
+                    Loading chart...
+                  </div>
+                )}
+              </div>
+
+              {/* Pie Chart - Order Type Distribution - Takes 1 column */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Type Distribution</h2>
+                {pieChartData && typeof window !== 'undefined' ? (
+                  <Chart
+                    options={pieChartData.options}
+                    series={pieChartData.series}
+                    type="pie"
+                    height={250}
+                  />
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
+                    Loading chart...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Charts Section - Second Row: 2 Donut Charts (1 col each) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {/* Order Status Chart */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Status</h2>
+                {orderStatusChartData && typeof window !== 'undefined' ? (
+                  <Chart
+                    options={orderStatusChartData.options}
+                    series={orderStatusChartData.series}
+                    type="donut"
+                    height={250}
+                  />
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
+                    Loading chart...
+                  </div>
+                )}
+              </div>
+
+              {/* Payment Status Chart */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">Payment Status</h2>
+                {paymentStatusChartData && typeof window !== 'undefined' ? (
+                  <Chart
+                    options={paymentStatusChartData.options}
+                    series={paymentStatusChartData.series}
+                    type="bar"
+                    height={250}
+                  />
+                ) : (
+                  <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
+                    Loading chart...
+                  </div>
+                )}
+              </div>
+            </div>
         </div>
       </div>
     </div>

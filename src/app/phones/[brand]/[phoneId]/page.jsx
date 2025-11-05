@@ -254,11 +254,11 @@ export default function PhoneIndividualPage({ params }) {
                     <div className="flex-1">
                       <div className="font-medium flex items-center gap-2 text-accent">
                         <Save className="w-5 h-5 text-secondary" />
-                        {availability.store.name}
+                        MLKPHONE
                       </div>
                       <div className="text-accent/80 flex items-center gap-2">
                         <MapPin className="w-5 h-5 text-accent/60" />
-                        {availability.store.location.address}
+                         11 Avenue of Marshal de Lattre de Tassigny 88000 Épinal
                       </div>
                     </div>
                     <button 

@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import {
-  LayoutDashboard,
   Wrench,
   Smartphone,
   LogOut,
@@ -21,12 +20,27 @@ import {
   Users,
   Package,
   X,
-  Home
+  Home,
+  ShoppingBag,
+  LayoutDashboard,
+  MessageSquare
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  {
+    name: 'Order Management',
+    href: '/dashboard/orders',
+    icon: ShoppingBag,
+    hasSubmenu: true,
+    submenu: [
+      { name: 'Repair Orders', href: '/dashboard/orders/repairs', icon: Wrench },
+      { name: 'New Phone Orders', href: '/dashboard/orders/phones', icon: Smartphone },
+      { name: 'Accessories Orders', href: '/dashboard/orders/accessories', icon: Package },
+    ]
+  },
   { name: 'Users', href: '/dashboard/users', icon: Users },
+  { name: 'Contacts', href: '/dashboard/contacts', icon: MessageSquare },
   {
     name: 'Repair Services',
     href: '/dashboard/repair-services',
@@ -116,8 +130,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.submenu && item.submenu.some((sub) => pathname === sub.href));
-              const isExpanded = expandedMenus.includes(item.name);
+                (item.submenu && item.submenu.some((sub) => pathname === sub.href)) ||
+                (item.hasSubmenu && pathname.startsWith(item.href + '/'));
+              const isExpanded = expandedMenus.includes(item.name) || isActive;
 
               return (
                 <li key={item.name}>
