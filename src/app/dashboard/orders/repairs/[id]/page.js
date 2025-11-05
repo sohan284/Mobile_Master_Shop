@@ -302,11 +302,7 @@ export default function RepairOrderDetailPage() {
                         )}
                       </div>
 
-                      {item.notes && (
-                        <div className="mt-3 pt-3 border-t border-gray-100">
-                          <p className="text-sm text-gray-600">Notes: {item.notes}</p>
-                        </div>
-                      )}
+                      
 
                       <p className="text-xs text-gray-500 mt-3">
                         Added: {new Date(item.created_at).toLocaleDateString('en-US', {
@@ -358,27 +354,7 @@ export default function RepairOrderDetailPage() {
               </div>
             </div>
 
-            {/* Notes */}
-            {(order.notes || order.admin_notes) && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Notes
-                </h2>
-                {order.notes && (
-                  <div className="mb-3">
-                    <p className="text-sm font-medium text-gray-600 mb-1">Customer Notes:</p>
-                    <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
-                  </div>
-                )}
-                {order.admin_notes && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Admin Notes:</p>
-                    <p className="text-gray-700 whitespace-pre-wrap">{order.admin_notes}</p>
-                  </div>
-                )}
-              </div>
-            )}
+         
           </div>
 
           {/* Sidebar */}

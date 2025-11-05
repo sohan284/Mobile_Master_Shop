@@ -72,7 +72,7 @@ export default function ContactsPage() {
 
     setIsDeleting(true);
     try {
-      await apiFetcher.delete(`/api/contacts/${selectedContact.id}/`);
+      await apiFetcher.delete(`/api/contact/${selectedContact.id}/`);
       toast.success('Contact deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['contacts', selectedStatus, currentPage] });
       setIsDeleteDialogOpen(false);
@@ -103,7 +103,7 @@ export default function ContactsPage() {
     
     setUpdatingStatus(prev => ({ ...prev, [contactId]: true }));
     
-    const endpoint = `/api/contacts/${contactId}/`;
+    const endpoint = `/api/contact/${contactId}/`;
 
     updateStatusMutation.mutate({
       url: endpoint,
@@ -116,7 +116,7 @@ export default function ContactsPage() {
   const { data: contactsData, isLoading: isLoadingContacts, error: errorContacts, refetch } = useApiGet(
     ['contacts', selectedStatus, currentPage],
     () => {
-      const url = '/api/contacts/';
+      const url = '/api/contact/';
       const params = new URLSearchParams();
       
       // Add status query parameter if status filter is not 'all'

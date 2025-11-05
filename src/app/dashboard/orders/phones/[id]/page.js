@@ -317,50 +317,11 @@ export default function PhoneOrderDetailPage() {
                     <p className="font-medium">{order.shipping_address}</p>
                   </div>
                 )}
-                <div className="grid grid-cols-3 gap-4 mt-3">
-                  {order.city && (
-                    <div>
-                      <p className="text-sm text-gray-600">City</p>
-                      <p className="font-medium">{order.city}</p>
-                    </div>
-                  )}
-                  {order.postal_code && (
-                    <div>
-                      <p className="text-sm text-gray-600">Postal Code</p>
-                      <p className="font-medium">{order.postal_code}</p>
-                    </div>
-                  )}
-                  {order.country && (
-                    <div>
-                      <p className="text-sm text-gray-600">Country</p>
-                      <p className="font-medium">{order.country}</p>
-                    </div>
-                  )}
-                </div>
+           
               </div>
             </div>
 
-            {/* Notes */}
-            {(order.notes || order.admin_notes) && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Notes
-                </h2>
-                {order.notes && (
-                  <div className="mb-3">
-                    <p className="text-sm font-medium text-gray-600 mb-1">Customer Notes:</p>
-                    <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
-                  </div>
-                )}
-                {order.admin_notes && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Admin Notes:</p>
-                    <p className="text-gray-700 whitespace-pre-wrap">{order.admin_notes}</p>
-                  </div>
-                )}
-              </div>
-            )}
+           
           </div>
 
           {/* Sidebar */}
