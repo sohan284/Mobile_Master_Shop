@@ -30,7 +30,7 @@ export default function DashboardLayout({ children }) {
             <div></div>
             {/* <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1> */}
             <div className="flex items-center gap-4">
-              <NotificationDropdown />
+              {/* <NotificationDropdown /> */}
               <UserInfo />
             </div>
           </div>

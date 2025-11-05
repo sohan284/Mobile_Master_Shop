@@ -300,10 +300,10 @@ export default function Dashboard() {
                   label: hoveredOrderStatus ? hoveredOrderStatus.label : 'Total',
                   formatter: function() {
                     if (hoveredOrderStatus) {
-                      return hoveredOrderStatus.value.toString();
+                      return hoveredOrderStatus.value?.toString();
                     }
-                    const total = this.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                    return total.toString();
+                    const total = this.globals?.seriesTotals?.reduce((a, b) => a + b, 0);
+                    return total?.toString();
                   }
                 }
               }

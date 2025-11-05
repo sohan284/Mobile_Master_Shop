@@ -72,7 +72,7 @@ export default function ContactsPage() {
 
     setIsDeleting(true);
     try {
-      await apiFetcher.delete(`/api/contact/${selectedContact.id}/`);
+      await apiFetcher.delete(`/auth/contact/${selectedContact.id}/`);
       toast.success('Contact deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['contacts', selectedStatus, currentPage] });
       setIsDeleteDialogOpen(false);
@@ -92,8 +92,12 @@ export default function ContactsPage() {
 
   // Function to handle status change
   const handleStatusChange = async (contact, newStatus) => {
-    const currentStatus = (contact.status || '').toLowerCase();
-    if (currentStatus === newStatus.toLowerCase()) return;
+    // Convert string status to boolean
+    const newStatusBoolean = newStatus === 'resolved' || newStatus === true;
+    const currentStatus = contact.status === true || contact.status === 'true';
+    
+    // If status is already the same, return
+    if (currentStatus === newStatusBoolean) return;
     
     const contactId = contact.id;
     if (!contactId) {
@@ -103,11 +107,11 @@ export default function ContactsPage() {
     
     setUpdatingStatus(prev => ({ ...prev, [contactId]: true }));
     
-    const endpoint = `/api/contact/${contactId}/`;
+    const endpoint = `/auth/contact/${contactId}/`;
 
     updateStatusMutation.mutate({
       url: endpoint,
-      data: { status: newStatus },
+      data: { status: newStatusBoolean }, // Send boolean value
       contactId: contactId
     });
   };
@@ -116,12 +120,14 @@ export default function ContactsPage() {
   const { data: contactsData, isLoading: isLoadingContacts, error: errorContacts, refetch } = useApiGet(
     ['contacts', selectedStatus, currentPage],
     () => {
-      const url = '/api/contact/';
+      const url = '/auth/contact/';
       const params = new URLSearchParams();
       
       // Add status query parameter if status filter is not 'all'
+      // Convert 'pending' to false and 'resolved' to true for API
       if (selectedStatus !== 'all') {
-        params.append('status', selectedStatus);
+        const statusBoolean = selectedStatus === 'resolved' ? 'true' : 'false';
+        params.append('status', statusBoolean);
       }
       
       // Add page parameter
@@ -136,6 +142,10 @@ export default function ContactsPage() {
   // Extract and normalize contacts from API
   const normalizedContacts = useMemo(() => {
     const normalizeContact = (contact) => {
+      // Handle boolean status: false = pending, true = resolved
+      const status = contact.status;
+      const isResolved = status === true || status === 'true' || status === 'resolved';
+      
       return {
         ...contact,
         id: contact.id,
@@ -143,8 +153,8 @@ export default function ContactsPage() {
         email: contact.email || 'N/A',
         phone: contact.phone || contact.phone_number || 'N/A',
         message: contact.message || contact.message_text || 'N/A',
-        status: contact.status || 'pending',
-        statusDisplay: contact.status_display || contact.status || 'Pending',
+        status: isResolved, // Store as boolean
+        statusDisplay: isResolved ? 'Resolved' : 'Pending',
         createdAt: contact.created_at || contact.createdAt || null,
         updatedAt: contact.updated_at || contact.updatedAt || null,
       };
@@ -170,15 +180,15 @@ export default function ContactsPage() {
   const isLoading = isLoadingContacts;
   const error = errorContacts;
 
-  // Get status badge styling
+  // Get status badge styling (handles boolean status)
   const getStatusBadge = (status) => {
-    const statusLower = status?.toLowerCase() || '';
-    if (statusLower === 'resolved') {
+    // Handle boolean or string status
+    const isResolved = status === true || status === 'true' || status === 'resolved';
+    if (isResolved) {
       return 'bg-green-100 text-green-800';
-    } else if (statusLower === 'pending') {
+    } else {
       return 'bg-yellow-100 text-yellow-800';
     }
-    return 'bg-gray-100 text-gray-800';
   };
 
   // Get status badge classes for Select component
@@ -223,16 +233,16 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: 'Phone',
-      accessor: 'phone',
+      header: 'Subject',
+      accessor: 'subject',
       sortable: true,
       render: (contact) => (
         <div className="flex items-center gap-2">
-          <Phone className="h-4 w-4 text-gray-400" />
-          <span>{contact.phone}</span>
+          <span>{contact.subject}</span>
         </div>
       ),
     },
+    
     {
       header: 'Message',
       accessor: 'message',
@@ -249,12 +259,14 @@ export default function ContactsPage() {
       sortable: true,
       render: (contact) => {
         const isUpdating = updatingStatus[contact.id];
-        const currentStatus = contact.status?.toLowerCase() || 'pending';
-        const badgeClasses = getStatusBadgeClasses(currentStatus);
+        // Convert boolean status to string for Select component
+        const isResolved = contact.status === true || contact.status === 'true';
+        const currentStatusString = isResolved ? 'resolved' : 'pending';
+        const badgeClasses = getStatusBadgeClasses(contact.status);
         
         return (
           <Select 
-            value={currentStatus} 
+            value={currentStatusString} 
             onValueChange={(newStatus) => handleStatusChange(contact, newStatus)}
             disabled={isUpdating}
           >
@@ -266,7 +278,7 @@ export default function ContactsPage() {
                   <span className="text-xs">Updating...</span>
                 ) : (
                   <span className="text-xs font-semibold capitalize">
-                    {statusOptions.find(opt => opt.value === currentStatus)?.label || contact.statusDisplay}
+                    {contact.statusDisplay || (isResolved ? 'Resolved' : 'Pending')}
                   </span>
                 )}
               </SelectValue>
