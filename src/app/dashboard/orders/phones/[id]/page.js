@@ -24,7 +24,7 @@ export default function PhoneOrderDetailPage() {
   // Fetch order details
   const { data: orderData, isLoading, error, refetch } = useApiGet(
     ['phoneOrder', orderId],
-    () => apiFetcher.get(`/api/brandnew/admin/orders/${orderId}/`)
+    () => apiFetcher.get(`/api/brandnew/orders/${orderId}/`)
   );
 
   const order = orderData?.data || orderData;
@@ -139,7 +139,7 @@ export default function PhoneOrderDetailPage() {
                   <p className="font-medium">{order.order_number || `#${order.id}`}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Date</p>
+                  <p className="text-sm text-gray-600">Order Date</p>
                   <p className="font-medium">
                     {order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -151,7 +151,7 @@ export default function PhoneOrderDetailPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
+                  <p className="text-sm text-gray-600">Order Status</p>
                   <Select
                     value={order.status?.toLowerCase() || 'pending'}
                     onValueChange={handleStatusChange}
@@ -159,7 +159,7 @@ export default function PhoneOrderDetailPage() {
                   >
                     <SelectTrigger className={`w-full mt-1 ${getStatusBadge(order.status)}`}>
                       <SelectValue>
-                        {updatingStatus ? 'Updating...' : statusOptions.find(opt => opt.value === order.status?.toLowerCase())?.label || order.status}
+                        {updatingStatus ? 'Updating...' : order.status_display || order.status}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -177,52 +177,91 @@ export default function PhoneOrderDetailPage() {
                     {order.payment_status_display || order.payment_status || 'Unknown'}
                   </Badge>
                 </div>
-                {order.quantity && (
-                  <div>
-                    <p className="text-sm text-gray-600">Quantity</p>
-                    <p className="font-medium">{order.quantity}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-sm text-gray-600">Quantity</p>
+                  <p className="font-medium">{order.quantity || 1}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Last Updated</p>
+                  <p className="font-medium text-sm">
+                    {order.updated_at ? new Date(order.updated_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'}
+                  </p>
+                </div>
               </div>
+              
+              {/* Status Timestamps */}
+              {(order.confirmed_at || order.shipped_at || order.delivered_at) && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Status History</p>
+                  <div className="space-y-2">
+                    {order.confirmed_at && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="w-24 text-gray-600">Confirmed:</span>
+                        <span className="font-medium">{new Date(order.confirmed_at).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {order.shipped_at && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="w-24 text-gray-600">Shipped:</span>
+                        <span className="font-medium">{new Date(order.shipped_at).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {order.delivered_at && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="w-24 text-gray-600">Delivered:</span>
+                        <span className="font-medium">{new Date(order.delivered_at).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Product Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
               <div className="flex gap-4">
-                {order.phone_image && (
-                  <Image
-                    src={order.phone_image}
-                    alt={order.phone_model_name || 'Product'}
-                    width={120}
-                    height={120}
-                    className="rounded-lg object-contain"
-                  />
+                {order.phone_model_image && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={order.phone_model_image}
+                      alt={order.phone_model_name || 'Product'}
+                      width={120}
+                      height={120}
+                      className="rounded-lg object-contain bg-gray-50 p-2"
+                    />
+                  </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{order.phone_model_name || 'N/A'}</h3>
-                  {order.brand_name && (
-                    <p className="text-gray-600">Brand: {order.brand_name}</p>
+                  <h3 className="font-semibold text-lg text-gray-900">{order.phone_model_name || 'N/A'}</h3>
+                  {order.phone_model_brand && (
+                    <p className="text-gray-600 mt-1">Brand: <span className="font-medium">{order.phone_model_brand}</span></p>
                   )}
-                  {order.color_name && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="text-gray-600">Color:</span>
-                      {order.color_code && (
-                        <span
-                          className="inline-block w-4 h-4 rounded-full border border-gray-300"
-                          style={{ backgroundColor: order.color_code }}
-                          title={order.color_name}
-                        />
-                      )}
-                      <span className="font-medium">{order.color_name}</span>
-                    </div>
-                  )}
-                  {order.ram && (
-                    <p className="text-gray-600 mt-1">RAM: {order.ram}</p>
-                  )}
-                  {order.memory && (
-                    <p className="text-gray-600">Storage: {order.memory}</p>
-                  )}
+                  <div className="mt-3 space-y-2">
+                    {order.phone_ram && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">RAM:</span>
+                        <span className="font-medium text-sm">{order.phone_ram} GB</span>
+                      </div>
+                    )}
+                    {order.phone_memory && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Storage:</span>
+                        <span className="font-medium text-sm">{order.phone_memory} GB</span>
+                      </div>
+                    )}
+                    {order.selected_color && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">Color:</span>
+                        <span className="font-medium text-sm">{order.selected_color}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -251,7 +290,7 @@ export default function PhoneOrderDetailPage() {
                   </div>
                 )}
                 {order.customer_email && (
-                  <div>
+                  <div className="col-span-2">
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Mail className="h-4 w-4" />
                       Email
@@ -259,26 +298,64 @@ export default function PhoneOrderDetailPage() {
                     <p className="font-medium">{order.customer_email}</p>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Shipping Information */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Shipping Information
+              </h2>
+              <div className="space-y-2">
                 {order.shipping_address && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      Address
-                    </p>
+                  <div>
+                    <p className="text-sm text-gray-600">Address</p>
                     <p className="font-medium">{order.shipping_address}</p>
                   </div>
                 )}
+                <div className="grid grid-cols-3 gap-4 mt-3">
+                  {order.city && (
+                    <div>
+                      <p className="text-sm text-gray-600">City</p>
+                      <p className="font-medium">{order.city}</p>
+                    </div>
+                  )}
+                  {order.postal_code && (
+                    <div>
+                      <p className="text-sm text-gray-600">Postal Code</p>
+                      <p className="font-medium">{order.postal_code}</p>
+                    </div>
+                  )}
+                  {order.country && (
+                    <div>
+                      <p className="text-sm text-gray-600">Country</p>
+                      <p className="font-medium">{order.country}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Notes */}
-            {order.notes && (
+            {(order.notes || order.admin_notes) && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   Notes
                 </h2>
-                <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+                {order.notes && (
+                  <div className="mb-3">
+                    <p className="text-sm font-medium text-gray-600 mb-1">Customer Notes:</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+                  </div>
+                )}
+                {order.admin_notes && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Admin Notes:</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{order.admin_notes}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -292,40 +369,83 @@ export default function PhoneOrderDetailPage() {
                 Payment Summary
               </h2>
               <div className="space-y-3">
-                {order.main_amount && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Price</span>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Unit Price</span>
+                  <span className="font-medium">
+                    €{parseFloat(order.unit_price || 0).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Quantity</span>
+                  <span className="font-medium">{order.quantity || 1}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-medium">
+                    €{parseFloat(order.subtotal || 0).toFixed(2)}
+                  </span>
+                </div>
+                
+                {parseFloat(order.website_discount_amount || 0) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({order.website_discount_percentage}%)</span>
                     <span className="font-medium">
-                      {parseFloat(order.main_amount).toFixed(2)} {order.currency || 'EUR'}
+                      -€{parseFloat(order.website_discount_amount).toFixed(2)}
                     </span>
                   </div>
                 )}
-                {order.discounted_amount && parseFloat(order.discounted_amount) > 0 && (
+                
+                {parseFloat(order.shipping_cost || 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Discounted Price</span>
-                    <span className="font-medium text-green-600">
-                      {parseFloat(order.discounted_amount).toFixed(2)} {order.currency || 'EUR'}
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-medium">
+                      €{parseFloat(order.shipping_cost).toFixed(2)}
                     </span>
                   </div>
                 )}
-                {order.quantity && order.quantity > 1 && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Quantity</span>
-                    <span className="font-medium">{order.quantity}</span>
+
+                {parseFloat(order.total_discount || 0) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Total Discount</span>
+                    <span className="font-medium">
+                      -€{parseFloat(order.total_discount).toFixed(2)}
+                    </span>
                   </div>
                 )}
+                
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="font-semibold text-gray-900">Total</span>
-                  <span className="font-bold text-lg">
-                    {order.total_amount ? `${parseFloat(order.total_amount).toFixed(2)} ${order.currency || 'EUR'}` : 'N/A'}
+                  <span className="font-semibold text-gray-900">Total Amount</span>
+                  <span className="font-bold text-lg text-gray-900">
+                    €{parseFloat(order.total_amount || 0).toFixed(2)}
                   </span>
                 </div>
               </div>
             </div>
+
+            {/* Payment Information */}
+            {order.stripe_payment_intent_id && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Payment Information
+                </h2>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm text-gray-600">Payment Method</p>
+                    <p className="font-medium">Stripe</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Payment Intent ID</p>
+                    <p className="font-mono text-xs bg-gray-50 p-2 rounded break-all">
+                      {order.stripe_payment_intent_id}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </PageTransition>
   );
 }
-

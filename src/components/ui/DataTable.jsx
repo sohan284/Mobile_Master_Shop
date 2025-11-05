@@ -49,6 +49,7 @@ export default function DataTable({
   orderTypeFilter, // JSX component
   statusFilter, // JSX component
   movingItems = {}, // Track which items are being moved
+  rowClassName, // function(item): string - optional per-row classes
   // Server-side pagination props
   totalCount = null,
   totalPages = null,
@@ -215,7 +216,7 @@ export default function DataTable({
               {columns.map((column, index) => (
                 <TableHead
                   key={index}
-                  className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
+                  className={column.sortable ? 'cursor-pointer hover:bg-blue-50' : ''}
                   onClick={() => column.sortable && !column.filterable && handleSort(column.accessor)}
                 >
                   <div className="flex flex-col space-y-2">
@@ -285,7 +286,7 @@ export default function DataTable({
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
                   onMouseEnter={() => setHoveredRowIndex(actualIndex)}
                   onMouseLeave={() => setHoveredRowIndex(null)}
-                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''}`}
+                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''} ${rowClassName ? rowClassName(item) : ''}`}
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>

@@ -72,7 +72,7 @@ export default function LanguageSwitcher() {
       >
         <Globe className="w-5 h-5" />
         <span className="text-sm font-medium hidden sm:inline">
-          {currentLanguage.flag} {currentLanguage.label}
+        {currentLanguage.label}
         </span>
         <span className="text-sm font-medium sm:hidden">
           {currentLanguage.code.toUpperCase()}
@@ -89,7 +89,7 @@ export default function LanguageSwitcher() {
                 currentLocale === lang.code ? 'bg-secondary/20 text-secondary' : 'text-white'
               }`}
             >
-              <span className="text-xl">{lang.flag}</span>
+              {/* <span className="text-xl">{lang.flag}</span> */}
               <span className="font-medium">{lang.label}</span>
               {currentLocale === lang.code && (
                 <span className="ml-auto text-secondary">✓</span>

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet, useApiPatch } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
-import { ArrowLeft, Calendar, User, Phone, Mail, MapPin, Package, DollarSign, CreditCard, FileText } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Phone, Mail, MapPin, Package, DollarSign, CreditCard, FileText, Wrench, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,7 +24,7 @@ export default function RepairOrderDetailPage() {
   // Fetch order details
   const { data: orderData, isLoading, error, refetch } = useApiGet(
     ['repairOrder', orderId],
-    () => apiFetcher.get(`/api/repair/admin/orders/${orderId}/`)
+    () => apiFetcher.get(`/api/repair/orders/${orderId}/`)
   );
 
   const order = orderData?.data || orderData;
@@ -72,8 +72,7 @@ export default function RepairOrderDetailPage() {
     { value: 'pending', label: 'Pending' },
     { value: 'confirmed', label: 'Confirmed' },
     { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
+    { value: 'completed', label: 'Completed' },
     { value: 'cancelled', label: 'Cancelled' },
     { value: 'refunded', label: 'Refunded' },
   ];
@@ -139,7 +138,7 @@ export default function RepairOrderDetailPage() {
                   <p className="font-medium">{order.order_number || `#${order.id}`}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Date</p>
+                  <p className="text-sm text-gray-600">Order Date</p>
                   <p className="font-medium">
                     {order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -151,7 +150,7 @@ export default function RepairOrderDetailPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
+                  <p className="text-sm text-gray-600">Order Status</p>
                   <Select
                     value={order.status?.toLowerCase() || 'pending'}
                     onValueChange={handleStatusChange}
@@ -159,7 +158,7 @@ export default function RepairOrderDetailPage() {
                   >
                     <SelectTrigger className={`w-full mt-1 ${getStatusBadge(order.status)}`}>
                       <SelectValue>
-                        {updatingStatus ? 'Updating...' : statusOptions.find(opt => opt.value === order.status?.toLowerCase())?.label || order.status}
+                        {updatingStatus ? 'Updating...' : order.status_display || order.status}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -179,47 +178,148 @@ export default function RepairOrderDetailPage() {
                 </div>
                 {order.schedule && (
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-600">Scheduled Date/Time</p>
+                    <p className="text-sm text-gray-600 flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Scheduled Date/Time
+                    </p>
                     <p className="font-medium">{order.schedule}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm text-gray-600">Last Updated</p>
+                  <p className="font-medium text-sm">
+                    {order.updated_at ? new Date(order.updated_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Status Timestamps */}
+              {(order.confirmed_at || order.completed_at) && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Status History</p>
+                  <div className="space-y-2">
+                    {order.confirmed_at && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="w-24 text-gray-600">Confirmed:</span>
+                        <span className="font-medium">{new Date(order.confirmed_at).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {order.completed_at && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="w-24 text-gray-600">Completed:</span>
+                        <span className="font-medium">{new Date(order.completed_at).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Device Information */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Phone className="h-5 w-5" />
+                Device Information
+              </h2>
+              <div className="space-y-2">
+                <div>
+                  <p className="text-sm text-gray-600">Device Model</p>
+                  <p className="font-semibold text-lg">{order.phone_model_name || 'N/A'}</p>
+                </div>
+                {order.brand_name && (
+                  <div>
+                    <p className="text-sm text-gray-600">Brand</p>
+                    <p className="font-medium">{order.brand_name}</p>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Product Information */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
-              <div className="flex gap-4">
-                {order.phone_image && (
-                  <Image
-                    src={order.phone_image}
-                    alt={order.phone_model_name || 'Product'}
-                    width={120}
-                    height={120}
-                    className="rounded-lg object-contain"
-                  />
-                )}
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{order.phone_model_name || 'N/A'}</h3>
-                  {order.brand_name && (
-                    <p className="text-gray-600">Brand: {order.brand_name}</p>
-                  )}
-                  {order.items && Array.isArray(order.items) && order.items.length > 0 && (
-                    <div className="mt-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Services:</p>
-                      <ul className="list-disc list-inside space-y-1">
-                        {order.items.map((item, index) => (
-                          <li key={index} className="text-sm text-gray-600">
-                            {item.problem_name || item.problem || 'Service'} 
-                            {item.part_type && ` (${item.part_type})`}
-                          </li>
-                        ))}
-                      </ul>
+            {/* Repair Services */}
+            {order.order_items && Array.isArray(order.order_items) && order.order_items.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Wrench className="h-5 w-5" />
+                  Repair Services
+                </h2>
+                <div className="space-y-4">
+                  {order.order_items.map((item, index) => (
+                    <div key={item.id || index} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{item.problem_name || 'Service'}</h3>
+                          {item.part_type && (
+                            <p className="text-sm text-gray-600 mt-1">
+                              Part Type: <span className="font-medium capitalize">{item.part_type}</span>
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-900">€{parseFloat(item.final_price || 0).toFixed(2)}</p>
+                          {parseFloat(item.discount_amount || 0) > 0 && (
+                            <p className="text-xs text-green-600 line-through">€{parseFloat(item.base_price || 0).toFixed(2)}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="text-gray-600">Base Price</p>
+                          <p className="font-medium">€{parseFloat(item.base_price || 0).toFixed(2)}</p>
+                        </div>
+                        {parseFloat(item.item_discount || 0) > 0 && (
+                          <div>
+                            <p className="text-gray-600">Item Discount</p>
+                            <p className="font-medium text-green-600">-€{parseFloat(item.item_discount || 0).toFixed(2)}</p>
+                          </div>
+                        )}
+                        {parseFloat(item.discount_percentage || 0) > 0 && (
+                          <div>
+                            <p className="text-gray-600">Discount</p>
+                            <p className="font-medium text-green-600">{item.discount_percentage}% (-€{parseFloat(item.discount_amount || 0).toFixed(2)})</p>
+                          </div>
+                        )}
+                        {item.warranty_days > 0 && (
+                          <div className="col-span-2">
+                            <p className="text-gray-600 flex items-center gap-1">
+                              <Shield className="h-4 w-4" />
+                              Warranty
+                            </p>
+                            <p className="font-medium">{item.warranty_days} days</p>
+                            {item.warranty_expires_at && (
+                              <p className="text-xs text-gray-500">
+                                Expires: {new Date(item.warranty_expires_at).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {item.notes && (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          <p className="text-sm text-gray-600">Notes: {item.notes}</p>
+                        </div>
+                      )}
+
+                      <p className="text-xs text-gray-500 mt-3">
+                        Added: {new Date(item.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Customer Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -245,7 +345,7 @@ export default function RepairOrderDetailPage() {
                   </div>
                 )}
                 {order.customer_email && (
-                  <div>
+                  <div className="col-span-2">
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Mail className="h-4 w-4" />
                       Email
@@ -253,26 +353,28 @@ export default function RepairOrderDetailPage() {
                     <p className="font-medium">{order.customer_email}</p>
                   </div>
                 )}
-                {order.shipping_address && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      Address
-                    </p>
-                    <p className="font-medium">{order.shipping_address}</p>
-                  </div>
-                )}
               </div>
             </div>
 
             {/* Notes */}
-            {order.notes && (
+            {(order.notes || order.admin_notes) && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   Notes
                 </h2>
-                <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+                {order.notes && (
+                  <div className="mb-3">
+                    <p className="text-sm font-medium text-gray-600 mb-1">Customer Notes:</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+                  </div>
+                )}
+                {order.admin_notes && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">Admin Notes:</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{order.admin_notes}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -289,20 +391,67 @@ export default function RepairOrderDetailPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
                   <span className="font-medium">
-                    {order.total_amount ? `${parseFloat(order.total_amount).toFixed(2)} ${order.currency || 'EUR'}` : 'N/A'}
+                    €{parseFloat(order.subtotal || 0).toFixed(2)}
                   </span>
                 </div>
-                {order.discount_amount && parseFloat(order.discount_amount) > 0 && (
+
+                {parseFloat(order.item_discount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span>-{parseFloat(order.discount_amount).toFixed(2)} {order.currency || 'EUR'}</span>
+                    <span>Item Discount</span>
+                    <span className="font-medium">
+                      -€{parseFloat(order.item_discount).toFixed(2)}
+                    </span>
                   </div>
                 )}
+
+                {parseFloat(order.website_discount_amount || 0) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Website Discount ({order.website_discount_percentage}%)</span>
+                    <span className="font-medium">
+                      -€{parseFloat(order.website_discount_amount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                {parseFloat(order.total_discount || 0) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Total Discount</span>
+                    <span className="font-medium">
+                      -€{parseFloat(order.total_discount).toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="font-semibold text-gray-900">Total</span>
-                  <span className="font-bold text-lg">
-                    {order.total_amount ? `${parseFloat(order.total_amount).toFixed(2)} ${order.currency || 'EUR'}` : 'N/A'}
+                  <span className="font-semibold text-gray-900">Total Amount</span>
+                  <span className="font-bold text-lg text-gray-900">
+                    €{parseFloat(order.total_amount || 0).toFixed(2)}
                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Total Services</span>
+                  <Badge variant="secondary">
+                    {order.order_items?.length || 0}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Order Status</span>
+                  <Badge className={getStatusBadge(order.status)}>
+                    {order.status_display || order.status}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Payment Status</span>
+                  <Badge className={getStatusBadge(order.payment_status)}>
+                    {order.payment_status_display || order.payment_status}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -312,4 +461,3 @@ export default function RepairOrderDetailPage() {
     </PageTransition>
   );
 }
-

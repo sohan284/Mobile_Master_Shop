@@ -90,7 +90,14 @@ export default function RepairOrdersPage() {
     setIsDeleting(false);
   };
 
-  const handleView = (order) => {
+  const handleView = async (order) => {
+    try {
+      await apiFetcher.patch(`/api/repair/orders/${order.id}/`, { is_read: true });
+      // Invalidate query to refresh the list and remove unread styling
+      queryClient.invalidateQueries({ queryKey: ['repairOrders', selectedStatus, currentPage] });
+    } catch (error) {
+      console.error('Failed to mark order as read:', error);
+    }
     router.push(`/dashboard/orders/repairs/${order.id}`);
   };
 
@@ -363,6 +370,7 @@ export default function RepairOrdersPage() {
                 onPageChange={setCurrentPage}
                 onDelete={handleDelete}
                 onView={handleView}
+                rowClassName={(order) => order?.is_read === false ? 'bg-blue-50' : ''}
                 statusFilter={
                   <Select className="cursor-pointer" value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="w-[180px] h-10">
