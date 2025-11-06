@@ -46,7 +46,17 @@
     "followUs": "Follow Us",
     "allRightsReserved": "All rights reserved",
     "copyright": "© {year} MLK. All rights reserved.",
-    "copyrightYear": "© {year} MLK. All rights reserved."
+    "copyrightYear": "© {year} MLK. All rights reserved.",
+    "shopDescription": "Your trusted partner for professional mobile phone repairs, quality smartphones, and premium accessories. Expert service with guaranteed satisfaction.",
+    "address": "MLKPHONE",
+    "addressLine1": "11 Avenue of Marshal de Lattre de Tassigny",
+    "addressLine2": "88000 Épinal, France",
+    "phoneNumber": "+33 06 46 08 53 80",
+    "emailAddress": "mlkphone.88000@gmail.com",
+    "businessHours": "Business Hours",
+    "mondayHours": "Monday: 2-7 pm",
+    "tuesdayToSaturdayHours": "Tuesday to Saturday: 10 am-1 pm and 2-7 pm",
+    "sundayHours": "Sunday: 10 am-1 pm"
   },
   "booking": {
     "title": "Booking & Payment",

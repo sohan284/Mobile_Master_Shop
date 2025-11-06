@@ -7,7 +7,7 @@ export default function Copyright() {
     const currentYear = new Date().getFullYear();
     
     return (
-        <div className="mt-10 pt-6 text-center text-sm text-gray-500 relative z-10 hover:text-white transition-colors duration-300">
+        <div className="py-4 sm:py-6 text-center text-xs sm:text-sm text-secondary/70 relative z-10 px-4">
             {t('copyright', { year: currentYear })}
         </div>
     );
