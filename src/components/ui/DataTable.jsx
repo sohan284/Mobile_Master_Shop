@@ -38,35 +38,56 @@ export default function DataTable({
   onDelete,
   onView,
   onRowClick,
+  onMoveUp,
+  onMoveDown,
   searchable = true,
   pagination = true,
   itemsPerPage = 10,
   className = "",
   loading = false,
-  height = "76vh"
+  height = "80vh",
+  orderTypeFilter, // JSX component
+  statusFilter, // JSX component
+  movingItems = {}, // Track which items are being moved
+  rowClassName, // function(item): string - optional per-row classes
+  // Server-side pagination props
+  totalCount = null,
+  totalPages = null,
+  currentPage = null,
+  onPageChange = null
 }) {
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
   const dataRef = useRef(safeData);
   
+  // Determine if using server-side pagination
+  const isServerSidePagination = totalCount !== null && totalPages !== null && currentPage !== null && onPageChange !== null;
+  
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [clientCurrentPage, setClientCurrentPage] = useState(1);
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
 
-  // Reset pagination and search when data changes
+  // Use server-side or client-side pagination
+  const effectiveCurrentPage = isServerSidePagination ? currentPage : clientCurrentPage;
+  const effectiveTotalPages = isServerSidePagination ? totalPages : null;
+  const effectiveTotalCount = isServerSidePagination ? totalCount : null;
+
+  // Reset pagination and search when data changes (only for client-side)
   useEffect(() => {
-    if (dataRef.current !== safeData) {
-      setCurrentPage(1);
+    if (!isServerSidePagination && dataRef.current !== safeData) {
+      setClientCurrentPage(1);
       setSearchTerm('');
       setSortField('');
       setSortDirection('asc');
       dataRef.current = safeData;
     }
-  }, [safeData]);
+  }, [safeData, isServerSidePagination]);
 
-  // Filter data based on search term
+  // Filter data based on search term (status filtering is handled by API)
   const filteredData = safeData.filter(item => {
+    // Apply search term filter
     if (!searchTerm) return true;
     return columns.some(column => {
       const value = column.accessor ? item[column.accessor] : '';
@@ -86,19 +107,24 @@ export default function DataTable({
     return 0;
   });
 
-  // Pagination - ensure we always show exactly itemsPerPage items
-  const totalPages = Math.max(1, Math.ceil(sortedData.length / itemsPerPage));
-  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
-  const startIndex = (validCurrentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
-  const paginatedData = pagination ? sortedData.slice(startIndex, endIndex) : sortedData;
-
-  // Sync currentPage with validCurrentPage if they differ
-  useEffect(() => {
-    if (currentPage !== validCurrentPage) {
-      setCurrentPage(validCurrentPage);
-    }
-  }, [currentPage, validCurrentPage]);
+  // Pagination - server-side or client-side
+  let paginatedData, validCurrentPage, startIndex, endIndex, calculatedTotalPages;
+  
+  if (isServerSidePagination) {
+    // Server-side pagination: data is already paginated from API
+    paginatedData = sortedData;
+    validCurrentPage = Math.min(Math.max(1, effectiveCurrentPage), effectiveTotalPages);
+    startIndex = (validCurrentPage - 1) * itemsPerPage;
+    endIndex = Math.min(startIndex + paginatedData.length, effectiveTotalCount);
+    calculatedTotalPages = effectiveTotalPages;
+  } else {
+    // Client-side pagination: paginate the data locally
+    calculatedTotalPages = Math.max(1, Math.ceil(sortedData.length / itemsPerPage));
+    validCurrentPage = Math.min(Math.max(1, effectiveCurrentPage), calculatedTotalPages);
+    startIndex = (validCurrentPage - 1) * itemsPerPage;
+    endIndex = Math.min(startIndex + itemsPerPage, sortedData.length);
+    paginatedData = pagination ? sortedData.slice(startIndex, endIndex) : sortedData;
+  }
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -110,7 +136,11 @@ export default function DataTable({
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    if (isServerSidePagination) {
+      onPageChange(page);
+    } else {
+      setClientCurrentPage(page);
+    }
   };
 
   const renderCell = (item, column) => {
@@ -128,6 +158,7 @@ export default function DataTable({
 
   // Check if any actions are provided
   const hasActions = !!(onView || onEdit || onDelete);
+  const hasMoveActions = !!(onMoveUp || onMoveDown);
 
   // Show skeleton loader when loading
   if (loading) {
@@ -151,6 +182,8 @@ export default function DataTable({
             <p className="text-lg font-semibold text-gray-900">{title}</p>
           </div>
           <div className="flex items-center space-x-2">
+            {orderTypeFilter && orderTypeFilter}
+            {statusFilter && statusFilter}
             {searchable && (
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -163,6 +196,7 @@ export default function DataTable({
                 />
               </div>
             )}
+           
             {onAdd && (
               <Button onClick={onAdd} className="gap-2 text-secondary cursor-pointer">
                 <Plus className="h-4 w-4" />
@@ -182,35 +216,43 @@ export default function DataTable({
               {columns.map((column, index) => (
                 <TableHead
                   key={index}
-                  className={column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''}
-                  onClick={() => column.sortable && handleSort(column.accessor)}
+                  className={column.sortable ? 'cursor-pointer hover:bg-blue-50' : ''}
+                  onClick={() => column.sortable && !column.filterable && handleSort(column.accessor)}
                 >
-                  <div className="flex items-center space-x-2">
-                    <span>{column.header}</span>
-                    {column.sortable && (
-                      <div className="flex flex-col">
-                        {sortField === column.accessor ? (
-                          sortDirection === 'asc' ? (
-                            <ArrowUp className="h-3 w-3" />
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span>{column.header}</span>
+                      {column.sortable && (
+                        <div className="flex flex-col">
+                          {sortField === column.accessor ? (
+                            sortDirection === 'asc' ? (
+                              <ArrowUp className="h-3 w-3" />
+                            ) : (
+                              <ArrowDown className="h-3 w-3" />
+                            )
                           ) : (
-                            <ArrowDown className="h-3 w-3" />
-                          )
-                        ) : (
-                          <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
-                        )}
+                            <ArrowUpDown className="h-3 w-3 text-muted-foreground" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {column.filterable && column.filterComponent && (
+                      <div onClick={(e) => e.stopPropagation()} className="mt-1">
+                        {column.filterComponent}
                       </div>
                     )}
                   </div>
                 </TableHead>
               ))}
               {hasActions && <TableHead>Actions</TableHead>}
+              {hasMoveActions && <TableHead className="w-2"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell 
-                  colSpan={columns.length + (hasActions ? 1 : 0)} 
+                  colSpan={columns.length + (hasActions ? 1 : 0) + (hasMoveActions ? 1 : 0)} 
                   className="h-full p-0"
                 >
                   <div className="flex flex-col items-center justify-center w-full h-full min-h-[400px] px-4">
@@ -228,6 +270,11 @@ export default function DataTable({
               </TableRow>
             ) : (
               paginatedData.map((item, index) => {
+                // Calculate actual index in the full dataset (before pagination)
+                const actualIndex = startIndex + index;
+                const isMoving = movingItems[item.id];
+                const isHovered = hoveredRowIndex === actualIndex;
+                
                 // Generate unique key based on item properties to prevent duplicates
                 const uniqueKey = item.id 
                   ? `${item.id}-${item.orderNumber || item.order_number || ''}-${startIndex + index}`
@@ -237,7 +284,9 @@ export default function DataTable({
                 <TableRow 
                   key={uniqueKey}
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
-                  className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
+                  onMouseEnter={() => setHoveredRowIndex(actualIndex)}
+                  onMouseLeave={() => setHoveredRowIndex(null)}
+                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''} ${rowClassName ? rowClassName(item) : ''}`}
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
@@ -280,6 +329,42 @@ export default function DataTable({
                       </div>
                     </TableCell>
                   )}
+                  {hasMoveActions && (
+                    <TableCell className="relative">
+                      <div className={`flex items-center space-x-1 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                        {onMoveUp && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              onMoveUp(item, actualIndex); 
+                            }}
+                            disabled={actualIndex === 0 || isMoving}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                            title="Move up"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {onMoveDown && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              onMoveDown(item, actualIndex); 
+                            }}
+                            disabled={actualIndex === sortedData.length - 1 || isMoving}
+                            className="h-8 w-8 p-0 cursor-pointer"
+                            title="Move down"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
                 );
               })
@@ -294,13 +379,21 @@ export default function DataTable({
         <div className="px-6 py-4 border-t flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              {sortedData.length > 0 ? (
-                `Showing ${startIndex + 1} to ${endIndex} of ${sortedData.length} ${sortedData.length === 1 ? 'result' : 'results'}`
+              {isServerSidePagination ? (
+                effectiveTotalCount > 0 ? (
+                  `Showing ${startIndex + 1} to ${endIndex} of ${effectiveTotalCount} ${effectiveTotalCount === 1 ? 'result' : 'results'}`
+                ) : (
+                  'No results'
+                )
               ) : (
-                'No results'
+                sortedData.length > 0 ? (
+                  `Showing ${startIndex + 1} to ${endIndex} of ${sortedData.length} ${sortedData.length === 1 ? 'result' : 'results'}`
+                ) : (
+                  'No results'
+                )
               )}
             </div>
-            {totalPages > 1 && (
+            {calculatedTotalPages > 1 && (
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -312,7 +405,7 @@ export default function DataTable({
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {Array.from({ length: calculatedTotalPages }, (_, i) => i + 1).map(page => (
                   <Button
                     key={page}
                     variant={validCurrentPage === page ? "default" : "outline"}
@@ -328,7 +421,7 @@ export default function DataTable({
                   variant="outline"
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage + 1)}
-                  disabled={validCurrentPage === totalPages}
+                  disabled={validCurrentPage === calculatedTotalPages}
                   className="h-8 w-8 p-0 cursor-pointer"
                 >
                   <ChevronRight className="h-4 w-4" />

@@ -206,7 +206,11 @@
     "selectTime": "Select Time",
     "scheduleRequired": "Please select a schedule date and time to proceed",
     "scheduleDescription": "Choose a preferred date and time for your repair service",
-    "selectedSchedule": "Selected Schedule"
+    "selectedSchedule": "Selected Schedule",
+    "timeNotAvailable": "The selected time is not available. Please select a time during business hours.",
+    "mondayHours": "Monday: 2-7 pm",
+    "tuesdayToSaturdayHours": "Tuesday to Saturday: 10 am-1 pm and 2-7 pm",
+    "sundayHours": "Sunday: 10 am-1 pm"
   },
   "phones": {
     "latestPhones": "LATEST PHONES",
@@ -598,7 +602,14 @@
     "emailPlaceholder": "john@example.com",
     "fillAllFields": "Please fill in all fields correctly",
     "messageSent": "Message sent successfully! We will get back to you soon.",
-    "messageFailed": "Failed to send message. Please try again."
+    "messageFailed": "Failed to send message. Please try again.",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
   },
   "profile": {
     "pleaseLogin": "Please log in to view your profile",

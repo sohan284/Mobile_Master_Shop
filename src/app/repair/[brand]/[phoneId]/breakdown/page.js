@@ -185,6 +185,53 @@ export default function PriceBreakdownPage({ params }) {
         return `${formatDate(date)}, ${formatTime(time)}`;
     };
 
+    // Validate schedule time against business hours
+    const validateScheduleTime = (date, time) => {
+        if (!date || !time) return '';
+
+        // Parse date string (YYYY-MM-DD) to get day of week in local timezone
+        const [year, month, day] = date.split('-').map(Number);
+        const selectedDate = new Date(year, month - 1, day); // month is 0-indexed
+        const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const [hours, minutes] = time.split(':');
+        const selectedHour = parseInt(hours, 10);
+        const selectedMinute = parseInt(minutes, 10);
+        const selectedTimeInMinutes = selectedHour * 60 + selectedMinute;
+
+        // Business hours in minutes (since midnight)
+        // Monday: 14:00-19:00 (840-1140 minutes)
+        // Tuesday-Saturday: 10:00-13:00 (600-780 minutes) OR 14:00-19:00 (840-1140 minutes)
+        // Sunday: 10:00-13:00 (600-780 minutes)
+
+        let isValid = false;
+
+        if (dayOfWeek === 1) { // Monday
+            // Monday: 2-7 pm (14:00-19:00)
+            isValid = selectedTimeInMinutes >= 840 && selectedTimeInMinutes < 1140;
+        } else if (dayOfWeek >= 2 && dayOfWeek <= 6) { // Tuesday to Saturday
+            // Tuesday to Saturday: 10 am-1 pm (10:00-13:00) OR 2-7 pm (14:00-19:00)
+            isValid = (selectedTimeInMinutes >= 600 && selectedTimeInMinutes < 780) ||
+                     (selectedTimeInMinutes >= 840 && selectedTimeInMinutes < 1140);
+        } else if (dayOfWeek === 0) { // Sunday
+            // Sunday: 10 am-1 pm (10:00-13:00)
+            isValid = selectedTimeInMinutes >= 600 && selectedTimeInMinutes < 780;
+        }
+
+        if (!isValid) {
+            let hoursMessage = '';
+            if (dayOfWeek === 1) {
+                hoursMessage = t('mondayHours');
+            } else if (dayOfWeek >= 2 && dayOfWeek <= 6) {
+                hoursMessage = t('tuesdayToSaturdayHours');
+            } else if (dayOfWeek === 0) {
+                hoursMessage = t('sundayHours');
+            }
+            return `${t('timeNotAvailable')} ${hoursMessage}`;
+        }
+
+        return '';
+    };
+
     const handleBackToServices = () => {
         router.back();
     };
@@ -195,6 +242,14 @@ export default function PriceBreakdownPage({ params }) {
             setScheduleError(t('scheduleRequired'));
             return;
         }
+        
+        // Validate time against business hours
+        const timeValidationError = validateScheduleTime(scheduleDate, scheduleTime);
+        if (timeValidationError) {
+            setScheduleError(timeValidationError);
+            return;
+        }
+        
         setScheduleError('');
 
         // Check if user is authenticated
@@ -502,8 +557,15 @@ export default function PriceBreakdownPage({ params }) {
                                                             type="date"
                                                             value={scheduleDate}
                                                             onChange={(e) => {
-                                                                setScheduleDate(e.target.value);
-                                                                setScheduleError('');
+                                                                const newDate = e.target.value;
+                                                                setScheduleDate(newDate);
+                                                                // Validate time if time is already selected
+                                                                if (scheduleTime) {
+                                                                    const error = validateScheduleTime(newDate, scheduleTime);
+                                                                    setScheduleError(error);
+                                                                } else {
+                                                                    setScheduleError('');
+                                                                }
                                                                 setTimeout(() => {
                                                                     e.target.blur();
                                                                 }, 100);
@@ -550,8 +612,15 @@ export default function PriceBreakdownPage({ params }) {
                                                             type="time"
                                                             value={scheduleTime}
                                                             onChange={(e) => {
-                                                                setScheduleTime(e.target.value);
-                                                                setScheduleError('');
+                                                                const newTime = e.target.value;
+                                                                setScheduleTime(newTime);
+                                                                // Validate time if date is already selected
+                                                                if (scheduleDate) {
+                                                                    const error = validateScheduleTime(scheduleDate, newTime);
+                                                                    setScheduleError(error);
+                                                                } else {
+                                                                    setScheduleError('');
+                                                                }
                                                                 setTimeout(() => {
                                                                     e.target.blur();
                                                                 }, 100);
@@ -647,7 +716,7 @@ export default function PriceBreakdownPage({ params }) {
                             
                             <CustomButton 
                                 onClick={handleProceedToBooking}
-                                disabled={!scheduleDate || !scheduleTime}
+                                disabled={!scheduleDate || !scheduleTime || !!scheduleError}
                                 className="bg-secondary text-primary hover:bg-secondary/90 px-6 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary"
                             >
                                 {t('proceedToBooking')}
