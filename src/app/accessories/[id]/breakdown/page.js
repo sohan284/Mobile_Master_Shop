@@ -8,25 +8,32 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import { encryptBkp } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import AuthModal from '@/components/AuthModal';
-import { Home, ShoppingCart, Settings } from 'lucide-react';
+import { Home, ShoppingCart, Settings, User, Mail, Phone } from 'lucide-react';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export default function AccessoryBreakdownPage({ params }) {
   const t = useTranslations('accessories');
   const { id } = use(params);
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [accessory, setAccessory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [priceData, setPriceData] = useState(null);
   const [error, setError] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryAddressError, setDeliveryAddressError] = useState('');
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState({
+    username: '',
+    email: '',
+    phone: ''
+  });
+  const [customerFormError, setCustomerFormError] = useState('');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -78,19 +85,58 @@ export default function AccessoryBreakdownPage({ params }) {
   const shippingCost = priceData?.shipping_cost ? parseFloat(priceData.shipping_cost) : 0;
   const handleBack = () => router.back();
 
+  const validateCustomerForm = () => {
+    if (!customerInfo.username.trim()) {
+      setCustomerFormError('Username is required');
+      return false;
+    }
+    if (!customerInfo.email.trim()) {
+      setCustomerFormError('Email is required');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerInfo.email)) {
+      setCustomerFormError('Please enter a valid email address');
+      return false;
+    }
+    if (!customerInfo.phone.trim()) {
+      setCustomerFormError('Phone number is required');
+      return false;
+    }
+    setCustomerFormError('');
+    return true;
+  };
+
   const handleProceedToBooking = async () => {
+    // Validate delivery address
+    if (!deliveryAddress.trim()) {
+      setDeliveryAddressError('Delivery address is required');
+      return;
+    }
+    setDeliveryAddressError('');
+
+    // Check if user is logged in, if not show customer form
     if (!isAuthenticated()) {
-      setShowAuthModal(true);
+      setShowCustomerForm(true);
       return;
     }
 
+    await createOrder();
+  };
+
+  const createOrder = async () => {
     try {
+      // Get customer info from user or form
+      const customerName = user?.name || user?.username || customerInfo.username || 'Customer';
+      const customerEmail = user?.email || customerInfo.email || '';
+      const customerPhone = user?.phone || customerInfo.phone || '01788175088';
+
       const body = {
         product_id: parseInt(id),
         quantity: quantity,
-        customer_name: user?.name || user?.username || 'Customer',
-        customer_email: user?.email || '',
-        customer_phone: user?.phone || '01788175088',
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
         address: deliveryAddress || '',
         shipping_address: accessory?.shipping_address || deliveryAddress || 'a',
         city: accessory?.city || 'a',
@@ -136,11 +182,6 @@ export default function AccessoryBreakdownPage({ params }) {
     } catch (e) {
       setError(t('failedToCreateOrder'));
     }
-  };
-
-  const handleAuthSuccess = () => {
-    setShowAuthModal(false);
-    handleProceedToBooking();
   };
 
   if (isLoading) {
@@ -237,11 +278,26 @@ export default function AccessoryBreakdownPage({ params }) {
                       id="deliveryAddress"
                       type="text"
                       value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      onChange={(e) => {
+                        setDeliveryAddress(e.target.value);
+                        if (deliveryAddressError && e.target.value.trim()) {
+                          setDeliveryAddressError('');
+                        }
+                      }}
                       placeholder={t('enterDeliveryAddress') || 'Enter your delivery address'}
-                      className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm transition-all duration-200 hover:bg-white/15 hover:border-accent/50 px-3 py-2 rounded-lg"
+                      className={`w-full bg-white/10 backdrop-blur-sm border-2 ${
+                        deliveryAddressError 
+                          ? 'border-red-500/50 focus:border-red-500' 
+                          : 'border-accent/30 focus:border-secondary'
+                      } text-accent placeholder:text-accent/50 focus:ring-secondary/50 focus:ring-2 h-10 text-sm transition-all duration-200 hover:bg-white/15 hover:border-accent/50 px-3 py-2 rounded-lg`}
                       required
                     />
+                    {deliveryAddressError && (
+                      <p className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                        <span>⚠️</span>
+                        {deliveryAddressError}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -303,12 +359,106 @@ export default function AccessoryBreakdownPage({ params }) {
         </div>
       </div>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={handleAuthSuccess}
-        redirectPath={`/booking`}
-      />
+      {/* Customer Information Form Dialog */}
+      <Dialog open={showCustomerForm} onOpenChange={setShowCustomerForm}>
+        <DialogContent className="bg-primary border-accent/20 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-secondary">Customer Information</DialogTitle>
+            <DialogDescription className="text-accent/80">
+              Please provide your contact information to proceed with the order.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {/* Username */}
+            <div>
+              <Label htmlFor="customer-username" className="text-accent text-sm font-medium mb-2 block">
+                <User className="w-4 h-4 inline mr-2" />
+                Username *
+              </Label>
+              <Input
+                id="customer-username"
+                type="text"
+                value={customerInfo.username}
+                onChange={(e) => setCustomerInfo({ ...customerInfo, username: e.target.value })}
+                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <Label htmlFor="customer-email" className="text-accent text-sm font-medium mb-2 block">
+                <Mail className="w-4 h-4 inline mr-2" />
+                Email *
+              </Label>
+              <Input
+                id="customer-email"
+                type="email"
+                value={customerInfo.email}
+                onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
+                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            {/* Phone */}
+            <div>
+              <Label htmlFor="customer-phone" className="text-accent text-sm font-medium mb-2 block">
+                <Phone className="w-4 h-4 inline mr-2" />
+                Phone *
+              </Label>
+              <Input
+                id="customer-phone"
+                type="tel"
+                value={customerInfo.phone}
+                onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                placeholder="Enter your phone number"
+                required
+              />
+            </div>
+
+            {customerFormError && (
+              <div className="p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
+                <p className="text-red-400 text-xs font-medium">{customerFormError}</p>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <CustomButton
+                onClick={async () => {
+                  // Validate delivery address before proceeding
+                  if (!deliveryAddress.trim()) {
+                    setDeliveryAddressError('Delivery address is required');
+                    setShowCustomerForm(false);
+                    return;
+                  }
+                  
+                  if (validateCustomerForm()) {
+                    setShowCustomerForm(false);
+                    setDeliveryAddressError('');
+                    await createOrder();
+                  }
+                }}
+                className="bg-secondary text-primary hover:bg-secondary/90 flex-1"
+              >
+                Continue to Checkout
+              </CustomButton>
+              <CustomButton
+                onClick={() => {
+                  setShowCustomerForm(false);
+                  setCustomerFormError('');
+                }}
+                className="bg-white/10 text-accent hover:bg-white/20 flex-1"
+              >
+                Cancel
+              </CustomButton>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }

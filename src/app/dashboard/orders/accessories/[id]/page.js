@@ -360,7 +360,7 @@ export default function AccessoryOrderDetailPage() {
             </div>
 
             {/* Payment Information */}
-            {order.stripe_payment_intent_id && (
+            {/* {order.stripe_payment_intent_id && (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
@@ -379,7 +379,7 @@ export default function AccessoryOrderDetailPage() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
