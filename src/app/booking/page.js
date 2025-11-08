@@ -80,9 +80,19 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
                 localStorage.removeItem('bookingPayment');
                 sessionStorage.removeItem('bookingPayment');
 
+                // Determine which tab to navigate to based on order type
+                let tabParam = 'all';
+                if (bookingPayment?.type === 'repair') {
+                    tabParam = 'repair';
+                } else if (bookingPayment?.type === 'phone') {
+                    tabParam = 'phone';
+                } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                    tabParam = 'accessory';
+                }
+
                 // Small delay to show the toast before redirecting
                 setTimeout(() => {
-                    router.push('/orders');
+                    router.push(`/orders?tab=${tabParam}`);
                 }, 1500);
                 // Don't set submitting to false here - we're redirecting
                 return;

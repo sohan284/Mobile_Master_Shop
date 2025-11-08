@@ -30,13 +30,21 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid, clear auth data
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      // Redirect to login page
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+      // Check if this is a calculate_price endpoint - don't log out for these
+      const url = error.config?.url || '';
+      const isCalculatePriceEndpoint = url.includes('calculate_price');
+      
+      // Only log out for actual authentication failures, not calculation errors
+      if (!isCalculatePriceEndpoint) {
+        // Token expired or invalid, clear auth data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        // Redirect to login page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
       }
+      // For calculate_price endpoints, just return the error without logging out
     }
     return Promise.reject(error);
   }

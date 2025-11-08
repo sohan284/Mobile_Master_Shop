@@ -208,9 +208,17 @@ export default function AccessoryDetailsPage() {
 
                     <CustomButton
                       onClick={() => router.push(`/accessories/${id}/breakdown`)}
-                      className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3"
+                      disabled={!accessory?.is_in_stock || (accessory?.stock_quantity !== undefined && accessory.stock_quantity <= 0)}
+                      className={`px-8 py-3 ${
+                        !accessory?.is_in_stock || (accessory?.stock_quantity !== undefined && accessory.stock_quantity <= 0)
+                          ? 'bg-accent/20 text-accent/50 cursor-not-allowed hover:bg-accent/20'
+                          : 'bg-secondary text-primary hover:bg-secondary/90'
+                      }`}
                     >
-                      {t('proceedToCheckout')}
+                      {!accessory?.is_in_stock || (accessory?.stock_quantity !== undefined && accessory.stock_quantity <= 0)
+                        ? t('outOfStock') || 'Out of Stock'
+                        : t('proceedToCheckout')
+                      }
                     </CustomButton>
                   </div>
                 </div>
