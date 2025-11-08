@@ -9,30 +9,36 @@ import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { encryptBkp } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import AuthModal from '@/components/AuthModal';
 import Link from 'next/link';
 import Breadcrumb from '@/components/ui/Breadcrumb';
-import { Home, Wrench, Smartphone, Settings, Calendar, Clock } from 'lucide-react';
+import { Home, Wrench, Smartphone, Settings, Calendar, Clock, User, Mail, Phone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import SafeImage from '@/components/ui/SafeImage';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export default function PriceBreakdownPage({ params }) {
     const t = useTranslations('repair');
     const { brand, phoneId } = use(params);
     const router = useRouter();
-    const { isAuthenticated, user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const [phoneInfo, setPhoneInfo] = useState(null);
     const [selectedServices, setSelectedServices] = useState([]);
     const [servicePartTypes, setServicePartTypes] = useState({});
     const [priceData, setPriceData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showAuthModal, setShowAuthModal] = useState(false);
     const [scheduleDate, setScheduleDate] = useState('');
     const [scheduleTime, setScheduleTime] = useState('');
     const [scheduleError, setScheduleError] = useState('');
+    const [showCustomerForm, setShowCustomerForm] = useState(false);
+    const [customerInfo, setCustomerInfo] = useState({
+        username: '',
+        email: '',
+        phone: ''
+    });
+    const [customerFormError, setCustomerFormError] = useState('');
 
     // Get phone info and selected services from sessionStorage
     useEffect(() => {
@@ -115,16 +121,31 @@ export default function PriceBreakdownPage({ params }) {
             } catch (err) {
                 console.error('Error calculating price:', err);
                 
-                // Check if it's an authentication error
+                // Get detailed error message from API response
+                const errorMessage = err?.response?.data?.message || 
+                                  err?.response?.data?.detail || 
+                                  err?.message || 
+                                  'Failed to calculate price. Please try again.';
+                
+                // Check error status and provide appropriate message
                 if (err.response?.status === 401) {
-                    setError('Authentication required. Please log in to calculate prices.');
+                    setError(errorMessage || 'Authentication required. Please log in to calculate prices.');
                 } else if (err.response?.status === 403) {
-                    setError('Access denied. You do not have permission to calculate prices.');
+                    setError(errorMessage || 'Access denied. You do not have permission to calculate prices.');
+                } else if (err.response?.status === 400) {
+                    setError(errorMessage || 'Invalid request. Please check your selections.');
                 } else if (err.response?.status >= 500) {
-                    setError('Server error. Please try again later.');
+                    setError(errorMessage || 'Server error. Please try again later.');
                 } else {
-                    setError('Failed to calculate price. Please try again.');
+                    setError(errorMessage);
                 }
+                
+                // Log full error for debugging
+                console.error('Full error details:', {
+                    status: err?.response?.status,
+                    data: err?.response?.data,
+                    message: errorMessage
+                });
                 
                 // Set fallback pricing data for demonstration
                 const fallbackData = {
@@ -236,6 +257,28 @@ export default function PriceBreakdownPage({ params }) {
         router.back();
     };
 
+    const validateCustomerForm = () => {
+        if (!customerInfo.username.trim()) {
+            setCustomerFormError('Username is required');
+            return false;
+        }
+        if (!customerInfo.email.trim()) {
+            setCustomerFormError('Email is required');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(customerInfo.email)) {
+            setCustomerFormError('Please enter a valid email address');
+            return false;
+        }
+        if (!customerInfo.phone.trim()) {
+            setCustomerFormError('Phone number is required');
+            return false;
+        }
+        setCustomerFormError('');
+        return true;
+    };
+
     const handleProceedToBooking = async () => {
         // Validate schedule selection
         if (!scheduleDate || !scheduleTime) {
@@ -252,11 +295,16 @@ export default function PriceBreakdownPage({ params }) {
         
         setScheduleError('');
 
-        // Check if user is authenticated
+        // Check if user is logged in, if not show customer form
         if (!isAuthenticated()) {
-            setShowAuthModal(true);
+            setShowCustomerForm(true);
             return;
         }
+
+        await createOrder();
+    };
+
+    const createOrder = async () => {
         try {
             // Combine date and time into format: YYYY-MM-DD HH:MM
             // scheduleDate is in YYYY-MM-DD format, scheduleTime is in HH:MM format
@@ -264,12 +312,17 @@ export default function PriceBreakdownPage({ params }) {
                 ? `${scheduleDate} ${scheduleTime}` 
                 : null;
 
+            // Get customer info from user or form
+            const customerName = user?.name || user?.username || customerInfo.username || 'Customer';
+            const customerEmail = user?.email || customerInfo.email || '';
+            const customerPhone = user?.phone || customerInfo.phone || '01788175088';
+
             // Build order body for backend
             const orderBody = {
                 phone_model_id: parseInt(phoneId),
-                customer_name: user?.name || user?.username || 'Customer',
-                customer_email: user?.email || '',
-                customer_phone: user?.phone || '01788175088',
+                customer_name: customerName,
+                customer_email: customerEmail,
+                customer_phone: customerPhone,
                 items: selectedServices.map((serviceId) => ({
                     problem_id: serviceId,
                     part_type: servicePartTypes[serviceId] || 'original'
@@ -315,11 +368,6 @@ export default function PriceBreakdownPage({ params }) {
             console.error('Order creation failed:', e);
             setError('Failed to create order. Please try again.');
         }
-    };
-
-    const handleAuthSuccess = async (user) => {
-        setShowAuthModal(false);
-        await handleProceedToBooking();
     };
 
     if (isLoading) {
@@ -731,14 +779,99 @@ export default function PriceBreakdownPage({ params }) {
                     
                 </div>
             </div>
-            
-            {/* Authentication Modal */}
-            <AuthModal
-                isOpen={showAuthModal}
-                onClose={() => setShowAuthModal(false)}
-                onSuccess={handleAuthSuccess}
-                redirectPath={`/booking`}
-            />
+
+            {/* Customer Information Form Dialog */}
+            <Dialog open={showCustomerForm} onOpenChange={setShowCustomerForm}>
+                <DialogContent className="bg-primary border-accent/20 text-white max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-secondary">Customer Information</DialogTitle>
+                        <DialogDescription className="text-accent/80">
+                            Please provide your contact information to proceed with the order.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 mt-4">
+                        {/* Username */}
+                        <div>
+                            <Label htmlFor="customer-username" className="text-accent text-sm font-medium mb-2 block">
+                                <User className="w-4 h-4 inline mr-2" />
+                                Username *
+                            </Label>
+                            <Input
+                                id="customer-username"
+                                type="text"
+                                value={customerInfo.username}
+                                onChange={(e) => setCustomerInfo({ ...customerInfo, username: e.target.value })}
+                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                placeholder="Enter your username"
+                                required
+                            />
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <Label htmlFor="customer-email" className="text-accent text-sm font-medium mb-2 block">
+                                <Mail className="w-4 h-4 inline mr-2" />
+                                Email *
+                            </Label>
+                            <Input
+                                id="customer-email"
+                                type="email"
+                                value={customerInfo.email}
+                                onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
+                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                placeholder="Enter your email"
+                                required
+                            />
+                        </div>
+
+                        {/* Phone */}
+                        <div>
+                            <Label htmlFor="customer-phone" className="text-accent text-sm font-medium mb-2 block">
+                                <Phone className="w-4 h-4 inline mr-2" />
+                                Phone *
+                            </Label>
+                            <Input
+                                id="customer-phone"
+                                type="tel"
+                                value={customerInfo.phone}
+                                onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                placeholder="Enter your phone number"
+                                required
+                            />
+                        </div>
+
+                        {customerFormError && (
+                            <div className="p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
+                                <p className="text-red-400 text-xs font-medium">{customerFormError}</p>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3 pt-2">
+                            <CustomButton
+                                onClick={async () => {
+                                    if (validateCustomerForm()) {
+                                        setShowCustomerForm(false);
+                                        await createOrder();
+                                    }
+                                }}
+                                className="bg-secondary text-primary hover:bg-secondary/90 flex-1"
+                            >
+                                Continue to Checkout
+                            </CustomButton>
+                            <CustomButton
+                                onClick={() => {
+                                    setShowCustomerForm(false);
+                                    setCustomerFormError('');
+                                }}
+                                className="bg-white/10 text-accent hover:bg-white/20 flex-1"
+                            >
+                                Cancel
+                            </CustomButton>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </PageTransition>
     );
 }

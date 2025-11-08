@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +17,7 @@ import { useApiGet } from '@/hooks/useApi';
 
 export default function OrdersPage() {
     const { isAuthenticated, user } = useAuth();
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all'); // 'all', 'repair', 'phone', 'accessory'
     const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -107,7 +109,13 @@ export default function OrdersPage() {
 
     const filteredOrders = getFilteredOrders();
 
-  
+    // Set active tab from URL query parameter on mount
+    useEffect(() => {
+        const tabParam = searchParams?.get('tab');
+        if (tabParam && ['all', 'repair', 'phone', 'accessory'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [searchParams]);
 
     const getOrderTypeIcon = (orderType) => {
         switch(orderType) {
