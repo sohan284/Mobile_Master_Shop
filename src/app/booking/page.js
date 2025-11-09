@@ -120,8 +120,8 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
         <form onSubmit={handleSubmit} className="space-y-4">
             <PaymentElement options={{ layout: 'tabs' }} />
             {message && <div className="text-sm text-accent/80">{message}</div>}
-            <CustomButton disabled={!stripe || submitting} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
-                {submitting ? 'Processing…' : `Pay ${currency} ${amount.toFixed(2)}`}
+            <CustomButton disabled={!stripe} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
+                {`Pay ${currency} ${amount.toFixed(2)}`}
             </CustomButton>
         </form>
     );
