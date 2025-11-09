@@ -19,7 +19,7 @@ import { useTranslations } from 'next-intl';
 export default function BrandPage({ params }) {
   const t = useTranslations('phones');
   const brand = use(params).brand?.toLowerCase();
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortOrder, setSortOrder] = useState('default');
   const [filteredPhones, setFilteredPhones] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
   const [storage, setStorage] = useState('all');
@@ -86,7 +86,23 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
     phones.sort((a, b) => {
       const priceA = parseFloat(a.final_price || a.main_amount || 0);
       const priceB = parseFloat(b.final_price || b.main_amount || 0);
-      return sortOrder === 'asc' ? priceA - priceB : priceB - priceA;
+      
+      if (sortOrder === 'default') {
+        // Default: First by rank (higher rank first), then by price
+        const rankA = parseFloat(a.rank || 0);
+        const rankB = parseFloat(b.rank || 0);
+        if (rankB !== rankA) {
+          return rankB - rankA; // Higher rank first
+        }
+        // If ranks are equal, sort by price (ascending)
+        return priceA - priceB;
+      } else if (sortOrder === 'desc') {
+        // Higher price first (ignore rank)
+        return priceB - priceA;
+      } else {
+        // Lower price first (ignore rank)
+        return priceA - priceB;
+      }
     });
 
     setFilteredPhones(phones);
@@ -203,8 +219,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value)}
                     >
-                      <option value="asc">{t('priceLowToHigh')}</option>
+                      <option value="default">{t('default')}</option>
                       <option value="desc">{t('priceHighToLow')}</option>
+                      <option value="asc">{t('priceLowToHigh')}</option>
                     </select>
                   </div>
 
@@ -283,8 +300,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                     <button
                       onClick={() => {
                         setSearchQuery('');
-                        setSortOrder('asc');
-                        setPriceRange({ min: 0, max: 2000 });
+                        setSortOrder('default');
+                        const maxPrice = brandPhones?.reduce((max, phone) => Math.max(max, parseFloat(phone.final_price || phone.main_amount || 0)), 0) || 0;
+                        setPriceRange({ min: 0, max: maxPrice });
                         setStorage('all');
                         setRam('all');
                         setAvailability('all');
