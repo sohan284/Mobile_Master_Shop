@@ -43,12 +43,17 @@ export default function NewPhoneModelsPage() {
   
   const [modelsList, setModelsList] = useState([]);
 
-  // Initialize local models list - maintain API order
+  // Initialize local models list - sort by rank (higher rank first)
   useEffect(() => {
     if (modelsResponse) {
-      // Keep models in the exact order from API
       const modelsData = modelsResponse?.data || [];
-      setModelsList(modelsData);
+      // Sort by rank in descending order (higher rank first)
+      const sortedModels = [...modelsData].sort((a, b) => {
+        const rankA = parseFloat(a.rank || 0);
+        const rankB = parseFloat(b.rank || 0);
+        return rankB - rankA; // Higher rank first
+      });
+      setModelsList(sortedModels);
     }
   }, [modelsResponse]);
 

@@ -82,7 +82,7 @@ export default function AccessoryBreakdownPage({ params }) {
   const websiteDiscount = priceData?.website_discount ? parseFloat(priceData.website_discount) : 0;
   const totalAmount = priceData?.total_amount ? parseFloat(priceData.total_amount) : priceAfterItemDiscount - websiteDiscount;
   const totalDiscount = priceData?.total_discount ? parseFloat(priceData.total_discount) : (itemDiscount + websiteDiscount);
-  const shippingCost = priceData?.shipping_cost ? parseFloat(priceData.shipping_cost) : 0;
+    const vat = priceData?.vat ? parseFloat(priceData.vat) : 0;
   const handleBack = () => router.back();
 
   const validateCustomerForm = () => {
@@ -169,7 +169,7 @@ export default function AccessoryBreakdownPage({ params }) {
           priceAfterItemDiscount,
           websiteDiscount,
           totalDiscount,
-          shippingCost
+          vat
         },
         display: {
           phone_model: accessory?.title,
@@ -322,6 +322,13 @@ export default function AccessoryBreakdownPage({ params }) {
                           <span>-€{totalDiscount.toFixed(2)}</span>
                         </div>
                       )}
+                      
+                   
+                        <div className="flex justify-between">
+                          <span className="text-accent/80">{t('vat') || 'VAT'}:</span>
+                          <span className="font-medium text-accent">20%</span>
+                        </div>
+                     
                       
                       <div className="border-t border-accent/20 pt-2 mt-2">
                         <div className="flex justify-between text-base font-bold">
