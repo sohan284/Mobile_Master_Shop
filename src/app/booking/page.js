@@ -120,8 +120,8 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
         <form onSubmit={handleSubmit} className="space-y-4">
             <PaymentElement options={{ layout: 'tabs' }} />
             {message && <div className="text-sm text-accent/80">{message}</div>}
-            <CustomButton disabled={!stripe || submitting} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
-                {submitting ? 'Processing…' : `Pay ${currency} ${amount.toFixed(2)}`}
+            <CustomButton disabled={!stripe} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
+                {`Pay ${currency} ${amount.toFixed(2)}`}
             </CustomButton>
         </form>
     );
@@ -312,12 +312,12 @@ export default function BookingPage() {
                                                     <span>-{bookingPayment.summary.websiteDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
-                                            {bookingPayment.summary?.shippingCost > 0 && (
+                                           
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>{t('shippingCost')}</span>
-                                                    <span>{bookingPayment.summary.shippingCost.toFixed(2)}</span>
+                                                    <span>{t('vat')}</span>
+                                                    <span>20%</span>
                                                 </div>
-                                            )}
+                                          
                                             <div className="border-t border-accent/20 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
                                                     <span>{t('total')}</span>
