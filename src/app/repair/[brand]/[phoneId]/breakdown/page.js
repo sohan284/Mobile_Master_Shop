@@ -739,6 +739,13 @@ export default function PriceBreakdownPage({ params }) {
                                             </div>
                                         )}
                                         
+                                
+                                            <div className="flex justify-between">
+                                                <span className="text-accent/80">{t('vat') || 'VAT'}:</span>
+                                                <span className="font-medium text-accent">20%</span>
+                                            </div>
+                                    
+                                        
                                                 <div className="border-t border-accent/20 pt-2 mt-2">
                                                     <div className="flex justify-between text-base font-bold">
                                                 <span className="text-accent">{t('totalBreakdown')}:</span>

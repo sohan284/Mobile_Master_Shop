@@ -97,7 +97,7 @@ console.log(selectedColor);
   const discountPercentage = priceData?.discount_percentage ? parseFloat(priceData.discount_percentage) : 0;
   const discountAmount = priceData?.discount_amount ? parseFloat(priceData.discount_amount) : 0;
   const totalDiscount = priceData?.total_discount ? parseFloat(priceData.total_discount) : 0;
-  const shippingCost = priceData?.shipping_cost ? parseFloat(priceData.shipping_cost) : 0;
+  const   vat = priceData?.vat ? parseFloat(priceData.vat) : 0;
   const totalAmount = priceData?.total_amount ? parseFloat(priceData.total_amount) : 0;
 
   const handleBack = () => router.back();
@@ -186,7 +186,7 @@ console.log(selectedColor);
           discountPercentage,
           discountAmount,
           totalDiscount,
-          shippingCost
+          vat
         },
         display: {
           phone_model: phone?.name || phone?.title,
@@ -383,10 +383,12 @@ console.log(selectedColor);
                         </div>
                       )}
                       
-                      <div className="flex justify-between">
-                        <span className="text-accent/80">{t('shippingCost')}:</span>
-                        <span className="font-medium text-accent">€{shippingCost.toFixed(2)}</span>
-                      </div>
+                    
+                        <div className="flex justify-between">
+                          <span className="text-accent/80">{t('vat') || 'VAT'}:</span>
+                          <span className="font-medium text-accent">20%</span>
+                        </div>
+                 
                       
                       <div className="border-t border-accent/20 pt-2 mt-2">
                         <div className="flex justify-between text-base font-bold">
