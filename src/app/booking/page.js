@@ -312,12 +312,12 @@ export default function BookingPage() {
                                                     <span>-{bookingPayment.summary.websiteDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
-                                            {bookingPayment.summary?.shippingCost > 0 && (
+                                           
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>{t('shippingCost')}</span>
-                                                    <span>{bookingPayment.summary.shippingCost.toFixed(2)}</span>
+                                                    <span>{t('vat')}</span>
+                                                    <span>20%</span>
                                                 </div>
-                                            )}
+                                          
                                             <div className="border-t border-accent/20 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
                                                     <span>{t('total')}</span>
