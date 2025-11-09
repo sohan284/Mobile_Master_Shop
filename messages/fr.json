@@ -269,6 +269,7 @@
     "tryRepairServices": "Essayer les services de réparation",
     "filters": "Filtres",
     "sortByPrice": "Trier par prix",
+    "default": "Par défaut (Rang d'abord)",
     "priceLowToHigh": "Prix : Du plus bas au plus haut",
     "priceHighToLow": "Prix : Du plus haut au plus bas",
     "priceRange": "Gamme de prix",

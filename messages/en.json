@@ -269,6 +269,7 @@
     "tryRepairServices": "Try Repair Services",
     "filters": "Filters",
     "sortByPrice": "Sort by Price",
+    "default": "Default (Rank First)",
     "priceLowToHigh": "Price: Low to High",
     "priceHighToLow": "Price: High to Low",
     "priceRange": "Price Range",
