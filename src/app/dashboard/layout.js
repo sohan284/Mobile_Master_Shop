@@ -4,6 +4,7 @@ import { useState } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UserInfo from '@/components/UserInfo';
 import Sidebar from './components/Sidebar';
+import NotificationDropdown from './components/NotificationDropdown';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -28,7 +29,10 @@ export default function DashboardLayout({ children }) {
             </button>
             <div></div>
             {/* <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1> */}
-            <UserInfo />
+            <div className="flex items-center gap-4">
+              {/* <NotificationDropdown /> */}
+              <UserInfo />
+            </div>
           </div>
           
           {/* Page content */}

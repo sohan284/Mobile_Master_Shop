@@ -254,19 +254,27 @@ export default function PhoneIndividualPage({ params }) {
                     <div className="flex-1">
                       <div className="font-medium flex items-center gap-2 text-accent">
                         <Save className="w-5 h-5 text-secondary" />
-                        {availability.store.name}
+                        MLKPHONE
                       </div>
                       <div className="text-accent/80 flex items-center gap-2">
                         <MapPin className="w-5 h-5 text-accent/60" />
-                        {availability.store.location.address}
+                         11 Avenue of Marshal de Lattre de Tassigny 88000 Épinal
                       </div>
                     </div>
                     <button 
                       onClick={handleProceedToCheckout}
-                      className="bg-secondary text-primary px-6 py-2 rounded-full flex items-center gap-2 hover:bg-secondary/90 transition-colors cursor-pointer"
+                      disabled={!phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0)}
+                      className={`px-6 py-2 rounded-full flex items-center gap-2 transition-colors ${
+                        !phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0)
+                          ? 'bg-accent/20 text-accent/50 cursor-not-allowed'
+                          : 'bg-secondary text-primary hover:bg-secondary/90 cursor-pointer'
+                      }`}
                     >
                       <Calendar className="w-5 h-5" />
-                      {t('buyNow')}
+                      {!phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0) 
+                        ? t('outOfStock') || 'Out of Stock'
+                        : t('buyNow')
+                      }
                     </button>
                   </div>
                 </div>

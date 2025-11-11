@@ -11,6 +11,7 @@ import { decryptBkp } from '@/lib/utils';
 import { apiFetcher } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
+import { Calendar, Clock } from 'lucide-react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -79,9 +80,19 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
                 localStorage.removeItem('bookingPayment');
                 sessionStorage.removeItem('bookingPayment');
 
+                // Determine which tab to navigate to based on order type
+                let tabParam = 'all';
+                if (bookingPayment?.type === 'repair') {
+                    tabParam = 'repair';
+                } else if (bookingPayment?.type === 'phone') {
+                    tabParam = 'phone';
+                } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                    tabParam = 'accessory';
+                }
+
                 // Small delay to show the toast before redirecting
                 setTimeout(() => {
-                    router.push('/orders');
+                    router.push(`/orders?tab=${tabParam}`);
                 }, 1500);
                 // Don't set submitting to false here - we're redirecting
                 return;
@@ -109,8 +120,8 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
         <form onSubmit={handleSubmit} className="space-y-4">
             <PaymentElement options={{ layout: 'tabs' }} />
             {message && <div className="text-sm text-accent/80">{message}</div>}
-            <CustomButton disabled={!stripe || submitting} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
-                {submitting ? 'Processing…' : `Pay ${currency} ${amount.toFixed(2)}`}
+            <CustomButton disabled={!stripe} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
+                {`Pay ${currency} ${amount.toFixed(2)}`}
             </CustomButton>
         </form>
     );
@@ -148,6 +159,36 @@ export default function BookingPage() {
 
     const amount = bookingPayment?.amount ?? 0;
     const currency = bookingPayment?.currency || 'EUR';
+    const tRepair = useTranslations('repair');
+
+    // Format schedule date/time for display
+    const formatScheduleDisplay = (scheduleString) => {
+        if (!scheduleString) return null;
+        
+        try {
+            // Schedule format is "YYYY-MM-DD HH:MM"
+            const [datePart, timePart] = scheduleString.split(' ');
+            if (!datePart || !timePart) return null;
+            
+            // Format date from YYYY-MM-DD to DD-MM-YYYY
+            const [year, month, day] = datePart.split('-');
+            const formattedDate = `${day}-${month}-${year}`;
+            
+            // Format time from HH:MM (24h) to HH:MM AM/PM (12h)
+            const [hours, minutes] = timePart.split(':');
+            const hour24 = parseInt(hours, 10);
+            const hour12 = hour24 === 0 ? 12 : hour24 > 12 ? hour24 - 12 : hour24;
+            const ampm = hour24 >= 12 ? 'PM' : 'AM';
+            const formattedTime = `${hour12.toString().padStart(2, '0')}:${minutes}${ampm}`;
+            
+            return { date: formattedDate, time: formattedTime, full: `${formattedDate} at ${formattedTime}` };
+        } catch (e) {
+            console.error('Error formatting schedule:', e);
+            return null;
+        }
+    };
+
+    const scheduleDisplay = bookingPayment?.schedule ? formatScheduleDisplay(bookingPayment.schedule) : null;
 
     if (isLoading) {
         return (
@@ -192,13 +233,31 @@ export default function BookingPage() {
                                 <div className="lg:col-span-2 space-y-6">
                                     <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4">
                                         <h3 className="text-lg font-semibold text-accent mb-3">{t('details')}</h3>
-                                        <div className="text-accent/80 text-sm">
+                                        <div className="text-accent/80 text-sm space-y-2">
                                             <div><span className="font-medium text-accent">{t('type')}:</span> {bookingPayment.type}</div>
                                             {bookingPayment.display?.phone_model && (
                                                 <div><span className="font-medium text-accent">{t('model')}:</span> {bookingPayment.display.phone_model}</div>
                                             )}
                                             {bookingPayment.display?.brand && (
                                                 <div><span className="font-medium text-accent">{t('brand')}:</span> {bookingPayment.display.brand}</div>
+                                            )}
+                                            {/* Schedule - Only show for repair type bookings */}
+                                            {bookingPayment.type === 'repair' && scheduleDisplay && (
+                                                <div className="mt-4 p-3 bg-secondary/10 backdrop-blur-sm rounded-lg border border-secondary/20">
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                                                            <Calendar className="w-4 h-4 text-secondary" />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="text-xs text-accent/60 uppercase tracking-wide mb-1">
+                                                                {tRepair('selectedSchedule')}
+                                                            </p>
+                                                            <p className="text-sm font-semibold text-accent">
+                                                                {scheduleDisplay.full}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             )}
                                         </div>
                                     </div>
@@ -253,12 +312,12 @@ export default function BookingPage() {
                                                     <span>-{bookingPayment.summary.websiteDiscount.toFixed(2)}</span>
                                                 </div>
                                             )}
-                                            {bookingPayment.summary?.shippingCost > 0 && (
+                                           
                                                 <div className="flex justify-between text-secondary">
-                                                    <span>{t('shippingCost')}</span>
-                                                    <span>{bookingPayment.summary.shippingCost.toFixed(2)}</span>
+                                                    <span>{t('vat')}</span>
+                                                    <span>20%</span>
                                                 </div>
-                                            )}
+                                          
                                             <div className="border-t border-accent/20 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
                                                     <span>{t('total')}</span>

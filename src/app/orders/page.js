@@ -1,5 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,8 +15,9 @@ import { Package, Phone, User, Calendar, CreditCard, CheckCircle2, Clock, XCircl
 import toast from 'react-hot-toast';
 import { useApiGet } from '@/hooks/useApi';
 
-export default function OrdersPage() {
+function OrdersContent() {
     const { isAuthenticated, user } = useAuth();
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState('all'); // 'all', 'repair', 'phone', 'accessory'
     const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -107,7 +109,13 @@ export default function OrdersPage() {
 
     const filteredOrders = getFilteredOrders();
 
-  
+    // Set active tab from URL query parameter on mount
+    useEffect(() => {
+        const tabParam = searchParams?.get('tab');
+        if (tabParam && ['all', 'repair', 'phone', 'accessory'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [searchParams]);
 
     const getOrderTypeIcon = (orderType) => {
         switch(orderType) {
@@ -610,4 +618,22 @@ export default function OrdersPage() {
     );
 }
 
+export default function OrdersPage() {
+    return (
+        <Suspense fallback={
+            <PageTransition>
+                <div className="min-h-screen relative overflow-hidden bg-primary">
+                    <div className="container mx-auto px-4 py-8">
+                        <div className="space-y-4">
+                            <Skeleton className="h-12 w-64 bg-white/10" />
+                            <Skeleton className="h-96 w-full bg-white/10" />
+                        </div>
+                    </div>
+                </div>
+            </PageTransition>
+        }>
+            <OrdersContent />
+        </Suspense>
+    );
+}
 
