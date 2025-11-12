@@ -26,10 +26,10 @@ export default function ShopInfo() {
             {/* Address */}
             <div className="flex items-start gap-3 group">
                 <div className="flex-shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-secondary group-hover:text-white transition-colors duration-300" />
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-secondary transition-colors duration-300" />
                 </div>
                 <div className="flex-1">
-                    <p className="text-secondary/90 text-xs sm:text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
+                    <p className="text-secondary/90 text-xs sm:text-sm leading-relaxed  transition-colors duration-300">
                         <span className="font-semibold">{t('address')}</span><br />
                         <span className="text-secondary/70">{t('addressLine1')}</span><br />
                         <span className="text-secondary/70">{t('addressLine2')}</span>

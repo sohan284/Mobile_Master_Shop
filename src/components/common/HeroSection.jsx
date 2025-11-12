@@ -40,8 +40,8 @@ export default function HeroSection({
                 fallbackSrc="/Apple.png"
               />
             ) : (
-              <div className="max-w-[380px] w-full h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] mx-auto bg-accent/20 rounded-lg flex items-center justify-center">
-                <span className="text-accent/60 text-lg">No Image</span>
+              <div className="max-w-[380px] w-full h-[240px] sm:h-[280px] md:h-[320px] lg:h-[380px] mx-auto bg-gray-200 rounded-lg flex items-center justify-center">
+                <span className="text-gray-400 text-lg">No Image</span>
               </div>
             )}
           </div>
@@ -52,15 +52,17 @@ export default function HeroSection({
 
   const ContentComponent = () => (
     <div className="space-y-6 flex flex-col items-center lg:items-start text-center lg:text-left">
-      <MotionFade delay={0.02} immediate={true}>
-        <div className="inline-flex items-center gap-2 bg-secondary/20 text-secondary px-4 py-2 rounded-full text-sm font-semibold">
-          <span className="w-2 h-2 bg-secondary text-secondary rounded-full animate-pulse"></span>
-          {badgeText}
-        </div>
-      </MotionFade>
+      {badgeText && (
+        <MotionFade delay={0.02} immediate={true}>
+          <div className="inline-flex items-center gap-2 bg-gray-200 text-secondary px-4 py-2 rounded-full text-sm font-semibold">
+            <span className="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+            {badgeText}
+          </div>
+        </MotionFade>
+      )}
 
       <MotionFade delay={0.03} immediate={true}>
-        <h1 className="font-extrabold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-accent leading-tight">
+        <h1 className="font-extrabold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-secondary leading-tight">
           {title} <span className="text-secondary relative block lg:inline">
             {subtitle}
             <svg className="absolute -bottom-2 left-0 w-full h-3 text-secondary/30" viewBox="0 0 200 12" fill="none" aria-hidden="true">
@@ -71,7 +73,7 @@ export default function HeroSection({
       </MotionFade>
 
       <MotionFade delay={0.04} immediate={true}>
-        <p className="text-lg sm:text-xl text-accent/80 leading-relaxed max-w-lg">
+        <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-lg">
           {description}
         </p>
       </MotionFade>

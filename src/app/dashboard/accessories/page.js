@@ -33,7 +33,7 @@ export default function AccessoriesPage() {
         <div className="flex items-center">
           <Image
             src={item?.picture || '/placeholder-image.png'}
-            alt={item?.name}
+            alt={item?.name || item?.title || 'Product image'}
             className="h-12 w-12 object-contain rounded"
             width={48}
             height={48}

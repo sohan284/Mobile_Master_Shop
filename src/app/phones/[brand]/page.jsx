@@ -116,12 +116,12 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
             <div className="flex flex-col lg:flex-row gap-8 my-12">
               {/* Filter Sidebar Skeleton */}
               <div className="lg:w-1/4 min-w-[280px]">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
-                  <Skeleton className="h-6 w-20 mb-6 bg-white/10" />
+                <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl p-6 border border-gray-600/20">
+                  <Skeleton className="h-6 w-20 mb-6 bg-gray-200" />
                   <div className="space-y-6">
-                    <Skeleton className="h-16 w-full bg-white/10" />
-                    <Skeleton className="h-16 w-full bg-white/10" />
-                    <Skeleton className="h-16 w-full bg-white/10" />
+                    <Skeleton className="h-16 w-full bg-gray-200" />
+                    <Skeleton className="h-16 w-full bg-gray-200" />
+                    <Skeleton className="h-16 w-full bg-gray-200" />
                   </div>
                 </div>
               </div>
@@ -131,7 +131,7 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                 <div className="max-h-[80vh] overflow-y-auto pr-2 py-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                      <Skeleton key={item} className="h-80 w-full bg-white/10" />
+                      <Skeleton key={item} className="h-80 w-full bg-gradient-to-br from-gray-100/40 to-gray-300/40" />
                     ))}
                   </div>
                 </div>
@@ -151,8 +151,8 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
           <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-center min-h-[60vh]">
               <div className="text-center space-y-4">
-                <h2 className="text-2xl font-bold text-accent">{t('errorLoadingPhones')}</h2>
-                <p className="text-accent/80">{t('couldntLoadPhones')}</p>
+                <h2 className="text-2xl font-bold text-secondary">{t('errorLoadingPhones')}</h2>
+                <p className="text-gray-600">{t('couldntLoadPhones')}</p>
               </div>
             </div>
           </div>
@@ -208,14 +208,14 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
             {/* Filter Sidebar - Sticky */}
             <MotionFade delay={0.2} immediate={true}>
               <div className="lg:w-1/4 min-w-[280px] lg:sticky lg:top-24 lg:h-[calc(90vh-8rem)]">
-                <div className=" rounded-xl p-6  border-accent/20 h-full overflow-y-auto scrollbar-hide">
+                <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl p-6 border border-gray-600/20 h-full overflow-y-auto scrollbar-hide">
                   <h3 className="text-xl font-bold text-secondary mb-6">{t('filters')}</h3>
 
                   {/* Price Sort */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">{t('sortByPrice')}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">{t('sortByPrice')}</label>
                     <select
-                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-gray-600"
                       value={sortOrder}
                       onChange={(e) => setSortOrder(e.target.value)}
                     >
@@ -227,7 +227,7 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
 
                   {/* Price Range Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">{t('priceRange')}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">{t('priceRange')}</label>
                     <input
                       type="range"
                       min="0"
@@ -237,7 +237,7 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                       onChange={(e) => setPriceRange(prev => ({ ...prev, max: parseInt(e.target.value) }))}
                       className="w-full accent-secondary cursor-pointer"
                     />
-                    <div className="flex justify-between text-accent/80 text-sm mt-2">
+                    <div className="flex justify-between text-gray-600 text-sm mt-2">
                       <span>€{priceRange.min.toLocaleString()}</span>
                       <span>€{priceRange.max.toLocaleString()}</span>
                     </div>
@@ -245,9 +245,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
 
                   {/* Storage Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">{t('storage')}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">{t('storage')}</label>
                     <select
-                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-gray-600"
                       value={storage}
                       onChange={(e) => setStorage(e.target.value)}
                     >
@@ -262,9 +262,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
 
                   {/* RAM Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">{t('ram')}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">{t('ram')}</label>
                     <select
-                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-gray-600"
                       value={ram}
                       onChange={(e) => setRam(e.target.value)}
                     >
@@ -280,9 +280,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
 
                   {/* Availability Filter */}
                   <div className="mb-6">
-                    <label className="block text-sm font-medium text-accent mb-3">{t('availability')}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-3">{t('availability')}</label>
                     <select
-                      className="cursor-pointer w-full p-3 border border-accent/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                      className="cursor-pointer w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-gray-600"
                       value={availability}
                       onChange={(e) => setAvailability(e.target.value)}
                     >
@@ -308,7 +308,7 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                         setAvailability('all');
                         setDiscount('all');
                       }}
-                      className="cursor-pointer w-full p-3 bg-secondary/20 text-secondary border border-secondary/30 rounded-lg hover:bg-secondary/30 transition-colors duration-200 font-medium"
+                      className="cursor-pointer w-full p-3 bg-gray-200 text-secondary border border-gray-300 rounded-lg hover:bg-gray-300 transition-colors duration-200 font-medium"
                     >
                       {t('clearAllFilters')}
                     </button>
@@ -335,9 +335,9 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                   renderItem={(phone, index) => (
                     <Link href={`/phones/${brand}/${phone.id}`} key={phone.id}>
                       <MotionFade delay={0.3 + index * 0.1} immediate={true}>
-                        <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
+                        <div className="group bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-600/20 hover:border-secondary/50 h-full overflow-hidden">
                           <div className="p-6 text-center h-full flex flex-col">
-                            <div className="mb-6 bg-white/5 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
+                            <div className="mb-6 bg-white rounded-xl border p-6 group-hover:from-gray-400/20 group-hover:to-gray-600/20 transition-all duration-500 relative overflow-hidden">
                               <Image
                                 src={phone.icon || '/SAMSUNG_GalaxyS23Ultra.png'}
                                 alt={phone.name}
@@ -348,23 +348,23 @@ setPriceRange({ min: 0, max: brandPhones?.reduce((max, phone) => Math.max(max, p
                             </div>
 
                             <div className="flex-grow flex flex-col justify-between">
-                              <h3 className="font-bold text-lg text-accent group-hover:text-secondary transition-colors duration-300 mb-3">
+                              <h3 className="font-bold text-lg text-secondary group-hover:text-secondary transition-colors duration-300 mb-3">
                                 {phone.name}
                               </h3>
 
                               <div className="space-y-2">
-                                <p className="text-accent/80 text-sm">{phone.memory}GB - {phone.ram}GB RAM</p>
+                                <p className="text-gray-600 text-sm">{phone.memory}GB - {phone.ram}GB RAM</p>
                                 <div className="space-y-1">
 
-                                  <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
+                                  <p className="text-lg text-gray-600 flex items-center justify-center gap-2">
                                     {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
-                                      <span className="text-xs text-green-500">
+                                      <span className="text-xs text-green-600">
                                         {parseFloat(phone.discount_percentage).toFixed(1)}% off
                                       </span>
                                     )}
                                     <span className='font-bold text-secondary'>${parseFloat(phone.final_price).toLocaleString()}</span>
                                     {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
-                                      <span className="text-sm text-accent/60 line-through">
+                                      <span className="text-sm text-gray-400 line-through">
                                         ${parseFloat(phone.main_amount).toLocaleString()}
                                       </span>
                                     )}

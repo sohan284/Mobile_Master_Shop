@@ -9,10 +9,6 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import MotionFade from '@/components/animations/MotionFade';
-import HeroSection from '@/components/common/HeroSection';
-import FeaturesSection from '@/components/common/FeaturesSection';
-import CTASection from '@/components/common/CTASection';
 import Image from 'next/image';
 import { Shield, Smartphone, TrendingDown } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
@@ -87,7 +83,7 @@ export default function Refurbished() {
     },
   ], [t]);
   return (
-    <div className="relative  text-white py-20 overflow-hidden">
+    <div className="relative text-secondary py-20 overflow-hidden">
       <style dangerouslySetInnerHTML={{ __html: swiperStyles }} />
       <div className="container mx-auto px-4 z-10 relative">
         {/* Header Section - Banner Style */}
@@ -104,7 +100,7 @@ export default function Refurbished() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-4 text-lg md:text-xl text-gray-300"
+            className="mt-4 text-lg md:text-xl text-gray-600"
           >
             {t('discoverSelection')}
           </motion.p>
@@ -131,7 +127,7 @@ export default function Refurbished() {
         >
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold mb-4">{t('featuredNewPhones')}</h3>
-            <p className="text-gray-300 max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto">
               {t('handpickedSelection')}
             </p>
           </div>
@@ -180,58 +176,45 @@ export default function Refurbished() {
             {models.map((model) => (
               <SwiperSlide key={model.id}>
                 <Link className='cursor-pointer' href={`/phones/${model.brand}/${model.id}`}>
-                <Card className="group cursor-pointer bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
-                  <CardContent className="p-4 py-0 text-center h-full flex flex-col relative">
-                    {/* Brand Badge */}
-                    {/* <div className="absolute top-3 left-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
-                                            {brand}
-                                        </div> */}
-
-                    {/* Condition Badge */}
-                    <div className="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
-                                            {t('new')}
-                                        </div>
-
-                    <div className="mb-4 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
-                      {/* Subtle background pattern */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-2 left-2 w-8 h-8 bg-secondary rounded-full"></div>
-                        <div className="absolute bottom-2 right-2 w-6 h-6 bg-primary rounded-full"></div>
+                  <Card className="group cursor-pointer bg-gray-200 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                    <CardContent className="p-4 py-0 text-center h-full flex flex-col relative">
+                      {/* Condition Badge */}
+                      <div className="absolute top-3 right-3 bg-black text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
+                        {t('new')}
                       </div>
-                      <div className='flex justify-center items-center'>
-                  
-                           <Image
-                                                width={400}
-                                                height={400}
-                                                src={model.icon}
-                                                alt={model.name}
-                                                className="w-full rounded-md object-contain group-hover:scale-110 transition-transform duration-500"
-                                            />
-                      </div>
-                    </div>
 
-                    <div className="flex-grow flex flex-col justify-between">
-                      <h3 className="font-bold text-lg text-white group-hover:text-secondary transition-colors duration-300">
-                        {model.name.replace('.png', '').replace(/[-_]/g, ' ')}
-                      </h3>
+                      <div className="mb-4 bg-white rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
+                     
+                        <div className='flex justify-center items-center'>
 
-                      <div className="space-y-2">
-                        <div className="text-center">
-                          <p className="text-sm text-gray-300 mb-1">
-                            {t('startingFrom')}
-                          </p>
-                          <p className="font-bold text-3xl text-secondary mb-2">
-                              €{model.main_amount}
-                          </p>
+                          <Image
+                            width={400}
+                            height={400}
+                            src={model.icon}
+                            alt={model.name}
+                            className="w-full rounded-md object-contain group-hover:scale-110 transition-transform duration-500"
+                          />
                         </div>
-
-                        {/* <div className="bg-gradient-to-r from-secondary/20 to-primary/20 text-white text-sm font-semibold px-4 py-2 rounded-full border border-secondary/30">
-                          {model.warranty} Month Warranty
-                        </div> */}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                      <div className="flex-grow flex flex-col justify-between">
+                        <h3 className="font-bold text-lg text-secondary">
+                          {model.name.replace('.png', '').replace(/[-_]/g, ' ')}
+                        </h3>
+
+                        <div className="space-y-2">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-1">
+                              {t('startingFrom')}
+                            </p>
+                            <p className="font-bold text-3xl text-secondary mb-2">
+                              €{model.main_amount}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </Link>
               </SwiperSlide>
             ))}
@@ -239,7 +222,7 @@ export default function Refurbished() {
 
           {/* Custom Navigation */}
           <div className="absolute top-24 md:top-16 right-0 flex gap-2">
-            <button className="swiper-button-prev-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
+            <button className="swiper-button-prev-custom cursor-pointer bg-secondary backdrop-blur-sm text-primary hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
                 fill="none"
@@ -255,7 +238,7 @@ export default function Refurbished() {
               </svg>
             </button>
 
-            <button className="swiper-button-next-custom cursor-pointer bg-white/10 /10 backdrop-blur-sm text-white hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
+            <button className="swiper-button-next-custom cursor-pointer bg-secondary backdrop-blur-sm text-primary hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
                 fill="none"
@@ -281,8 +264,8 @@ export default function Refurbished() {
           className="mb-16"
         >
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4 text-white">{t('whyChooseOurPhones')}</h3>
-            <p className="text-gray-300 text-lg">{t('premiumQualityPhones')}</p>
+            <h3 className="text-3xl font-bold mb-4 text-secondary">{t('whyChooseOurPhones')}</h3>
+            <p className="text-gray-600 text-lg">{t('premiumQualityPhones')}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -296,7 +279,7 @@ export default function Refurbished() {
                   transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                   className="group relative"
                 >
-                  <div className="relative bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
+                  <div className="relative bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                     {/* Gradient background on hover */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
 
@@ -308,8 +291,8 @@ export default function Refurbished() {
                       </div>
                     </div>
 
-                    <h4 className="text-xl font-bold mb-3 text-white">{feature.title}</h4>
-                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                    <h4 className="text-xl font-bold mb-3 text-secondary">{feature.title}</h4>
+                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                   </div>
                 </motion.div>
               );

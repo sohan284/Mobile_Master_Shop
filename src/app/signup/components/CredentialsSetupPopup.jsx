@@ -87,28 +87,28 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[85]">
-      <div className="bg-[#39404D] backdrop-blur-sm rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="bg-white backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-300 p-8 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold text-accent">{t('completeYourAccount')}</h2>
-            <p className="text-sm text-accent/80">{t('setUpUsernamePassword')}</p>
+            <h2 className="text-xl font-bold text-secondary">{t('completeYourAccount')}</h2>
+            <p className="text-sm text-gray-600">{t('setUpUsernamePassword')}</p>
           </div>
           <button
             onClick={onClose}
-            className="text-accent/60 hover:text-accent transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Email Display (Read-only) */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-6">
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
           <div className="flex items-center">
-            <Mail className="text-accent/60 mr-2" size={16} />
+            <Mail className="text-gray-400 mr-2" size={16} />
             <div>
-              <p className="text-sm text-accent/80">{t('emailAddressLabel')}</p>
-              <p className="font-medium text-accent">{email}</p>
+              <p className="text-sm text-gray-600">{t('emailAddressLabel')}</p>
+              <p className="font-medium text-secondary">{email}</p>
             </div>
           </div>
         </div>
@@ -117,42 +117,42 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
         <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="credentials-form">
           {/* Username Field */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-accent mb-2">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-600 mb-2">
               {t('username')}
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 id="username"
                 name="credentials-username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                 placeholder={t('chooseUsername')}
                 autoComplete="off"
                 required
               />
             </div>
-            <p className="mt-1 text-xs text-accent/60">
+            <p className="mt-1 text-xs text-gray-500">
               {t('usernameRequirements')}
             </p>
           </div>
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-accent mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-2">
               {t('password')}
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 id="password"
                 name="credentials-password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                 placeholder={t('createStrongPassword')}
                 autoComplete="new-password"
                 required
@@ -160,30 +160,30 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent/60 hover:text-accent"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            <p className="mt-1 text-xs text-accent/60">
+            <p className="mt-1 text-xs text-gray-500">
               {t('passwordRequirements')}
             </p>
           </div>
 
           {/* Confirm Password Field */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-accent mb-2">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-600 mb-2">
               {t('confirmPassword')}
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent/60" size={20} />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 id="confirmPassword"
                 name="credentials-confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                 placeholder={t('confirmYourPassword')}
                 autoComplete="new-password"
                 required
@@ -191,7 +191,7 @@ export default function CredentialsSetupPopup({ email, onSubmit, onClose }) {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent/60 hover:text-accent"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>

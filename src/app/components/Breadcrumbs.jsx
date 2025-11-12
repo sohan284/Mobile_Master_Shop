@@ -31,11 +31,11 @@ export default function Breadcrumbs() {
                 {/* Show route segments only if not on home */}
                 {crumbs.map((crumb, i) => (
                     <li key={crumb.href} className="flex items-center space-x-1">
-                        <span className="text-gray-400">/</span>
+                        <span className="text-gray-700">/</span>
                         {i === crumbs.length - 1 ? (
-                            <span className="text-gray-500">{crumb.label}</span>
+                            <span className="text-gray-800">{crumb.label}</span>
                         ) : (
-                            <Link href={crumb.href} className="hover:underline text-gray-700">
+                            <Link href={crumb.href} className="hover:underline text-gray-800">
                                 {crumb.label}
                             </Link>
                         )}

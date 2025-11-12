@@ -20,25 +20,25 @@ function SearchSection({
           <h2 className="text-3xl md:text-4xl font-bold text-secondary mb-2">
             {title}
           </h2>
-          <p className="text-accent/80 text-xs md:text-xl leading-relaxed">
+          <p className="text-gray-600 text-xs md:text-xl leading-relaxed">
             {description}
           </p>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="w-full my-3 flex justify-end">
+      <div className="w-full my-3 flex justify-center">
         <div className="relative w-full max-w-md">
           <input
             type="text"
             placeholder={placeholder}
             value={searchTerm}
             onChange={onSearchChange}
-            className="w-full py-1 pl-12 pr-4 text-accent text-lg bg-white/10 backdrop-blur-md border-2 border-accent/30 rounded-2xl focus:outline-none focus:border-secondary transition-all duration-300 shadow-sm hover:shadow-lg placeholder:text-accent/60"
+            className="w-full py-1 pl-12 pr-4 text-secondary text-lg bg-white border-2 border-gray-300 rounded-2xl focus:outline-none focus:border-secondary transition-all duration-300 shadow-sm hover:shadow-lg placeholder:text-gray-400"
           />
           <div className="absolute inset-y-0 left-0 flex items-center pl-4">
             <svg
-              className="w-6 h-6 text-accent/60"
+              className="w-6 h-6 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
