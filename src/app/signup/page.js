@@ -71,7 +71,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/90 via-primary/95 to-primary flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
@@ -84,24 +84,24 @@ export default function SignupPage() {
         </div>
 
         {/* Signup Form */}
-        <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
+        <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-600/20 p-8">
           <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" name="signup-form">
-            <h1 className="text-3xl font-bold text-accent mb-2">{t('createAccountTitle')}</h1>
-            <p className="text-secondary">{t('getStarted')}</p>
+            <h1 className="text-3xl font-bold text-secondary mb-2">{t('createAccountTitle')}</h1>
+            <p className="text-gray-600">{t('getStarted')}</p>
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-accent mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-2">
                 {t('emailAddress')}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   id="email"
                   name="signup-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                   placeholder={t('enterEmailAddress')}
                   autoComplete="off"
                   required
@@ -127,7 +127,7 @@ export default function SignupPage() {
           <div className="mt-6 text-center">
             <button
               onClick={() => router.push('/login')}
-              className="flex items-center cursor-pointer justify-center text-accent hover:text-secondary transition-colors duration-200"
+              className="flex items-center cursor-pointer justify-center text-gray-600 hover:text-secondary transition-colors duration-200"
             >
               <ArrowLeft size={16} className="mr-2" />
               {t('backToLogin')}
@@ -137,7 +137,7 @@ export default function SignupPage() {
 
         {/* Footer */}
         <div className="text-center mt-6">
-          <p className="text-secondary text-sm">
+          <p className="text-gray-600 text-sm">
             {t('copyright')}
           </p>
         </div>

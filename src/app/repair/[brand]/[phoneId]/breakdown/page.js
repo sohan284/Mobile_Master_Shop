@@ -392,32 +392,32 @@ export default function PriceBreakdownPage({ params }) {
                         </div> */}  
 
                         {/* Price Breakdown Card Skeleton */}
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
-                            <Skeleton className="h-8 w-64 mb-6 bg-white/10" />
+                        <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-8 mb-8">
+                            <Skeleton className="h-8 w-64 mb-6 bg-gray-200" />
                             
                             {/* Device Info Skeleton */}
-                            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 mb-6">
+                            <div className="bg-white rounded-lg border p-4 mb-6">
                                 <div className="flex items-center">
-                                    <Skeleton className="w-12 h-12 rounded-lg bg-white/10" />
+                                    <Skeleton className="w-12 h-12 rounded-lg bg-gray-200" />
                                     <div className="ml-4 flex-1">
-                                        <Skeleton className="h-6 w-48 mb-2 bg-white/10" />
-                                        <Skeleton className="h-4 w-32 bg-white/10" />
+                                        <Skeleton className="h-6 w-48 mb-2 bg-gray-200" />
+                                        <Skeleton className="h-4 w-32 bg-gray-200" />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Selected Services Skeleton */}
                             <div className="mb-6">
-                                <Skeleton className="h-6 w-40 mb-4 bg-white/10" />
+                                <Skeleton className="h-6 w-40 mb-4 bg-gray-200" />
                                 <div className="space-y-3">
                                     {[1, 2, 3].map((item) => (
-                                        <div key={item} className="flex justify-between items-center p-4 bg-white/5 backdrop-blur-sm rounded-lg">
+                                        <div key={item} className="flex justify-between items-center p-4 bg-white rounded-lg border">
                                             <div className="flex-1">
-                                                <Skeleton className="h-5 w-32 mb-2 bg-white/10" />
-                                                <Skeleton className="h-4 w-24 bg-white/10" />
+                                                <Skeleton className="h-5 w-32 mb-2 bg-gray-200" />
+                                                <Skeleton className="h-4 w-24 bg-gray-200" />
                                             </div>
                                             <div className="text-right">
-                                                <Skeleton className="h-6 w-16 bg-white/10" />
+                                                <Skeleton className="h-6 w-16 bg-gray-200" />
                                             </div>
                                         </div>
                                     ))}
@@ -425,18 +425,18 @@ export default function PriceBreakdownPage({ params }) {
                             </div>
 
                             {/* Price Summary Skeleton */}
-                            <div className="border-t border-accent/20 pt-6">
+                            <div className="border-t border-gray-300 pt-6">
                                 <div className="space-y-3">
                                     {[1, 2, 3, 4].map((item) => (
                                         <div key={item} className="flex justify-between">
-                                            <Skeleton className="h-4 w-32 bg-white/10" />
-                                            <Skeleton className="h-4 w-16 bg-white/10" />
+                                            <Skeleton className="h-4 w-32 bg-gray-200" />
+                                            <Skeleton className="h-4 w-16 bg-gray-200" />
                                         </div>
                                     ))}
-                                    <div className="border-t border-accent/20 pt-3">
+                                    <div className="border-t border-gray-300 pt-3">
                                         <div className="flex justify-between">
-                                            <Skeleton className="h-6 w-40 bg-white/10" />
-                                            <Skeleton className="h-6 w-20 bg-white/10" />
+                                            <Skeleton className="h-6 w-40 bg-gray-200" />
+                                            <Skeleton className="h-6 w-20 bg-gray-200" />
                                         </div>
                                     </div>
                                 </div>
@@ -445,8 +445,8 @@ export default function PriceBreakdownPage({ params }) {
 
                         {/* Action Buttons Skeleton */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Skeleton className="h-12 w-40 bg-white/10" />
-                            <Skeleton className="h-12 w-48 bg-white/10" />
+                            <Skeleton className="h-12 w-40 bg-gray-200" />
+                            <Skeleton className="h-12 w-48 bg-gray-200" />
                         </div>
                     </div>
                 </div>
@@ -498,12 +498,12 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Warning for fallback pricing */}
                     {error && priceData && (
                         <MotionFade delay={0.1} immediate={true}>
-                            <div className="bg-secondary/20 border border-secondary rounded-lg p-3 mb-4">
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
                                 <div className="flex items-center gap-2">
-                                    <div className="text-secondary text-lg">⚠️</div>
+                                    <div className="text-yellow-600 text-lg">⚠️</div>
                                     <div>
-                                        <h3 className="font-semibold text-sm text-accent">{t('estimatedPricing')}</h3>
-                                        <p className="text-accent/80 text-xs">{error}</p>
+                                        <h3 className="font-semibold text-sm text-secondary">{t('estimatedPricing')}</h3>
+                                        <p className="text-gray-600 text-xs">{error}</p>
                                     </div>
                                 </div>
                             </div>
@@ -513,7 +513,7 @@ export default function PriceBreakdownPage({ params }) {
                     {/* Price Breakdown */}
                     {priceData && (
                         <MotionFade delay={0.2} immediate={true}>
-                            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-5 mb-4">
+                            <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-5 mb-4">
                                 {/* Breadcrumb Navigation */}
                                 <Breadcrumb
                                     items={[
@@ -531,9 +531,9 @@ export default function PriceBreakdownPage({ params }) {
                                     {/* Left Column - Device & Services */}
                                     <div className="md:col-span-2 space-y-4">
                                 {/* Device Info */}
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                                        <div className="bg-white rounded-lg border p-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                                                     {phoneInfo?.image ? (
                                                         <SafeImage
                                                             src={phoneInfo.image}
@@ -548,25 +548,25 @@ export default function PriceBreakdownPage({ params }) {
                                                     )}
                                         </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-base text-accent truncate">{priceData.phone_model}</h3>
-                                                    <p className="text-xs text-accent/80">{priceData.brand}</p>
+                                                    <h3 className="font-semibold text-base text-secondary truncate">{priceData.phone_model}</h3>
+                                                    <p className="text-xs text-gray-600">{priceData.brand}</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Selected Services */}
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                                            <h3 className="text-sm font-semibold text-accent mb-2">{t('selectedServices')}</h3>
+                                        <div className="bg-white rounded-lg border p-3">
+                                            <h3 className="text-sm font-semibold text-secondary mb-2">{t('selectedServices')}</h3>
                                             <div className="space-y-2">
                                         {priceData.items.map((item, index) => (
-                                                    <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
+                                                    <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded border">
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="font-medium text-sm text-accent truncate">{item.problem_name}</h4>
-                                                            <p className="text-xs text-accent/80">
+                                                            <h4 className="font-medium text-sm text-secondary truncate">{item.problem_name}</h4>
+                                                            <p className="text-xs text-gray-600">
                                                                 {t('partType')}: <span className="font-medium capitalize">{item.part_type}</span>
                                                             </p>
                                                             {parseFloat(item.discount) > 0 && (
-                                                                <p className="text-xs text-secondary/80 mt-0.5">
+                                                                <p className="text-xs text-green-600 mt-0.5">
                                                                     -€{parseFloat(item.discount).toFixed(2)} discount
                                                                 </p>
                                                             )}
@@ -582,8 +582,8 @@ export default function PriceBreakdownPage({ params }) {
                                         </div>
 
                                         {/* Schedule Selection */}
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                                            <h3 className="text-sm font-semibold text-accent mb-3 flex items-center gap-2">
+                                        <div className="bg-white rounded-lg border p-3">
+                                            <h3 className="text-sm font-semibold text-secondary mb-3 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-secondary" />
                                                 {t('selectSchedule')}
                                             </h3>
@@ -592,13 +592,13 @@ export default function PriceBreakdownPage({ params }) {
                                                 <div>
                                                     <Label 
                                                         htmlFor="scheduleDate" 
-                                                        className="text-accent text-xs font-medium mb-1 block"
+                                                        className="text-gray-600 text-xs font-medium mb-1 block"
                                                     >
                                                         {t('scheduleDate')} *
                                                     </Label>
                                                     <div className="relative group">
                                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                                                            <Calendar className="w-4 h-4 text-accent/60 group-focus-within:text-secondary transition-colors duration-200" />
+                                                            <Calendar className="w-4 h-4 text-gray-400 group-focus-within:text-secondary transition-colors duration-200" />
                                                         </div>
                                                         <Input
                                                             id="scheduleDate"
@@ -630,12 +630,12 @@ export default function PriceBreakdownPage({ params }) {
                                                                 }
                                                             }}
                                                             min={new Date().toISOString().split('T')[0]}
-                                                            className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:bg-white/15 hover:border-accent/50 pl-10 pr-3 py-2 rounded-lg"
+                                                            className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:border-gray-400 pl-10 pr-3 py-2 rounded-lg"
                                                             required
                                                         />
                                                         {scheduleDate && (
                                                             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                                <span className="text-xs text-secondary/80 font-medium">
+                                                                <span className="text-xs text-gray-600 font-medium">
                                                                     {formatDate(scheduleDate)}
                                                                 </span>
                                                 </div>
@@ -647,13 +647,13 @@ export default function PriceBreakdownPage({ params }) {
                                                 <div>
                                                     <Label 
                                                         htmlFor="scheduleTime" 
-                                                        className="text-accent text-xs font-medium mb-1 block"
+                                                        className="text-gray-600 text-xs font-medium mb-1 block"
                                                     >
                                                         {t('scheduleTime')} *
                                                     </Label>
                                                     <div className="relative group">
                                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
-                                                            <Clock className="w-4 h-4 text-accent/60 group-focus-within:text-secondary transition-colors duration-200" />
+                                                            <Clock className="w-4 h-4 text-gray-400 group-focus-within:text-secondary transition-colors duration-200" />
                                                         </div>
                                                         <Input
                                                             id="scheduleTime"
@@ -684,12 +684,12 @@ export default function PriceBreakdownPage({ params }) {
                                                                     }
                                                                 }
                                                             }}
-                                                            className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:bg-white/15 hover:border-accent/50 pl-10 pr-3 py-2 rounded-lg"
+                                                            className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-xs cursor-pointer transition-all duration-200 hover:border-gray-400 pl-10 pr-3 py-2 rounded-lg"
                                                             required
                                                         />
                                                         {scheduleTime && (
                                                             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                                <span className="text-xs text-secondary/80 font-medium">
+                                                                <span className="text-xs text-gray-600 font-medium">
                                                                     {formatTime(scheduleTime)}
                                                                 </span>
                                                         </div>
@@ -698,8 +698,8 @@ export default function PriceBreakdownPage({ params }) {
                                                 </div>
                                             </div>
                                             {scheduleError && (
-                                                <div className="mt-2 p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
-                                                    <p className="text-red-400 text-xs font-medium flex items-center gap-2">
+                                                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                                                    <p className="text-red-600 text-xs font-medium flex items-center gap-2">
                                                         <span>⚠️</span>
                                                         {scheduleError}
                                                     </p>
@@ -711,12 +711,12 @@ export default function PriceBreakdownPage({ params }) {
                                     {/* Right Column - Price Summary */}
                                   <div  className="md:col-span-1">
                                   <div>
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-accent/20 sticky top-4">
-                                            <h3 className="text-sm font-semibold text-accent mb-3">{t('priceSummary')}</h3>
+                                        <div className="bg-white rounded-lg border border-gray-300 p-3 sticky top-4">
+                                            <h3 className="text-sm font-semibold text-secondary mb-3">{t('priceSummary')}</h3>
                                             <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
-                                            <span className="text-accent/80">{t('subtotalBreakdown')}:</span>
-                                            <span className="font-medium text-accent">€{parseFloat(priceData.subtotal).toFixed(2)}</span>
+                                            <span className="text-gray-600">{t('subtotalBreakdown')}:</span>
+                                            <span className="font-medium text-secondary">€{parseFloat(priceData.subtotal).toFixed(2)}</span>
                                         </div>
                                         
                                         {parseFloat(priceData.item_discount) > 0 && (
@@ -741,14 +741,14 @@ export default function PriceBreakdownPage({ params }) {
                                         
                                 
                                             <div className="flex justify-between">
-                                                <span className="text-accent/80">{t('vat') || 'VAT'}:</span>
-                                                <span className="font-medium text-accent">20%</span>
+                                                <span className="text-gray-600">{t('vat') || 'VAT'}:</span>
+                                                <span className="font-medium text-secondary">20%</span>
                                             </div>
                                     
                                         
-                                                <div className="border-t border-accent/20 pt-2 mt-2">
+                                                <div className="border-t border-gray-300 pt-2 mt-2">
                                                     <div className="flex justify-between text-base font-bold">
-                                                <span className="text-accent">{t('totalBreakdown')}:</span>
+                                                <span className="text-secondary">{t('totalBreakdown')}:</span>
                                                 <span className="text-secondary">€{parseFloat(priceData.total_amount).toFixed(2)}</span>
                                             </div>
                                         </div>
@@ -764,7 +764,7 @@ export default function PriceBreakdownPage({ params }) {
                                     <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
                             <CustomButton 
                                 onClick={handleBackToServices}
-                                className="bg-accent/20 text-accent hover:bg-accent/30 px-6 py-2 text-sm"
+                                className="bg-gray-200 text-secondary hover:bg-gray-300 px-6 py-2 text-sm"
                             >
                                 {t('backToServices')}
                             </CustomButton>
@@ -789,17 +789,17 @@ export default function PriceBreakdownPage({ params }) {
 
             {/* Customer Information Form Dialog */}
             <Dialog open={showCustomerForm} onOpenChange={setShowCustomerForm}>
-                <DialogContent className="bg-primary border-accent/20 text-white max-w-md">
+                <DialogContent className="bg-primary border-gray-300 text-secondary max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-secondary">Customer Information</DialogTitle>
-                        <DialogDescription className="text-accent/80">
+                        <DialogDescription className="text-gray-600">
                             Please provide your contact information to proceed with the order.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 mt-4">
                         {/* Username */}
                         <div>
-                            <Label htmlFor="customer-username" className="text-accent text-sm font-medium mb-2 block">
+                            <Label htmlFor="customer-username" className="text-gray-600 text-sm font-medium mb-2 block">
                                 <User className="w-4 h-4 inline mr-2" />
                                 Username *
                             </Label>
@@ -808,7 +808,7 @@ export default function PriceBreakdownPage({ params }) {
                                 type="text"
                                 value={customerInfo.username}
                                 onChange={(e) => setCustomerInfo({ ...customerInfo, username: e.target.value })}
-                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                                 placeholder="Enter your username"
                                 required
                             />
@@ -816,7 +816,7 @@ export default function PriceBreakdownPage({ params }) {
 
                         {/* Email */}
                         <div>
-                            <Label htmlFor="customer-email" className="text-accent text-sm font-medium mb-2 block">
+                            <Label htmlFor="customer-email" className="text-gray-600 text-sm font-medium mb-2 block">
                                 <Mail className="w-4 h-4 inline mr-2" />
                                 Email *
                             </Label>
@@ -825,7 +825,7 @@ export default function PriceBreakdownPage({ params }) {
                                 type="email"
                                 value={customerInfo.email}
                                 onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                                 placeholder="Enter your email"
                                 required
                             />
@@ -833,7 +833,7 @@ export default function PriceBreakdownPage({ params }) {
 
                         {/* Phone */}
                         <div>
-                            <Label htmlFor="customer-phone" className="text-accent text-sm font-medium mb-2 block">
+                            <Label htmlFor="customer-phone" className="text-gray-600 text-sm font-medium mb-2 block">
                                 <Phone className="w-4 h-4 inline mr-2" />
                                 Phone *
                             </Label>
@@ -842,15 +842,15 @@ export default function PriceBreakdownPage({ params }) {
                                 type="tel"
                                 value={customerInfo.phone}
                                 onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                                 placeholder="Enter your phone number"
                                 required
                             />
                         </div>
 
                         {customerFormError && (
-                            <div className="p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
-                                <p className="text-red-400 text-xs font-medium">{customerFormError}</p>
+                            <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-red-600 text-xs font-medium">{customerFormError}</p>
                             </div>
                         )}
 
@@ -871,7 +871,7 @@ export default function PriceBreakdownPage({ params }) {
                                     setShowCustomerForm(false);
                                     setCustomerFormError('');
                                 }}
-                                className="bg-white/10 text-accent hover:bg-white/20 flex-1"
+                                className="bg-gray-200 text-secondary hover:bg-gray-300 flex-1"
                             >
                                 Cancel
                             </CustomButton>

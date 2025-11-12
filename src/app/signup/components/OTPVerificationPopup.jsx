@@ -97,7 +97,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-[75]">
-      <div className="bg-[#39404D] backdrop-blur-sm rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="bg-white backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-300 p-8 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
@@ -105,28 +105,28 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
               <Mail className="text-primary" size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-accent">{t('verifyEmail')}</h2>
-              <p className="text-sm text-accent/80">{t('enterCodeSentToEmail')}</p>
+              <h2 className="text-xl font-bold text-secondary">{t('verifyEmail')}</h2>
+              <p className="text-sm text-gray-600">{t('enterCodeSentToEmail')}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-accent/60 hover:text-accent transition-colors"
+            className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Email Display */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 mb-6">
-          <p className="text-sm text-accent/80">{t('codeSentTo')}</p>
-          <p className="font-medium text-accent">{email}</p>
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-6">
+          <p className="text-sm text-gray-600">{t('codeSentTo')}</p>
+          <p className="font-medium text-secondary">{email}</p>
         </div>
 
         {/* OTP Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-accent mb-3">
+            <label className="block text-sm font-medium text-gray-600 mb-3">
               {t('enter6DigitCode')}
             </label>
             <div className="flex space-x-2 justify-center">
@@ -142,7 +142,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                   onChange={(e) => handleInputChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   onPaste={handlePaste}
-                  className="w-12 h-12 text-center text-lg font-bold border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent"
+                  className="w-12 h-12 text-center text-lg font-bold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary"
                 />
               ))}
             </div>
@@ -161,7 +161,7 @@ export default function OTPVerificationPopup({ email, onVerified, onClose }) {
                 {t('resendCode')}
               </button>
             ) : (
-              <p className="text-accent/60 text-sm cursor-pointer">
+              <p className="text-gray-500 text-sm cursor-pointer">
                 {t('resendCodeIn', { seconds: timeLeft })}
               </p>
             )}

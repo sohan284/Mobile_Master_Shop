@@ -189,10 +189,10 @@ export default function AccessoryBreakdownPage({ params }) {
       <PageTransition>
         <div className="min-h-screen relative overflow-hidden bg-primary">
           <div className="container mx-auto px-4 py-8">
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
-              <Skeleton className="h-8 w-64 mb-6 bg-white/10" />
-              <Skeleton className="h-6 w-40 mb-4 bg-white/10" />
-              <Skeleton className="h-10 w-48 bg-white/10" />
+            <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-8 mb-8">
+              <Skeleton className="h-8 w-64 mb-6 bg-gray-200" />
+              <Skeleton className="h-6 w-40 mb-4 bg-gray-200" />
+              <Skeleton className="h-10 w-48 bg-gray-200" />
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default function AccessoryBreakdownPage({ params }) {
     return (
       <PageTransition>
         <div className="min-h-screen relative overflow-hidden bg-primary">
-          <div className="container mx-auto px-4 py-8 text-center text-accent/80">
+          <div className="container mx-auto px-4 py-8 text-center text-gray-600">
             {t('accessoryNotFound')}
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function AccessoryBreakdownPage({ params }) {
       <div className="min-h-screen relative overflow-hidden bg-primary">
         <div className="container mx-auto px-4 py-16">
           <MotionFade delay={0.1} immediate={true}>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-5 mb-4">
+            <div className="bg-gradient-to-br from-gray-100/40 text-gray-700 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-5 mb-4">
               <Breadcrumb
                 items={[
                   { label: 'Home', href: '/', icon: Home },
@@ -233,14 +233,14 @@ export default function AccessoryBreakdownPage({ params }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 {/* Left Column - Product Info & Selected Items */}
                 <div className="md:col-span-2 space-y-4">
-                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                  <div className="bg-white rounded-lg border p-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
                         <Image src={accessory.picture || '/Accessories.png'} alt={accessory.title} width={40} height={40} className="rounded" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base text-accent truncate">{accessory.title}</h3>
-                        <p className="text-xs text-accent/80">{t('quantity')}: {quantity}</p>
+                        <h3 className="font-semibold text-base text-secondary truncate">{accessory.title}</h3>
+                        <p className="text-xs text-gray-600">{t('quantity')}: {quantity}</p>
                       </div>
                     </div>
                   </div>
@@ -249,12 +249,12 @@ export default function AccessoryBreakdownPage({ params }) {
                     <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-2 text-red-400 text-sm">{error}</div>
                   )}
 
-                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
-                    <h3 className="text-sm font-semibold text-accent mb-2">{t('selectedItems')}</h3>
+                  <div className="bg-white rounded-lg border p-3">
+                    <h3 className="text-sm font-semibold text-secondary mb-2">{t('selectedItems')}</h3>
                     <div className="flex justify-between items-center">
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm text-accent">{accessory.title}</h4>
-                        <div className="flex gap-3 mt-1 text-xs text-accent/80">
+                        <h4 className="font-medium text-sm text-secondary">{accessory.title}</h4>
+                        <div className="flex gap-3 mt-1 text-xs text-gray-600">
                           <span>{t('unitPrice')}: <span className="font-medium">€{unitPrice.toFixed(2)}</span></span>
                           <span>•</span>
                           <span>{t('quantity')}: <span className="font-medium">{quantity}</span></span>
@@ -267,10 +267,10 @@ export default function AccessoryBreakdownPage({ params }) {
                   </div>
 
                   {/* Delivery Address */}
-                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3">
+                  <div className="bg-white rounded-lg border p-3">
                     <Label 
                       htmlFor="deliveryAddress" 
-                      className="text-accent text-sm font-semibold mb-2 block"
+                      className="text-secondary text-sm font-semibold mb-2 block"
                     >
                       {t('deliveryAddress') || 'Delivery Address'} *
                     </Label>
@@ -285,11 +285,11 @@ export default function AccessoryBreakdownPage({ params }) {
                         }
                       }}
                       placeholder={t('enterDeliveryAddress') || 'Enter your delivery address'}
-                      className={`w-full bg-white/10 backdrop-blur-sm border-2 ${
+                      className={`w-full bg-white border-2 ${
                         deliveryAddressError 
                           ? 'border-red-500/50 focus:border-red-500' 
-                          : 'border-accent/30 focus:border-secondary'
-                      } text-accent placeholder:text-accent/50 focus:ring-secondary/50 focus:ring-2 h-10 text-sm transition-all duration-200 hover:bg-white/15 hover:border-accent/50 px-3 py-2 rounded-lg`}
+                          : 'border-gray-300 focus:border-secondary'
+                      } text-secondary placeholder:text-gray-400 focus:ring-secondary/50 focus:ring-2 h-10 text-sm transition-all duration-200 hover:border-gray-400 px-3 py-2 rounded-lg`}
                       required
                     />
                     {deliveryAddressError && (
@@ -303,12 +303,12 @@ export default function AccessoryBreakdownPage({ params }) {
 
                 {/* Right Column - Price Summary */}
                 <div className="md:col-span-1">
-                  <div className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-accent/20 sticky top-4">
-                    <h3 className="text-sm font-semibold text-accent mb-3">{t('priceSummary') || 'Price Summary'}</h3>
+                  <div className="bg-white rounded-lg border border-gray-300 p-3 sticky top-4">
+                    <h3 className="text-sm font-semibold text-secondary mb-3">{t('priceSummary') || 'Price Summary'}</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-accent/80">{t('subtotal')}:</span>
-                        <span className="font-medium text-accent">€{subtotal.toFixed(2)}</span>
+                        <span className="text-gray-600">{t('subtotal')}:</span>
+                        <span className="font-medium text-secondary">€{subtotal.toFixed(2)}</span>
                       </div>
                       {itemDiscount > 0 && (
                         <div className="flex justify-between text-secondary">
@@ -325,14 +325,14 @@ export default function AccessoryBreakdownPage({ params }) {
                       
                    
                         <div className="flex justify-between">
-                          <span className="text-accent/80">{t('vat') || 'VAT'}:</span>
-                          <span className="font-medium text-accent">20%</span>
+                          <span className="text-gray-600">{t('vat') || 'VAT'}:</span>
+                          <span className="font-medium text-secondary">20%</span>
                         </div>
                      
                       
-                      <div className="border-t border-accent/20 pt-2 mt-2">
+                      <div className="border-t border-gray-300 pt-2 mt-2">
                         <div className="flex justify-between text-base font-bold">
-                          <span className="text-accent">{t('totalAmount')}:</span>
+                          <span className="text-secondary">{t('totalAmount')}:</span>
                           <span className="text-secondary">€{totalAmount.toFixed(2)}</span>
                         </div>
                       </div>
@@ -345,7 +345,7 @@ export default function AccessoryBreakdownPage({ params }) {
                   </div>
                   <MotionFade delay={0.2} immediate={true}>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
-              <CustomButton onClick={handleBack} className="bg-accent/20 text-accent hover:bg-accent/30 px-6 py-2 text-sm">
+              <CustomButton onClick={handleBack} className="bg-gray-200 text-secondary hover:bg-gray-300 px-6 py-2 text-sm">
                 {t('backToProduct')}
               </CustomButton>
               <CustomButton 
@@ -368,17 +368,17 @@ export default function AccessoryBreakdownPage({ params }) {
 
       {/* Customer Information Form Dialog */}
       <Dialog open={showCustomerForm} onOpenChange={setShowCustomerForm}>
-        <DialogContent className="bg-primary border-accent/20 text-white max-w-md">
+        <DialogContent className="bg-primary border-gray-300 text-secondary max-w-md">
           <DialogHeader>
             <DialogTitle className="text-secondary">Customer Information</DialogTitle>
-            <DialogDescription className="text-accent/80">
+            <DialogDescription className="text-gray-600">
               Please provide your contact information to proceed with the order.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             {/* Username */}
             <div>
-              <Label htmlFor="customer-username" className="text-accent text-sm font-medium mb-2 block">
+              <Label htmlFor="customer-username" className="text-gray-600 text-sm font-medium mb-2 block">
                 <User className="w-4 h-4 inline mr-2" />
                 Username *
               </Label>
@@ -387,7 +387,7 @@ export default function AccessoryBreakdownPage({ params }) {
                 type="text"
                 value={customerInfo.username}
                 onChange={(e) => setCustomerInfo({ ...customerInfo, username: e.target.value })}
-                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                 placeholder="Enter your username"
                 required
               />
@@ -395,7 +395,7 @@ export default function AccessoryBreakdownPage({ params }) {
 
             {/* Email */}
             <div>
-              <Label htmlFor="customer-email" className="text-accent text-sm font-medium mb-2 block">
+              <Label htmlFor="customer-email" className="text-gray-600 text-sm font-medium mb-2 block">
                 <Mail className="w-4 h-4 inline mr-2" />
                 Email *
               </Label>
@@ -404,7 +404,7 @@ export default function AccessoryBreakdownPage({ params }) {
                 type="email"
                 value={customerInfo.email}
                 onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
-                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                 placeholder="Enter your email"
                 required
               />
@@ -412,7 +412,7 @@ export default function AccessoryBreakdownPage({ params }) {
 
             {/* Phone */}
             <div>
-              <Label htmlFor="customer-phone" className="text-accent text-sm font-medium mb-2 block">
+              <Label htmlFor="customer-phone" className="text-gray-600 text-sm font-medium mb-2 block">
                 <Phone className="w-4 h-4 inline mr-2" />
                 Phone *
               </Label>
@@ -421,15 +421,15 @@ export default function AccessoryBreakdownPage({ params }) {
                 type="tel"
                 value={customerInfo.phone}
                 onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
-                className="w-full bg-white/10 backdrop-blur-sm border-2 border-accent/30 text-accent placeholder:text-accent/50 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
+                className="w-full bg-white border-2 border-gray-300 text-secondary placeholder:text-gray-400 focus:border-secondary focus:ring-secondary/50 focus:ring-2 h-10 text-sm"
                 placeholder="Enter your phone number"
                 required
               />
             </div>
 
             {customerFormError && (
-              <div className="p-2 bg-red-500/20 backdrop-blur-sm border border-red-500/50 rounded-lg">
-                <p className="text-red-400 text-xs font-medium">{customerFormError}</p>
+              <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-600 text-xs font-medium">{customerFormError}</p>
               </div>
             )}
 
@@ -458,7 +458,7 @@ export default function AccessoryBreakdownPage({ params }) {
                   setShowCustomerForm(false);
                   setCustomerFormError('');
                 }}
-                className="bg-white/10 text-accent hover:bg-white/20 flex-1"
+                className="bg-gray-200 text-secondary hover:bg-gray-300 flex-1"
               >
                 Cancel
               </CustomButton>

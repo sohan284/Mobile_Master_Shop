@@ -176,19 +176,15 @@ export default function Refurbished() {
             {models.map((model) => (
               <SwiperSlide key={model.id}>
                 <Link className='cursor-pointer' href={`/phones/${model.brand}/${model.id}`}>
-                  <Card className="group cursor-pointer bg-white/10 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
+                  <Card className="group cursor-pointer bg-gray-200 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
                     <CardContent className="p-4 py-0 text-center h-full flex flex-col relative">
                       {/* Condition Badge */}
-                      <div className="absolute top-3 right-3 bg-secondary text-primary text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
+                      <div className="absolute top-3 right-3 bg-black text-white text-xs font-bold px-2 py-1 rounded-full z-10 shadow">
                         {t('new')}
                       </div>
 
-                      <div className="mb-4 bg-gradient-to-br from-white/10 to-white/5 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
-                        {/* Subtle background pattern */}
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-2 left-2 w-8 h-8 bg-secondary rounded-full"></div>
-                          <div className="absolute bottom-2 right-2 w-6 h-6 bg-primary rounded-full"></div>
-                        </div>
+                      <div className="mb-4 bg-white rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
+                     
                         <div className='flex justify-center items-center'>
 
                           <Image
@@ -283,7 +279,7 @@ export default function Refurbished() {
                   transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                   className="group relative"
                 >
-                  <div className="relative bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
+                  <div className="relative bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105">
                     {/* Gradient background on hover */}
                     <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
 

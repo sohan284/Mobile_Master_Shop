@@ -102,7 +102,7 @@ export default function AccessoryDetailsPage() {
           <div className="mb-6">
             <button
               onClick={() => router.back()}
-              className="text-accent hover:text-secondary transition-colors cursor-pointer"
+              className="text-gray-600 hover:text-secondary transition-colors cursor-pointer"
             >
               {t('back')}
             </button>
@@ -110,7 +110,7 @@ export default function AccessoryDetailsPage() {
 
           {isLoading && !accessory && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <div className="bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm rounded-xl p-6">
                 <Skeleton className="w-full h-80" />
               </div>
               <div className="space-y-4">
@@ -124,9 +124,9 @@ export default function AccessoryDetailsPage() {
 
           {accessory && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 overflow-hidden">
-                  <div className="p-8">
-                    <div className="bg-white/5 rounded-xl p-6">
+                <div className="group bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 overflow-hidden">
+                  <div className="p-12">
+                    <div className="bg-white rounded-xl p-6">
                       <Image
                         src={accessory.picture || '/Accessories.png'}
                         alt={accessory.title}
@@ -143,13 +143,13 @@ export default function AccessoryDetailsPage() {
                     {accessory.title}
                   </h1>
                   {accessory.subtitle && (
-                    <p className="text-accent/80">{accessory.subtitle}</p>
+                    <p className="text-gray-600">{accessory.subtitle}</p>
                   )}
 
                   <div className="mt-2">
-                    <p className="text-lg text-accent/80 flex items-center gap-3">
+                    <p className="text-lg text-gray-600 flex items-center gap-3">
                       {accessory.discount_percentage && parseFloat(accessory.discount_percentage) > 0 && (
-                        <span className="text-xs text-green-500">
+                        <span className="text-xs text-green-600">
                           {parseFloat(accessory.discount_percentage).toFixed(1)}% off
                         </span>
                       )}
@@ -157,12 +157,12 @@ export default function AccessoryDetailsPage() {
                         €{parseFloat(accessory.final_price).toLocaleString()}
                       </span>
                       {accessory.discounted_amount && accessory.discounted_amount !== accessory.main_amount && (
-                        <span className="text-sm text-accent/60 line-through">
+                        <span className="text-sm text-gray-400 line-through">
                           €{parseFloat(accessory.main_amount).toLocaleString()}
                         </span>
                       )}
                     </p>
-                    <div className="text-accent/80 text-sm mt-1">
+                    <div className="text-gray-600 text-sm mt-1">
                         {t('total')}: <span className="font-semibold text-secondary">€{(parseFloat(accessory.final_price || 0) * quantity).toLocaleString()}</span>
                     </div>
                   </div>
@@ -172,7 +172,7 @@ export default function AccessoryDetailsPage() {
                       {accessory.is_in_stock ? t('inStock') : t('outOfStock')}
                     </span>
                     {typeof accessory.stock_quantity === 'number' && (
-                      <span className="text-accent/80">{t('qty')}: {accessory.stock_quantity}</span>
+                      <span className="text-gray-600">{t('qty')}: {accessory.stock_quantity}</span>
                     )}
                   </div>
 
@@ -180,7 +180,7 @@ export default function AccessoryDetailsPage() {
 
                   {accessory.description && (
                     <div
-                      className="mt-4 text-accent/90 leading-relaxed"
+                      className="mt-4 text-gray-600 leading-relaxed"
                       dangerouslySetInnerHTML={{ __html: accessory.description }}
                     />
                   )}
@@ -190,7 +190,7 @@ export default function AccessoryDetailsPage() {
                       <button
                         aria-label="Decrease quantity"
                         onClick={dec}
-                        className="w-10 h-10 cursor-pointer rounded-full bg-white/10 hover:bg-white/15 text-secondary text-lg"
+                        className="w-10 h-10 cursor-pointer rounded-full bg-gray-200 hover:bg-gray-300 text-secondary text-lg transition-colors"
                       >
                         −
                       </button>
@@ -200,7 +200,7 @@ export default function AccessoryDetailsPage() {
                       <button
                         aria-label="Increase quantity"
                         onClick={inc}
-                        className="w-10 h-10 cursor-pointer rounded-full bg-white/10 hover:bg-white/15 text-secondary text-lg"
+                        className="w-10 h-10 cursor-pointer rounded-full bg-gray-200 hover:bg-gray-300 text-secondary text-lg transition-colors"
                       >
                         +
                       </button>
@@ -211,7 +211,7 @@ export default function AccessoryDetailsPage() {
                       disabled={!accessory?.is_in_stock || (accessory?.stock_quantity !== undefined && accessory.stock_quantity <= 0)}
                       className={`px-8 py-3 ${
                         !accessory?.is_in_stock || (accessory?.stock_quantity !== undefined && accessory.stock_quantity <= 0)
-                          ? 'bg-accent/20 text-accent/50 cursor-not-allowed hover:bg-accent/20'
+                          ? 'bg-gray-200 text-gray-400 cursor-not-allowed hover:bg-gray-200'
                           : 'bg-secondary text-primary hover:bg-secondary/90'
                       }`}
                     >
@@ -226,7 +226,7 @@ export default function AccessoryDetailsPage() {
           )}
 
           {!isLoading && !accessory && (
-            <div className="text-center text-accent/80 py-24">
+            <div className="text-center text-gray-600 py-24">
               {t('couldNotLoad')}
             </div>
           )}

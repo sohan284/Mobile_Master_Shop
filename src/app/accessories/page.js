@@ -103,18 +103,16 @@ export default function AccessoriesPage() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen relative overflow-hidden md:p-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(0_0_0/0.03)_1px,transparent_0)] bg-[length:24px_24px] pointer-events-none"></div>
-
+      <div className="min-h-screen relative overflow-hidden bg-primary md:p-20">
         <div className="container mx-auto px-4 py-8 relative z-10">
           {/* Header */}
           <div className="mb-12">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+                <h1 className="text-4xl md:text-5xl font-bold text-secondary mb-2">
                   {t('premiumAccessories')}
                 </h1>
-                <p className="text-lg text-white opacity-90">
+                <p className="text-lg text-gray-600">
                   {t('discoverHighQuality')}
                 </p>
               </div>
@@ -163,10 +161,10 @@ export default function AccessoriesPage() {
             }}
             renderItem={(item) => (
               <Link href={`/accessories/${item.id}`} className="group block h-full">
-                <div className="group bg-white/10 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-accent/20 hover:border-secondary/50 h-full overflow-hidden">
+                <div className="group bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-600/20 hover:border-secondary/50 h-full overflow-hidden">
                   <div className="p-6 text-center h-full flex flex-col">
                     {/* Image container with hover effect */}
-                    <div className="mb-6 bg-white/10 backdrop-blur-sm rounded-xl p-6 group-hover:from-secondary/5 group-hover:to-primary/10 transition-all duration-500 relative overflow-hidden">
+                    <div className="mb-6 bg-white rounded-xl border p-6 group-hover:from-gray-400/20 group-hover:to-gray-600/20 transition-all duration-500 relative overflow-hidden">
                       <Image
                         src={item.picture || '/Accessories.png'}
                         alt={item.title}
@@ -178,18 +176,18 @@ export default function AccessoriesPage() {
 
                     {/* Title, description, price */}
                     <div className="flex-grow flex flex-col justify-between">
-                      <h3 className="font-bold text-lg text-accent group-hover:text-secondary transition-colors duration-300 mb-3">
+                      <h3 className="font-bold text-lg text-secondary group-hover:text-secondary transition-colors duration-300 mb-3">
                         {item.title}
                       </h3>
 
                       <div className="space-y-2">
                         {item.subtitle && (
-                          <p className="text-accent/80 text-sm">{item.subtitle}</p>
+                          <p className="text-gray-600 text-sm">{item.subtitle}</p>
                         )}
                         <div className="space-y-1">
-                          <p className="text-lg text-accent/80 flex items-center justify-center gap-2">
+                          <p className="text-lg text-gray-600 flex items-center justify-center gap-2">
                             {item.discount_percentage && parseFloat(item.discount_percentage) > 0 && (
-                              <span className="text-xs text-green-500">
+                              <span className="text-xs text-green-600">
                                 {parseFloat(item.discount_percentage).toFixed(1)}% off
                               </span>
                             )}
@@ -197,7 +195,7 @@ export default function AccessoriesPage() {
                               ${parseFloat(item.final_price || 0).toLocaleString()}
                             </span>
                             {item.main_amount && item.main_amount !== item.final_price && (
-                              <span className="text-sm text-accent/60 line-through">
+                              <span className="text-sm text-gray-400 line-through">
                                 ${parseFloat(item.main_amount || 0).toLocaleString()}
                               </span>
                             )}

@@ -140,7 +140,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/90 via-primary/95 to-primary flex pt-[10vh] justify-center p-4">
+    <div className="min-h-screen bg-primary flex pt-[10vh] justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
@@ -155,16 +155,16 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <div className="bg-white/10  rounded-2xl shadow-2xl p-8">
+        <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-600/20 p-8">
           <div className="space-y-6" role="form" aria-label="Login form">
             {/* Username or Email Field */}
-            <h1 className="text-3xl font-bold text-accent mb-2">{t('login')}</h1>
+            <h1 className="text-3xl font-bold text-secondary mb-2">{t('login')}</h1>
             <div>
-              <label htmlFor="userName" className="block text-sm font-medium text-accent mb-2">
+              <label htmlFor="userName" className="block text-sm font-medium text-gray-600 mb-2">
                 {t('usernameOrEmail')}
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   id="userName"
                   name="login-username"
@@ -172,24 +172,24 @@ export default function LoginPage() {
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
-                  className="w-full pl-10 pr-4 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                   placeholder={t('enterUsernameOrEmail')}
                   autoComplete="off"
                   required
                 />
               </div>
-              <p className="mt-1 text-xs text-accent/80">
+              <p className="mt-1 text-xs text-gray-600">
                 {t('canUseEither')}
               </p>
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-accent mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-2">
                 {t('password')}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-accent" size={20} />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
                   id="password"
                   name="login-password"
@@ -197,7 +197,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)}
-                  className="w-full pl-10 pr-12 py-3 border border-accent/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white/5 text-accent placeholder:text-accent/60"
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-white text-secondary placeholder:text-gray-400"
                   placeholder={t('enterPassword')}
                   autoComplete="new-password"
                   required
@@ -205,7 +205,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-accent hover:text-accent/80"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -234,7 +234,7 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
-            <p className="text-accent text-sm">
+            <p className="text-gray-600 text-sm">
               {t('dontHaveAccount')}{' '}
               <button
                 onClick={() => router.push('/signup')}
@@ -251,7 +251,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <div className="text-center mt-12">
-          <p className="text-secondary text-sm">
+          <p className="text-gray-600 text-sm">
             {t('copyright')}
           </p>
         </div>

@@ -119,7 +119,7 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <PaymentElement options={{ layout: 'tabs' }} />
-            {message && <div className="text-sm text-accent/80">{message}</div>}
+            {message && <div className="text-sm text-gray-600">{message}</div>}
             <CustomButton disabled={!stripe} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
                 {`Pay ${currency} ${amount.toFixed(2)}`}
             </CustomButton>
@@ -195,10 +195,10 @@ export default function BookingPage() {
             <PageTransition>
                 <div className="min-h-screen relative overflow-hidden bg-primary">
                     <div className="container mx-auto px-4 py-8">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
-                            <Skeleton className="h-8 w-64 mb-6 bg-white/10" />
-                            <Skeleton className="h-6 w-40 mb-4 bg-white/10" />
-                            <Skeleton className="h-10 w-48 bg-white/10" />
+                        <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-8 mb-8">
+                            <Skeleton className="h-8 w-64 mb-6 bg-gray-200" />
+                            <Skeleton className="h-6 w-40 mb-4 bg-gray-200" />
+                            <Skeleton className="h-10 w-48 bg-gray-200" />
                         </div>
                     </div>
                 </div>
@@ -211,9 +211,9 @@ export default function BookingPage() {
             <PageTransition>
                 <div className="min-h-screen relative overflow-hidden bg-primary">
                     <div className="container mx-auto px-4 py-8">
-                        <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8">
+                        <div className="text-center bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-8">
                             <h2 className="text-2xl font-bold text-secondary mb-4">{t('noBookingDetails')}</h2>
-                            <p className="text-accent/80 mb-6">{t('startFromFlow')}</p>
+                            <p className="text-gray-600 mb-6">{t('startFromFlow')}</p>
                         </div>
                     </div>
                 </div>
@@ -226,33 +226,33 @@ export default function BookingPage() {
             <div className="min-h-screen relative overflow-hidden bg-primary">
                 <div className="container mx-auto px-4 py-8">
                     <MotionFade delay={0.1} immediate={true}>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8 mb-8">
+                        <div className="bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg border border-gray-600/20 p-8 mb-8">
                             <h2 className="text-2xl font-bold text-secondary mb-6">{t('title')}</h2>
 
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2 space-y-6">
-                                    <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4">
-                                        <h3 className="text-lg font-semibold text-accent mb-3">{t('details')}</h3>
-                                        <div className="text-accent/80 text-sm space-y-2">
-                                            <div><span className="font-medium text-accent">{t('type')}:</span> {bookingPayment.type}</div>
+                                    <div className="bg-white rounded-lg border p-4">
+                                        <h3 className="text-lg font-semibold text-secondary mb-3">{t('details')}</h3>
+                                        <div className="text-gray-600 text-sm space-y-2">
+                                            <div><span className="font-medium text-secondary">{t('type')}:</span> {bookingPayment.type}</div>
                                             {bookingPayment.display?.phone_model && (
-                                                <div><span className="font-medium text-accent">{t('model')}:</span> {bookingPayment.display.phone_model}</div>
+                                                <div><span className="font-medium text-secondary">{t('model')}:</span> {bookingPayment.display.phone_model}</div>
                                             )}
                                             {bookingPayment.display?.brand && (
-                                                <div><span className="font-medium text-accent">{t('brand')}:</span> {bookingPayment.display.brand}</div>
+                                                <div><span className="font-medium text-secondary">{t('brand')}:</span> {bookingPayment.display.brand}</div>
                                             )}
                                             {/* Schedule - Only show for repair type bookings */}
                                             {bookingPayment.type === 'repair' && scheduleDisplay && (
-                                                <div className="mt-4 p-3 bg-secondary/10 backdrop-blur-sm rounded-lg border border-secondary/20">
+                                                <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                                                     <div className="flex items-start gap-3">
-                                                        <div className="w-8 h-8 rounded-lg bg-secondary/20 flex items-center justify-center flex-shrink-0">
-                                                            <Calendar className="w-4 h-4 text-secondary" />
+                                                        <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                                                            <Calendar className="w-4 h-4 text-yellow-600" />
                                                         </div>
                                                         <div className="flex-1">
-                                                            <p className="text-xs text-accent/60 uppercase tracking-wide mb-1">
+                                                            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
                                                                 {tRepair('selectedSchedule')}
                                                             </p>
-                                                            <p className="text-sm font-semibold text-accent">
+                                                            <p className="text-sm font-semibold text-secondary">
                                                                 {scheduleDisplay.full}
                                                             </p>
                                                         </div>
@@ -263,18 +263,18 @@ export default function BookingPage() {
                                     </div>
 
                                     {Array.isArray(bookingPayment.items) && bookingPayment.items.length > 0 && (
-                                        <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4">
-                                            <h3 className="text-lg font-semibold text-accent mb-3">{t('items')}</h3>
+                                        <div className="bg-white rounded-lg border p-4">
+                                            <h3 className="text-lg font-semibold text-secondary mb-3">{t('items')}</h3>
                                             <div className="space-y-2">
                                                 {bookingPayment.items.map((item, idx) => (
-                                                    <div key={idx} className="flex justify-between items-center p-3 bg-white/5 rounded">
-                                                        <div className="text-accent">
+                                                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded border">
+                                                        <div className="text-secondary">
                                                             <div className="font-medium">{item.problem_name || item.name || `Item ${idx + 1}`}</div>
                                                             {item.part_type && (
-                                                                <div className="text-xs text-accent/70">Part Type: {item.part_type}</div>
+                                                                <div className="text-xs text-gray-600">Part Type: {item.part_type}</div>
                                                             )}
                                                             {item.quantity && item.price && (
-                                                                <div className="text-xs text-accent/70">{currency} {parseFloat(item.price).toFixed(2)} × {parseInt(item.quantity)}</div>
+                                                                <div className="text-xs text-gray-600">{currency} {parseFloat(item.price).toFixed(2)} × {parseInt(item.quantity)}</div>
                                                             )}
                                                         </div>
                                                         <div className="text-secondary font-semibold">
@@ -293,12 +293,12 @@ export default function BookingPage() {
                                 </div>
 
                                 <div className="lg:col-span-1">
-                                    <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-accent/20 sticky top-8">
-                                        <h3 className="text-lg font-semibold text-accent mb-4">{t('orderSummary')}</h3>
-                                        <div className="space-y-3 mb-6 text-accent">
+                                    <div className="bg-white rounded-lg border border-gray-300 p-6 sticky top-8">
+                                        <h3 className="text-lg font-semibold text-secondary mb-4">{t('orderSummary')}</h3>
+                                        <div className="space-y-3 mb-6 text-gray-600">
                                             <div className="flex justify-between">
                                                 <span>{t('subtotal')}</span>
-                                                <span>{(bookingPayment.summary?.subtotal ?? bookingPayment.amount ?? 0).toFixed(2)}</span>
+                                                <span className="text-secondary">{(bookingPayment.summary?.subtotal ?? bookingPayment.amount ?? 0).toFixed(2)}</span>
                                             </div>
                                             {bookingPayment.summary?.itemDiscount > 0 && (
                                                 <div className="flex justify-between text-secondary">
@@ -318,7 +318,7 @@ export default function BookingPage() {
                                                     <span>20%</span>
                                                 </div>
                                           
-                                            <div className="border-t border-accent/20 pt-3">
+                                            <div className="border-t border-gray-300 pt-3">
                                                 <div className="flex justify-between text-lg font-bold text-secondary">
                                                     <span>{t('total')}</span>
                                                     <span>{currency} {amount.toFixed(2)}</span>
@@ -327,7 +327,7 @@ export default function BookingPage() {
                                         </div>
 
                                         {clientSecret && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
-                                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night' } }}>
+                                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'flat' } }}>
                                                 <CheckoutForm 
                                                     clientSecret={clientSecret} 
                                                     amount={amount} 

@@ -193,7 +193,7 @@ export default function Repair() {
                             {/* First set of logos */}
                             {brands.map((item, idx) => (
                                 <div key={`first-${item.id}`} className="flex-shrink-0 mx-6 group">
-                                    <div className="w-16 h-16 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-gray-600/5 bg-gray-600/3">
+                                    <div className="w-16 h-16 bg-gray-300 shadow-lg rounded-lg flex items-center justify-center transition-all duration-300">
                                         <img
                                             src={item.logo}
                                             alt={item.name}
@@ -242,7 +242,7 @@ export default function Repair() {
                                     transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
                                     className="group relative"
                                 >
-                                    <div className="relative bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105 h-full flex flex-col">
+                                    <div className="relative bg-gradient-to-br from-gray-200/40 to-gray-400/40 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 text-center hover:border-gray-600 transition-all duration-300 hover:shadow-2xl hover:scale-105 h-full flex flex-col">
                                         {/* Gradient background on hover */}
                                         <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-300`}></div>
 
