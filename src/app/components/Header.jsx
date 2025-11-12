@@ -135,7 +135,7 @@ export default function Header() {
           {/* ✅ Mobile Header: Hamburger + Logo + User */}
           <div className="md:hidden flex justify-between items-center w-full mobile-menu-container">
             <button
-              className="text-white focus:outline-none hover:text-gray-300 transition-colors"
+              className="text-secondary focus:outline-none hover:text-gray-800 transition-colors"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
@@ -155,7 +155,7 @@ export default function Header() {
                 <div className="relative" ref={mobileProfileDropdownRef}>
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center space-x-2 text-white focus:outline-none hover:text-gray-300 transition-colors"
+                    className="flex items-center space-x-2 text-secondary focus:outline-none hover:text-gray-700 transition-colors"
                     aria-label="Profile menu"
                   >
                     <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold text-sm">
@@ -168,7 +168,7 @@ export default function Header() {
                       <Link
                         href="/profile"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                        className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                       >
                         <UserCircle size={16} className="mr-2" />
                         {t('profile')}
@@ -176,7 +176,7 @@ export default function Header() {
                       <Link
                         href="/orders"
                         onClick={() => setIsProfileDropdownOpen(false)}
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                        className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                       >
                         <Package size={16} className="mr-2" />
                         {t('orders')}
@@ -185,7 +185,7 @@ export default function Header() {
                         <Link
                           href="/dashboard"
                           onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                          className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                         >
                           <LayoutDashboard size={16} className="mr-2" />
                           {t('dashboard')}
@@ -204,7 +204,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="text-white focus:outline-none hover:text-gray-300"
+                  className="text-secondary focus:outline-none hover:text-gray-700"
                 >
                   <User size={22} />
                 </Link>
@@ -223,19 +223,19 @@ export default function Header() {
 
             {/* Navigation */}
             <div className="flex items-center justify-center space-x-8 lg:space-x-12 xl:space-x-20 text-base xl:text-lg">
-              <Link href="/repair" className="hover:underline hover:text-white transition">
+              <Link href="/repair" className="hover:underline hover:text-secondary transition">
                 {t('repair')}
               </Link>
-              <Link href="/phones" className="hover:underline hover:text-white transition">
+              <Link href="/phones" className="hover:underline hover:text-secondary transition">
                 {t('phones')}
               </Link>
-              <Link href="/accessories" className="hover:underline hover:text-white transition">
+              <Link href="/accessories" className="hover:underline hover:text-secondary transition">
                 {t('accessories')}
               </Link>
-              <Link href="/contact" className="hover:underline hover:text-white transition">
+              <Link href="/contact" className="hover:underline hover:text-secondary transition">
                 {t('contact')}
               </Link>
-           
+
               {/* Cart and User */}
               <div className="flex items-center space-x-4">
                 <LanguageSwitcher />
@@ -244,7 +244,7 @@ export default function Header() {
                   <div className="relative" ref={desktopProfileDropdownRef}>
                     <button
                       onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                      className="flex items-center cursor-pointer space-x-2 text-white hover:text-gray-300 transition-colors focus:outline-none"
+                      className="flex items-center cursor-pointer space-x-2 text-secondary hover:text-gray-700 transition-colors focus:outline-none"
                       aria-label="Profile menu"
                     >
                       <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold">
@@ -258,7 +258,7 @@ export default function Header() {
                         <Link
                           href="/profile"
                           onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                          className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                         >
                           <UserCircle size={16} className="mr-2" />
                           {t('profile')}
@@ -266,7 +266,7 @@ export default function Header() {
                         <Link
                           href="/orders"
                           onClick={() => setIsProfileDropdownOpen(false)}
-                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                          className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                         >
                           <Package size={16} className="mr-2" />
                           {t('orders')}
@@ -275,7 +275,7 @@ export default function Header() {
                           <Link
                             href="/dashboard"
                             onClick={() => setIsProfileDropdownOpen(false)}
-                            className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 transition-colors"
+                            className="flex items-center px-4 py-2 text-sm text-secondary hover:bg-white/20 transition-colors"
                           >
                             <LayoutDashboard size={16} className="mr-2" />
                             {t('dashboard')}
@@ -292,7 +292,7 @@ export default function Header() {
                     )}
                   </div>
                 ) : (
-                  <Link href="/login" className="hover:text-gray-300">
+                  <Link href="/login" className="hover:text-gray-700">
                     <User size={24} />
                   </Link>
                 )}
@@ -313,36 +313,33 @@ export default function Header() {
                 <div className="flex flex-col space-y-4">
                   <Link
                     href="/repair"
-                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    className="text-secondary hover:text-gray-700 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('repair')}
                   </Link>
                   <Link
                     href="/phones"
-                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    className="text-secondary hover:text-gray-700 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('phones')}
                   </Link>
                   <Link
                     href="/accessories"
-                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    className="text-secondary hover:text-gray-700 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('accessories')}
                   </Link>
                   <Link
                     href="/contact"
-                    className="text-white hover:text-gray-300 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
+                    className="text-secondary hover:text-gray-700 transition-colors py-3 text-lg font-medium border-b border-secondary/10"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t('contact')}
                   </Link>
-                 
                 </div>
-
-
               </div>
             </div>
           </div>

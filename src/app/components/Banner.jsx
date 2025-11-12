@@ -14,7 +14,7 @@ export default function Banner() {
   const t = useTranslations('banner');
   
   return (
-    <div className="relative  text-white pb-20 pt-3 overflow-hidden min-h-screen">
+    <div className="relative  text-black pb-20 pt-3 overflow-hidden min-h-screen">
       <div className="container mx-auto px-4 z-10 relative ">
         {/* Text Section */}
         <div className="text-center mt-8 md:mt-12">
@@ -31,7 +31,7 @@ export default function Banner() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-8 text-xl md:text-2xl text-gray-300 font-light"
+            className="mt-8 text-xl md:text-2xl text-gray-600 font-light"
           >
             {t('experiencePremium')}
           </motion.p>
@@ -50,7 +50,7 @@ export default function Banner() {
             <Link href="/phones">
               <CustomButton 
                 variant="outline"
-                className="bg-transparent border-2 border-white text-white hover:text-white"
+                className="bg-transparent border-2 border-black text-gray-600 hover:text-black"
               >
                 {t('viewModels')}
               </CustomButton>
@@ -66,7 +66,7 @@ export default function Banner() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-900/40 to-gray-800/40 backdrop-blur-sm cursor-pointer group"
+              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm cursor-pointer group"
             >
               <div className="transform group-hover:scale-110 transition-transform duration-300">
                 <Image
@@ -77,7 +77,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">{t('repair')}</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-black text-xl lg:text-2xl">{t('repair')}</h2>
             </motion.div>
           </Link>
 
@@ -107,7 +107,7 @@ export default function Banner() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-900/40 to-gray-800/40 backdrop-blur-sm cursor-pointer group"
+              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm cursor-pointer group"
             >
               <div className="transform group-hover:scale-110 transition-transform duration-300">
                 <Image
@@ -118,7 +118,7 @@ export default function Banner() {
                   className="object-contain w-16 md:w-16 lg:w-20"
                 />
               </div>
-              <h2 className="mt-3 md:mt-4 font-semibold text-white text-xl lg:text-2xl">{t('accessories')}</h2>
+              <h2 className="mt-3 md:mt-4 font-semibold text-black text-xl lg:text-2xl">{t('accessories')}</h2>
             </motion.div>
           </Link>
         </div>
@@ -162,7 +162,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">{t('repair')}</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-black text-base sm:text-lg">{t('repair')}</h2>
               </motion.div>
             </Link>
 
@@ -181,7 +181,7 @@ export default function Banner() {
                   height={60}
                   className="object-contain w-12 sm:w-16"
                 />
-                <h2 className="mt-2 sm:mt-3 font-semibold text-white text-base sm:text-lg">{t('accessories')}</h2>
+                <h2 className="mt-2 sm:mt-3 font-semibold text-black text-base sm:text-lg">{t('accessories')}</h2>
               </motion.div>
             </Link>
           </div>

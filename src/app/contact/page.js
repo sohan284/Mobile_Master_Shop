@@ -120,7 +120,7 @@ export default function ContactPage() {
   const cardsAnim = mounted ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-95";
 
   return (
-    <div className="min-h-screen bg-primary text-white relative overflow-hidden">
+    <div className="min-h-screen bg-primary text-secondary relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-14 left-1/4 w-96  h-96 bg-secondary/5 rounded-full blur-3xl"></div>
@@ -131,13 +131,13 @@ export default function ContactPage() {
         
         {/* Hero Section */}
         <div className={`${baseEnter} ${heroAnim} text-center mb-12 lg:mb-16`}>
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/100 backdrop-blur-sm border border-accent/20 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-secondary backdrop-blur-sm border border-accent/20 mb-6">
             <MessageSquare className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight  bg-gradient-to-r from-white to-accent bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight bg-secondary bg-clip-text text-transparent">
             {t('getInTouch')}
           </h1>
-          <p className="text-lg sm:text-xl text-accent/80 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
             {t('haveQuestions')}
           </p>
         </div>
@@ -152,14 +152,14 @@ export default function ContactPage() {
                 <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
                   <Send className="w-5 h-5 text-secondary" />
                 </div>
-                <h2 className="text-2xl font-bold text-white">Send us a Message</h2>
+                <h2 className="text-2xl font-bold text-secondary">Send us a Message</h2>
               </div>
 
               <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                 {/* Name & Email Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label htmlFor="name" className="block text-sm font-semibold text-accent">
+                    <label htmlFor="name" className="block text-sm font-semibold text-secondary">
                       {t('name')} <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -168,14 +168,14 @@ export default function ContactPage() {
                       type="text"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-accent/30 rounded-xl text-white placeholder-accent/50 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
+                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-gray-400 rounded-xl text-secondary placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
                       placeholder={t('namePlaceholder')}
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="email" className="block text-sm font-semibold text-accent">
+                    <label htmlFor="email" className="block text-sm font-semibold text-secondary">
                       {t('email')} <span className="text-red-400">*</span>
                     </label>
                     <input
@@ -184,7 +184,7 @@ export default function ContactPage() {
                       type="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-accent/30 rounded-xl text-white placeholder-accent/50 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
+                      className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-gray-400 rounded-xl text-secondary placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
                       placeholder={t('emailPlaceholder')}
                       required
                     />
@@ -193,7 +193,7 @@ export default function ContactPage() {
 
                 {/* Subject */}
                 <div className="space-y-2">
-                  <label htmlFor="subject" className="block text-sm font-semibold text-accent">
+                  <label htmlFor="subject" className="block text-sm font-semibold text-secondary">
                     {t('subject')} <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -202,7 +202,7 @@ export default function ContactPage() {
                     type="text"
                     value={formData.subject}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-accent/30 rounded-xl text-white placeholder-accent/50 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
+                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-gray-400 rounded-xl text-secondary placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10"
                     placeholder={t('howCanWeHelp')}
                     required
                   />
@@ -210,7 +210,7 @@ export default function ContactPage() {
 
                 {/* Message */}
                 <div className="space-y-2">
-                  <label htmlFor="message" className="block text-sm font-semibold text-accent">
+                  <label htmlFor="message" className="block text-sm font-semibold text-secondary">
                     {t('message')} <span className="text-red-400">*</span>
                   </label>
                   <textarea
@@ -219,7 +219,7 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={handleInputChange}
                     rows={6}
-                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-accent/30 rounded-xl text-white placeholder-accent/50 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10 resize-none"
+                    className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border-2 border-gray-400 rounded-xl text-secondary placeholder-gray-400 focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/50 transition-all duration-200 hover:bg-white/10 resize-none"
                     placeholder={t('tellUsMore')}
                     required
                   />
@@ -267,18 +267,18 @@ export default function ContactPage() {
                               <Icon className="w-6 h-6" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-bold text-white mb-2 text-base">
+                              <h3 className="font-bold text-secondary mb-2 text-base">
                                 {info.title}
                               </h3>
-                              <div className="text-accent/90 text-sm leading-relaxed">
+                              <div className="text-secondary/90 text-sm leading-relaxed">
                                 {info.content === "day" ? (
                                   <div className="space-y-1">
-                                    <p className="text-white/90">{t('monday')}: <span className="text-accent">2-7 pm</span></p>
-                                    <p className="text-white/90">{t('tuesday')} to {t('saturday')}: <span className="text-accent">10 am-1 pm and 2-7 pm</span></p>
-                                    <p className="text-white/90">{t('sunday')}: <span className="text-accent">10 am-1 pm</span></p>
+                                    <p className="text-secondary/90">{t('monday')}: <span className="text-secondary">2-7 pm</span></p>
+                                    <p className="text-secondary/90">{t('tuesday')} to {t('saturday')}: <span className="text-secondary">10 am-1 pm and 2-7 pm</span></p>
+                                    <p className="text-secondary/90">{t('sunday')}: <span className="text-secondary">10 am-1 pm</span></p>
                                   </div>
                                 ) : (
-                                  <p className="whitespace-pre-line text-white/90">{info.content}</p>
+                                  <p className="whitespace-pre-line text-secondary/90">{info.content}</p>
                                 )}
                               </div>
                             </div>
