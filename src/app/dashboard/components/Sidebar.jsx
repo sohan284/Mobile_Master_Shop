@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { useApiGet } from '@/hooks/useApi';
-import { apiFetcher } from '@/lib/api';
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useApiGet } from "@/hooks/useApi";
+import { apiFetcher } from "@/lib/api";
 import {
   Wrench,
   Smartphone,
@@ -25,48 +25,75 @@ import {
   Home,
   ShoppingBag,
   LayoutDashboard,
-  MessageSquare
-} from 'lucide-react';
+  MessageSquare,
+} from "lucide-react";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   {
-    name: 'Order Management',
-    href: '/dashboard/orders',
+    name: "Order Management",
+    href: "/dashboard/orders",
     icon: ShoppingBag,
     hasSubmenu: true,
     submenu: [
-      { name: 'Repair', href: '/dashboard/orders/repairs', icon: Wrench, unreadKey: 'repair_unread' },
-      { name: 'New Phone', href: '/dashboard/orders/phones', icon: Smartphone, unreadKey: 'phone_unread' },
-      { name: 'Accessories', href: '/dashboard/orders/accessories', icon: Package, unreadKey: 'acceessories_unread' },
-    ]
+      {
+        name: "Repair",
+        href: "/dashboard/orders/repairs",
+        icon: Wrench,
+        unreadKey: "repair_unread",
+      },
+      {
+        name: "New Phone",
+        href: "/dashboard/orders/phones",
+        icon: Smartphone,
+        unreadKey: "phone_unread",
+      },
+      {
+        name: "Accessories",
+        href: "/dashboard/orders/accessories",
+        icon: Package,
+        unreadKey: "acceessories_unread",
+      },
+    ],
   },
-  { name: 'Users', href: '/dashboard/users', icon: Users },
-  { name: 'Contacts', href: '/dashboard/contacts', icon: MessageSquare },
+  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Contacts", href: "/dashboard/contacts", icon: MessageSquare },
   {
-    name: 'Repair Services',
-    href: '/dashboard/repair-services',
+    name: "Repair Services",
+    href: "/dashboard/repair-services",
     icon: Wrench,
     hasSubmenu: true,
     submenu: [
-      { name: 'Brands', href: '/dashboard/repair-services/brands', icon: Tag },
-      { name: 'Models', href: '/dashboard/repair-services/models', icon: PhoneIcon },
-      { name: 'Problems', href: '/dashboard/repair-services/problems', icon: List },
-    ]
+      { name: "Brands", href: "/dashboard/repair-services/brands", icon: Tag },
+      {
+        name: "Models",
+        href: "/dashboard/repair-services/models",
+        icon: PhoneIcon,
+      },
+      {
+        name: "Problems",
+        href: "/dashboard/repair-services/problems",
+        icon: List,
+      },
+    ],
   },
   {
-    name: 'New Phones',
-    href: '/dashboard/new-phones',
+    name: "New Phones",
+    href: "/dashboard/new-phones",
     icon: Smartphone,
     hasSubmenu: true,
     submenu: [
-      { name: 'Brands', href: '/dashboard/new-phones/brands', icon: Tag },
-      { name: 'Models', href: '/dashboard/new-phones/models', icon: PhoneIcon },
-      { name: 'Colors', href: '/dashboard/new-phones/colors', icon: Palette },
-    ]
+      { name: "Brands", href: "/dashboard/new-phones/brands", icon: Tag },
+      { name: "Models", href: "/dashboard/new-phones/models", icon: PhoneIcon },
+      { name: "Colors", href: "/dashboard/new-phones/colors", icon: Palette },
+    ],
   },
-  { name: 'Accessories', href: '/dashboard/accessories', icon: Package },
-  { name: 'Global Discount', href: '/dashboard/global-discount', icon: Percent },
+  { name: "Accessories", href: "/dashboard/accessories", icon: Package },
+  {
+    name: "Global Discount",
+    href: "/dashboard/global-discount",
+    icon: Percent,
+  },
 ];
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -77,8 +104,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   // Fetch statistics to get unread counts
   const { data: ordersData } = useApiGet(
-    ['dashboardStatistics'],
-    () => apiFetcher.get('/api/admin/orders/'),
+    ["dashboardStatistics"],
+    () => apiFetcher.get("/api/admin/orders/"),
     {
       refetchInterval: 60000, // Refetch every 60 seconds
     }
@@ -96,12 +123,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const handleLogout = async () => {
     try {
-      toast.loading('Logging out...');
+      toast.loading("Logging out...");
       await logout();
-      toast.success('Logged out successfully!');
-      router.push('/login');
+      toast.success("Logged out successfully!");
+      router.push("/login");
     } catch (error) {
-      toast.error('Logout failed. Please try again.');
+      toast.error("Logout failed. Please try again.");
     }
   };
 
@@ -110,7 +137,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden bg-white"
+          className="fixed inset-0 z-40 lg:hidden bg-white
+          "
           onClick={() => setSidebarOpen(false)}
         >
           <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
@@ -120,15 +148,19 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       {/* Sidebar */}
       <div
         className={`
-          z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out bg-secondary
-          ${sidebarOpen ? 'translate-x-0 fixed inset-y-0 left-0' : '-translate-x-full fixed inset-y-0 left-0'}
+          z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out bg-white
+          ${
+            sidebarOpen
+              ? "translate-x-0 fixed inset-y-0 left-0"
+              : "-translate-x-full fixed inset-y-0 left-0"
+          }
           lg:translate-x-0 lg:relative lg:inset-auto
           flex flex-col 
         `}
       >
         {/* Top Section */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-secondary flex-shrink-0">
-          <p className="text-lg font-semibold text-primary">Admin Panel</p>
+          <p className="text-lg font-semibold text-accent">Admin Panel</p>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600"
@@ -143,8 +175,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             {navigation.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.submenu && item.submenu.some((sub) => pathname === sub.href)) ||
-                (item.hasSubmenu && pathname.startsWith(item.href + '/'));
+                (item.submenu &&
+                  item.submenu.some((sub) => pathname === sub.href)) ||
+                (item.hasSubmenu && pathname.startsWith(item.href + "/"));
               const isExpanded = expandedMenus.includes(item.name) || isActive;
 
               return (
@@ -154,10 +187,12 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       <button
                         onClick={() => toggleSubmenu(item.name)}
                         className={`
-                          w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                          ${isActive
-                            ? 'bg-blue-50 text-primary border-l-2 border-primary'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}
+                          w-full flex text-black items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
+                          ${
+                            isActive
+                              ? "bg-blue-50 text-black border-l-2 border-primary"
+                              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                          }
                         `}
                       >
                         <div className="flex items-center">
@@ -177,31 +212,45 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       <div
                         className={`
                           overflow-hidden transition-all duration-300 ease-in-out
-                          ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+                          ${
+                            isExpanded
+                              ? "max-h-96 opacity-100"
+                              : "max-h-0 opacity-0"
+                          }
                         `}
                       >
                         <ul className="ml-6 mt-2 space-y-1">
                           {item.submenu.map((subItem, index) => {
                             const isSubActive = pathname === subItem.href;
-                            const unreadCount = subItem.unreadKey ? (statistics[subItem.unreadKey] || 0) : 0;
+                            const unreadCount = subItem.unreadKey
+                              ? statistics[subItem.unreadKey] || 0
+                              : 0;
                             return (
                               <li
                                 key={subItem.name}
                                 className={`
                                   transition-all duration-300 ease-in-out
-                                  ${isExpanded ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'}
+                                  ${
+                                    isExpanded
+                                      ? "translate-x-0 opacity-100"
+                                      : "-translate-x-4 opacity-0"
+                                  }
                                 `}
                                 style={{
-                                  transitionDelay: isExpanded ? `${index * 50}ms` : '0ms',
+                                  transitionDelay: isExpanded
+                                    ? `${index * 50}ms`
+                                    : "0ms",
                                 }}
                               >
                                 <Link
                                   href={subItem.href}
                                   className={`
                                     flex items-center justify-between px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-                                    ${isSubActive
-                                      ? 'bg-blue-50 text-primary border-l-2 border-primary'
-                                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
+                                    ${
+                                      isSubActive
+                                        ? "bg-blue-50 text-accent border-l-2 border-primary"
+                                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                                    }
                                   `}
                                   onClick={() => setSidebarOpen(false)}
                                 >
@@ -211,7 +260,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                                   </div>
                                   {unreadCount > 0 && (
                                     <span className="ml-2 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
-                                      {unreadCount > 99 ? '99+' : unreadCount}
+                                      {unreadCount > 99 ? "99+" : unreadCount}
                                     </span>
                                   )}
                                 </Link>
@@ -226,9 +275,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                       href={item.href}
                       className={`
                         flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200
-                        ${isActive
-                          ? 'bg-blue-50 text-primary border-r-2 border-primary'
-                          : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}
+                        ${
+                          isActive
+                            ? "bg-blue-50 text-accent border-r-2 border-primary"
+                            : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                        }
                       `}
                       onClick={() => setSidebarOpen(false)}
                     >

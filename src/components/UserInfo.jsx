@@ -1,5 +1,5 @@
-'use client';
-import { useAuth } from '@/contexts/AuthContext';
+"use client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const UserInfo = () => {
   const { user, isAdmin, getUserRole } = useAuth();
@@ -9,16 +9,16 @@ const UserInfo = () => {
   return (
     <div className="flex items-center space-x-4">
       <div className="text-sm text-gray-600">
-        <div className="font-medium text-primary capitalize">
-          {user.name || user.username || user.email || 'User'}
+        <div className="font-medium text-accent capitalize">
+          {user.name || user.username || user.email || "User"}
         </div>
-        <div className="text-xs text-gray-500 capitalize">
-          {getUserRole()}
-        </div>
+        <div className="text-xs text-gray-500 capitalize">{getUserRole()}</div>
       </div>
-      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+      <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
         <span className="text-white text-sm font-medium">
-          {(user.name || user.username || user.email || 'U').charAt(0).toUpperCase()}
+          {(user.name || user.username || user.email || "U")
+            .charAt(0)
+            .toUpperCase()}
         </span>
       </div>
     </div>
