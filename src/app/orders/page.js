@@ -280,7 +280,7 @@ function OrdersContent() {
                                 setReviewDialogOpen(true);
                                 setReviewForm({ rating: 5, comment: '' });
                             }}
-                            className="bg-secondary text-primary hover:bg-secondary/90 w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-1.5 text-sm py-2 px-3"
+                            className="bg-accent text-white hover:bg-accent/90 w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-1.5 text-sm py-2 px-3"
                         >
                             <MessageSquare size={14} />
                             Add Review
@@ -343,14 +343,14 @@ function OrdersContent() {
                                     onClick={() => setActiveTab('all')}
                                     className={`px-4 py-2 cursor-pointer rounded-lg font-medium transition-all flex items-center gap-2 ${
                                         activeTab === 'all'
-                                            ? 'bg-secondary text-primary shadow-md'
+                                                ? 'bg-accent text-white shadow-md'
                                             : 'bg-white/5 text-accent hover:bg-white/10'
                                     }`}
                                 >
                                     <Package size={16} />
                                     All Orders
                                     {!isLoading && (
-                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'all' ? 'border-primary/30 text-primary' : 'text-white'}`}>
+                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'all' ? 'border-primary/30 text-primary' : 'text-accent'}`}>
                                             {totalOrders}
                                         </Badge>
                                     )}
@@ -359,14 +359,14 @@ function OrdersContent() {
                                     onClick={() => setActiveTab('repair')}
                                     className={`px-4 py-2 rounded-lg cursor-pointer font-medium transition-all flex items-center gap-2 ${
                                         activeTab === 'repair'
-                                            ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30 shadow-md'
+                                            ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30 shadow-md'
                                             : 'bg-white/5 text-accent hover:bg-white/10'
                                     }`}
                                 >
                                     <Wrench size={16} />
                                     Repair Services
                                     {!isLoading && normalizedRepairOrders.length > 0 && (
-                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'repair' ? 'border-blue-500/30 text-blue-300' : 'text-white'}`}>
+                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'repair' ? 'border-blue-500/30 text-blue-500' : 'text-accent'}`}>
                                             {normalizedRepairOrders.length}
                                         </Badge>
                                     )}
@@ -375,14 +375,14 @@ function OrdersContent() {
                                     onClick={() => setActiveTab('phone')}
                                     className={`px-4 py-2 rounded-lg cursor-pointer font-medium transition-all flex items-center gap-2 ${
                                         activeTab === 'phone'
-                                            ? 'bg-green-500/20 text-green-300 border border-green-500/30 shadow-md'
+                                            ? 'bg-green-500/20 text-green-500 border border-green-500/30 shadow-md'
                                             : 'bg-white/5 text-accent hover:bg-white/10'
                                     }`}
                                 >
                                     <Smartphone size={16} />
                                     New Phones
                                     {!isLoading && normalizedPhoneOrders.length > 0 && (
-                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'phone' ? 'border-green-500/30 text-green-300' : 'text-white'}`}>
+                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'phone' ? 'border-green-500/30 text-green-500' : 'text-accent'}`}>
                                             {normalizedPhoneOrders.length}
                                         </Badge>
                                     )}
@@ -391,14 +391,14 @@ function OrdersContent() {
                                     onClick={() => setActiveTab('accessory')}
                                     className={`px-4 py-2 rounded-lg cursor-pointer font-medium transition-all flex items-center gap-2 ${
                                         activeTab === 'accessory'
-                                            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-md'
+                                            ? 'bg-purple-500/10 text-purple-500 border border-purple-500/30 shadow-md'
                                             : 'bg-white/5 text-accent hover:bg-white/10'
                                     }`}
                                 >
                                     <ShoppingBag size={16} />
                                     Accessories
                                     {!isLoading && normalizedAccessoryOrders.length > 0 && (
-                                        <Badge variant="outline" className={`ml-1 text-xs ${activeTab === 'accessory' ? 'border-purple-500/30 text-purple-300' : 'text-white'}`}>
+                                        <Badge variant="outline" className={`ml-1 text-black text-xs ${activeTab === 'accessory' ? 'border-purple-500/30 text-purple-500' : 'text-black'}`}>
                                             {normalizedAccessoryOrders.length}
                                         </Badge>
                                     )}
