@@ -183,16 +183,14 @@ export default function Refurbished() {
                         {t('new')}
                       </div>
 
-                      <div className="mb-4 bg-white rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
-                     
-                        <div className='flex justify-center items-center'>
-
+                      <div className="mb-4 bg-white h-32 sm:h-40 md:h-44 lg:h-48 rounded-md p-2 group-hover:from-secondary/20 group-hover:to-primary/20 transition-all duration-500 relative overflow-hidden">
+                        <div className='flex justify-center items-center h-full w-full'>
                           <Image
                             width={400}
                             height={400}
                             src={model.icon}
                             alt={model.name}
-                            className="w-full rounded-md object-contain group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-full object-contain rounded-md group-hover:scale-110 transition-transform duration-500"
                           />
                         </div>
                       </div>
@@ -221,7 +219,7 @@ export default function Refurbished() {
           </Swiper>
 
           {/* Custom Navigation */}
-          <div className="absolute top-24 md:top-16 right-0 flex gap-2">
+          <div className="absolute top-32 md:top-16 right-0 flex gap-2">
             <button className="swiper-button-prev-custom cursor-pointer bg-secondary backdrop-blur-sm text-primary hover:opacity-90 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500  group">
               <svg
                 className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"

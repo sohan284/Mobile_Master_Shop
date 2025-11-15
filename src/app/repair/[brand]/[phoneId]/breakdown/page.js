@@ -108,8 +108,7 @@ export default function PriceBreakdownPage({ params }) {
           })),
         };
 
-        console.log("Calculating price with:", requestBody);
-
+   
         // Try with authentication first
         let response;
         try {
@@ -118,10 +117,7 @@ export default function PriceBreakdownPage({ params }) {
             requestBody
           );
         } catch (authError) {
-          console.log(
-            "Auth error, trying without authentication...",
-            authError
-          );
+     
 
           // If auth fails, try without authentication
           const { apiClient } = await import("@/lib/api");
@@ -140,8 +136,7 @@ export default function PriceBreakdownPage({ params }) {
 
         if (response.success) {
           setPriceData(response.data);
-          console.log("Price calculation successful:", response.data);
-        } else {
+      } else {
           setError(
             "Failed to calculate price: " +
               (response.message || "Unknown error")
@@ -211,8 +206,7 @@ export default function PriceBreakdownPage({ params }) {
           })),
         };
 
-        console.log("Using fallback pricing data:", fallbackData);
-        setPriceData(fallbackData);
+       setPriceData(fallbackData);
         setError(
           "Using estimated pricing. Final pricing will be confirmed during booking."
         );

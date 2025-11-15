@@ -121,7 +121,7 @@ export default function GlobalDiscountPage() {
     try {
       // Fetch repair services discount
       const repairResponse = await apiFetcher.get('/api/repair/discount/');
-      console.log('Repair services response:', repairResponse);
+     
       if (repairResponse) {
         setDiscountSettings(prev => ({
           ...prev,
@@ -137,7 +137,7 @@ export default function GlobalDiscountPage() {
 
       // Fetch new phones discount
       const newPhonesResponse = await apiFetcher.get('/api/brandnew/discount/');
-      console.log('New phones response:', newPhonesResponse);
+    
       if (newPhonesResponse) {
         setDiscountSettings(prev => ({
           ...prev,
@@ -154,7 +154,7 @@ export default function GlobalDiscountPage() {
 
       // Fetch accessories discount
       const accessoriesResponse = await apiFetcher.get('/api/accessories/discount/');
-      console.log('Accessories response:', accessoriesResponse);
+      
       if (accessoriesResponse) {
         setDiscountSettings(prev => ({
           ...prev,

@@ -18,7 +18,12 @@ const nunito = Nunito({
 });
 
 export const metadata = {
-  // You can add title/description if needed
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://mlkphone.com'),
+  title: {
+    default: 'MLKPHONE',
+    template: '%s | MLKPHONE',
+  },
+  description: 'Expert mobile phone repair services, refurbished phones, and premium accessories.',
   verification: {
     google: "1Np9pV4J01wsJbl-xNC00R74DY6io1LaT5hmniVruQk",
   },

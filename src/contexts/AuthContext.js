@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       const response = await loginUser(credentials);
       
       // Handle different response formats
-      console.log(response)
+   
       const authToken = response?.tokens?.access || response.access_token || response.data?.token;
       const userData = response.user || response.data?.user;
       

@@ -49,7 +49,7 @@ export default function LoginPage() {
   // }, [isAuthenticated, router]);
 
   const handleSubmit = async (e) => {
-    console.log('Login attempt started');
+ 
 
     // Prevent any default behavior
     if (e) {
@@ -83,9 +83,9 @@ export default function LoginPage() {
     const loadingToast = toast.loading(t('signingYouIn'));
 
     try {
-      console.log('Calling login API...');
+     
       const result = await login(userName, password);
-      console.log('Login result:', result);
+ 
       toast.dismiss(loadingToast);
 
       if (result.success) {
@@ -216,7 +216,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={(e) => {
-                console.log('Button clicked');
+            
                 e.preventDefault();
                 e.stopPropagation();
                 handleSubmit(e);

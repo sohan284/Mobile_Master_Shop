@@ -89,6 +89,7 @@
   },
   "repair": {
     "repair": "réparation",
+    "selectDateFirst": "Sélectionnez une date d'abord",
     "fixYourDevice": "RÉPARER VOTRE APPAREIL",
     "expertTechnicians": "Techniciens experts, pièces premium et un bonus de réparation de 25€ pour chaque service. Faites réparer votre appareil en toute confiance.",
     "bookRepair": "Réserver une réparation",
@@ -634,5 +635,31 @@
     "fullName": "Nom complet",
     "role": "Rôle",
     "viewOrders": "Voir les commandes"
+  },
+  "metadata": {
+    "homeTitle": "Réparer, Vendre & Acheter des Téléphones Mobiles",
+    "homeDescription": "Services de réparation de téléphones portables experts, téléphones reconditionnés et accessoires premium. Solutions rapides, fiables et abordables pour tous vos besoins mobiles.",
+    "homeKeywords": "réparation téléphone portable, téléphones reconditionnés, accessoires téléphone, réparation smartphone, acheter téléphones, vendre téléphones",
+    "phonesTitle": "Acheter des Téléphones Neufs",
+    "phonesDescription": "Parcourez notre collection de smartphones neufs des meilleures marques. Derniers modèles avec garantie et prix compétitifs.",
+    "phonesKeywords": "téléphones neufs, smartphones, acheter téléphones, derniers téléphones, offres téléphones, téléphones mobiles",
+    "accessoriesTitle": "Accessoires Téléphone",
+    "accessoriesDescription": "Accessoires téléphone premium incluant étuis, chargeurs, câbles et plus encore. Produits de haute qualité à prix compétitifs.",
+    "accessoriesKeywords": "accessoires téléphone, étuis téléphone, chargeurs, câbles, magasin accessoires téléphone",
+    "repairTitle": "Services de Réparation Téléphone",
+    "repairDescription": "Services de réparation téléphone professionnels pour toutes les grandes marques. Réparations rapides et fiables avec garantie. Techniciens experts et pièces de qualité.",
+    "repairKeywords": "réparation téléphone, réparation mobile, réparation smartphone, réparation écran, remplacement batterie, services réparation téléphone",
+    "contactTitle": "Nous Contacter",
+    "contactDescription": "Contactez MLKPHONE. Contactez-nous pour les réparations de téléphones, les demandes de produits ou le support client. Nous sommes là pour vous aider !",
+    "contactKeywords": "contact, support client, contact réparation téléphone, contact MLKPHONE, service client",
+    "termsTitle": "Conditions Générales",
+    "termsDescription": "Lisez nos conditions générales. Comprenez les règles et réglementations pour utiliser nos services, acheter des produits et services de réparation.",
+    "termsKeywords": "conditions générales, légal, accord utilisateur, conditions de service",
+    "privacyTitle": "Politique de Confidentialité",
+    "privacyDescription": "Lisez notre politique de confidentialité pour comprendre comment nous collectons, utilisons et protégeons vos informations personnelles. Pratiques de confidentialité conformes au RGPD.",
+    "privacyKeywords": "politique de confidentialité, protection des données, RGPD, informations personnelles, droits de confidentialité",
+    "refundTitle": "Politique de Remboursement et de Retour",
+    "refundDescription": "Découvrez notre politique de remboursement et de retour. Fenêtre de retour de 30 jours, retours faciles et remboursements complets pour les produits éligibles.",
+    "refundKeywords": "politique de remboursement, politique de retour, garantie de remboursement, retours produits"
   }
 }

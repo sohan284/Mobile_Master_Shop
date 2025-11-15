@@ -61,6 +61,7 @@ function OrdersContent() {
     data: phoneOrdersData,
     isLoading: isLoadingPhone,
     error: errorPhone,
+    refetch: refetchPhoneOrders,
   } = useApiGet(
     ["phoneOrders"],
     () => apiFetcher.get("/api/brandnew/orders/"),
@@ -70,6 +71,7 @@ function OrdersContent() {
     data: accessoryOrdersData,
     isLoading: isLoadingAccessory,
     error: errorAccessory,
+    refetch: refetchAccessoryOrders,
   } = useApiGet(
     ["accessoryOrders"],
     () => apiFetcher.get("/api/accessories/orders/"),
@@ -912,7 +914,7 @@ function OrdersContent() {
                     setSelectedOrder(null);
                   } catch (error) {
                     toast.dismiss(loadingToast);
-                    console.log(error.response?.data.order_id);
+          
                     toast.error(
                       error.response?.data?.message ||
                         error.response?.data.order_id ||
