@@ -46,6 +46,7 @@ function OrdersContent() {
     comment: "",
   });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10); // Show 10 orders initially
 
   // Fetch orders from all three APIs
   const {
@@ -218,6 +219,8 @@ function OrdersContent() {
   };
 
   const filteredOrders = getFilteredOrders();
+  const visibleOrders = filteredOrders.slice(0, visibleCount);
+  const hasMore = filteredOrders.length > visibleCount;
 
   // Set active tab from URL query parameter on mount
   useEffect(() => {
@@ -229,6 +232,11 @@ function OrdersContent() {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
+
+  // Reset visible count when tab changes
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [activeTab]);
 
   const getOrderTypeIcon = (orderType) => {
     switch (orderType) {
@@ -535,16 +543,17 @@ function OrdersContent() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen relative overflow-hidden ">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen relative overflow-hidden flex flex-col">
+        <div className="container mx-auto px-4 py-8 flex flex-col flex-1 min-h-0">
           <MotionFade delay={0.1} immediate={true}>
-            <div className="  rounded-xl ">
-              <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col flex-1 min-h-0 rounded-xl">
+              {/* Fixed Header */}
+              <div className="flex-shrink-0 flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-secondary">My Orders</h2>
               </div>
 
-              {/* Tabs */}
-              <div className="flex flex-wrap gap-2 mb-4 border-b border-accent/20 pb-3">
+              {/* Fixed Tabs */}
+              <div className="flex-shrink-0 flex flex-wrap gap-2 mb-4 border-b border-accent/20 pb-3">
                 <button
                   onClick={() => setActiveTab("all")}
                   className={`px-4 py-2 cursor-pointer rounded-lg font-medium transition-all flex items-center gap-2 ${
@@ -639,21 +648,23 @@ function OrdersContent() {
                 </button>
               </div>
 
-              {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                    <div
-                      key={i}
-                      className="p-4 bg-white/5 rounded-lg border border-accent/10"
-                    >
-                      <Skeleton className="h-6 w-40 mb-2 bg-white/10" />
-                      <Skeleton className="h-8 w-64 bg-white/10" />
-                    </div>
-                  ))}
-                </div>
-              ) : error ? (
-                <div className="text-accent">{error}</div>
-              ) : filteredOrders.length === 0 ? (
+              {/* Scrollable Content Area */}
+              <div className="flex-1 overflow-y-auto min-h-0">
+                {isLoading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                      <div
+                        key={i}
+                        className="p-4 bg-white/5 rounded-lg border border-accent/10"
+                      >
+                        <Skeleton className="h-6 w-40 mb-2 bg-white/10" />
+                        <Skeleton className="h-8 w-64 bg-white/10" />
+                      </div>
+                    ))}
+                  </div>
+                ) : error ? (
+                  <div className="text-accent">{error}</div>
+                ) : filteredOrders.length === 0 ? (
                 <div className="text-center py-12">
                   <Package size={48} className="mx-auto text-accent/40 mb-4" />
                   <p className="text-accent/80 text-lg">
@@ -679,96 +690,109 @@ function OrdersContent() {
                         } order.`}
                   </p>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {activeTab === "all" ? (
-                    // Show all orders grouped by type when "All" is selected
-                    <>
-                      {/* Repair Service Orders */}
-                      {normalizedRepairOrders.length > 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
-                            <div className="p-1.5 bg-blue-500/20 rounded-lg">
-                              <Wrench size={16} className="text-blue-300" />
+                ) : (
+                  <div className="space-y-3">
+                    {activeTab === "all" ? (
+                      // Show all orders grouped by type when "All" is selected
+                      <>
+                        {/* Repair Service Orders */}
+                        {normalizedRepairOrders.length > 0 && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
+                              <div className="p-1.5 bg-blue-500/20 rounded-lg">
+                                <Wrench size={16} className="text-blue-300" />
+                              </div>
+                              <div>
+                                <h3 className="text-base font-semibold text-secondary">
+                                  Repair Services
+                                </h3>
+                                <p className="text-xs text-accent/60">
+                                  {normalizedRepairOrders.length}{" "}
+                                  {normalizedRepairOrders.length === 1
+                                    ? "order"
+                                    : "orders"}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="text-base font-semibold text-secondary">
-                                Repair Services
-                              </h3>
-                              <p className="text-xs text-accent/60">
-                                {normalizedRepairOrders.length}{" "}
-                                {normalizedRepairOrders.length === 1
-                                  ? "order"
-                                  : "orders"}
-                              </p>
-                            </div>
+                            {normalizedRepairOrders
+                              .slice(0, activeTab === "all" ? undefined : undefined)
+                              .map((order) => renderOrderCard(order))}
                           </div>
-                          {normalizedRepairOrders.map((order) =>
-                            renderOrderCard(order)
-                          )}
-                        </div>
-                      )}
+                        )}
 
-                      {/* New Phone Orders */}
-                      {normalizedPhoneOrders.length > 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
-                            <div className="p-1.5 bg-green-500/20 rounded-lg">
-                              <Smartphone
-                                size={16}
-                                className="text-green-300"
-                              />
+                        {/* New Phone Orders */}
+                        {normalizedPhoneOrders.length > 0 && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
+                              <div className="p-1.5 bg-green-500/20 rounded-lg">
+                                <Smartphone
+                                  size={16}
+                                  className="text-green-300"
+                                />
+                              </div>
+                              <div>
+                                <h3 className="text-base font-semibold text-secondary">
+                                  New Phones
+                                </h3>
+                                <p className="text-xs text-accent/60">
+                                  {normalizedPhoneOrders.length}{" "}
+                                  {normalizedPhoneOrders.length === 1
+                                    ? "order"
+                                    : "orders"}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="text-base font-semibold text-secondary">
-                                New Phones
-                              </h3>
-                              <p className="text-xs text-accent/60">
-                                {normalizedPhoneOrders.length}{" "}
-                                {normalizedPhoneOrders.length === 1
-                                  ? "order"
-                                  : "orders"}
-                              </p>
-                            </div>
+                            {normalizedPhoneOrders
+                              .slice(0, activeTab === "all" ? undefined : undefined)
+                              .map((order) => renderOrderCard(order))}
                           </div>
-                          {normalizedPhoneOrders.map((order) =>
-                            renderOrderCard(order)
-                          )}
-                        </div>
-                      )}
+                        )}
 
-                      {/* Accessories Orders */}
-                      {normalizedAccessoryOrders.length > 0 && (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
-                            <div className="p-1.5 bg-purple-500/20 rounded-lg">
-                              <ShoppingBag
-                                size={16}
-                                className="text-purple-300"
-                              />
+                        {/* Accessories Orders */}
+                        {normalizedAccessoryOrders.length > 0 && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 pb-1.5 border-b border-accent/20">
+                              <div className="p-1.5 bg-purple-500/20 rounded-lg">
+                                <ShoppingBag
+                                  size={16}
+                                  className="text-purple-300"
+                                />
+                              </div>
+                              <div>
+                                <h3 className="text-base font-semibold text-secondary">
+                                  Accessories
+                                </h3>
+                                <p className="text-xs text-accent/60">
+                                  {normalizedAccessoryOrders.length}{" "}
+                                  {normalizedAccessoryOrders.length === 1
+                                    ? "order"
+                                    : "orders"}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="text-base font-semibold text-secondary">
-                                Accessories
-                              </h3>
-                              <p className="text-xs text-accent/60">
-                                {normalizedAccessoryOrders.length}{" "}
-                                {normalizedAccessoryOrders.length === 1
-                                  ? "order"
-                                  : "orders"}
-                              </p>
-                            </div>
+                            {normalizedAccessoryOrders
+                              .slice(0, activeTab === "all" ? undefined : undefined)
+                              .map((order) => renderOrderCard(order))}
                           </div>
-                          {normalizedAccessoryOrders.map((order) =>
-                            renderOrderCard(order)
-                          )}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    // Show filtered orders when a specific tab is selected
-                    filteredOrders.map((order) => renderOrderCard(order))
-                  )}
+                        )}
+                      </>
+                    ) : (
+                      // Show filtered orders when a specific tab is selected
+                      visibleOrders.map((order) => renderOrderCard(order))
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Show More Button - Only show for individual tabs, not "all" */}
+              {!isLoading && !error && hasMore && activeTab !== "all" && (
+                <div className="flex-shrink-0 flex justify-center pt-4 border-t border-accent/20 mt-4">
+                  <CustomButton
+                    onClick={() => setVisibleCount((prev) => prev + 10)}
+                    className="bg-accent text-white hover:bg-accent/90 px-6 py-2"
+                  >
+                    Show More ({filteredOrders.length - visibleCount} remaining)
+                  </CustomButton>
                 </div>
               )}
             </div>
