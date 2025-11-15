@@ -20,9 +20,6 @@ export default function HeroSection({
   layout = "image-left" // "image-left" or "content-left"
 }) {
   const VisualComponent = () => {
-    console.log('HeroSection - Image prop:', image);
-    console.log('HeroSection - ImageAlt prop:', imageAlt);
-
     // align image center on small screens, on large screens position based on layout
     const justifyClass = layout === "image-left" ? "lg:justify-start" : "lg:justify-end";
 

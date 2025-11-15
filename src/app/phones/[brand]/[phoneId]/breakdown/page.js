@@ -53,7 +53,6 @@ export default function PhoneBreakdownPage({ params }) {
     }
     setIsLoading(false);
   }, [phoneId]);
-console.log(selectedColor);
 
   // Calculate price from API
   useEffect(() => {

@@ -43,7 +43,7 @@ export default function Banner() {
             className="mt-6 flex justify-center gap-4 flex-wrap"
           >
             <Link href="/repair">
-              <CustomButton className="bg-blue-600 text-white hover:bg-blue-700">
+              <CustomButton className=" text-white bg-secondary hover:bg-secondary/90">
                 {t('bookAppointment')}
               </CustomButton>
             </Link>
@@ -66,7 +66,7 @@ export default function Banner() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm cursor-pointer group"
+              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-[#C4C3BB] to-gray-white backdrop-blur-sm cursor-pointer group"
             >
               <div className="transform group-hover:scale-110 transition-transform duration-300">
                 <Image
@@ -107,7 +107,7 @@ export default function Banner() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-gray-300/40 to-gray-500/40 backdrop-blur-sm cursor-pointer group"
+              className="w-52 mb-24 lg:w-60 h-52 lg:h-60 rounded-2xl md:rounded-3xl shadow-2xl flex flex-col items-center justify-center border border-gray-700/50 hover:scale-105 hover:border-gray-600/60 transition-all duration-300 bg-gradient-to-br from-white  to-[#C4C3BB] backdrop-blur-sm cursor-pointer group"
             >
               <div className="transform group-hover:scale-110 transition-transform duration-300">
                 <Image

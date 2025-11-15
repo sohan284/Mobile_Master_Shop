@@ -82,13 +82,13 @@ export default function ProfilePage() {
                                         </div>
                                     )}
 
-                                    <div className="flex items-start space-x-4 p-4 bg-white/5 rounded-lg border border-accent/10">
+                                    {/* <div className="flex items-start space-x-4 p-4 bg-white/5 rounded-lg border border-accent/10">
                                         <Shield className="text-accent mt-1" size={20} />
                                         <div className="flex-1">
                                             <p className="text-accent/60 text-sm mb-1">{t('role')}</p>
                                             <p className="text-accent font-medium capitalize">{user?.role || 'user'}</p>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 {/* Actions */}

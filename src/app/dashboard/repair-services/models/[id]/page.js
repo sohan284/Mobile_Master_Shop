@@ -135,7 +135,7 @@ export default function ModelDetailsPage() {
   };
 
   const handleDeleteService = (service) => {
-    console.log(service);
+   
     setSelectedService(service);
     setIsDeleteDialogOpen(true);
   };
@@ -144,7 +144,6 @@ export default function ModelDetailsPage() {
     if (!selectedService) return;
 
     setIsDeleting(true);
-    console.log(selectedService);
     
     try {
       await deleteService(selectedService.problem_id);

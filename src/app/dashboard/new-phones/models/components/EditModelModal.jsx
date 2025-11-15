@@ -96,7 +96,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       });
     }
   }, [model]);
-console.log(formData);
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({

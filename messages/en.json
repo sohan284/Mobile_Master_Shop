@@ -89,6 +89,7 @@
   },
   "repair": {
     "repair": "repair",
+    "selectDateFirst": "Select a date first",
     "fixYourDevice": "FIX YOUR DEVICE",
     "expertTechnicians": "Expert technicians, premium parts, and a €25 repair bonus for every service. Get your device fixed with confidence.",
     "bookRepair": "Book Repair",
@@ -634,5 +635,31 @@
     "fullName": "Full Name",
     "role": "Role",
     "viewOrders": "View Orders"
+  },
+  "metadata": {
+    "homeTitle": "Repair, Sell & Buy Mobile Phones",
+    "homeDescription": "Expert mobile phone repair services, refurbished phones, and premium accessories. Fast, reliable, and affordable solutions for all your mobile needs.",
+    "homeKeywords": "mobile phone repair, refurbished phones, phone accessories, smartphone repair, buy phones, sell phones",
+    "phonesTitle": "Buy New Phones",
+    "phonesDescription": "Browse our collection of new smartphones from top brands. Latest models with warranty and competitive prices.",
+    "phonesKeywords": "new phones, smartphones, buy phones, latest phones, phone deals, mobile phones",
+    "accessoriesTitle": "Phone Accessories",
+    "accessoriesDescription": "Premium phone accessories including cases, chargers, cables, and more. High quality products with competitive prices.",
+    "accessoriesKeywords": "phone accessories, phone cases, chargers, cables, phone accessories store",
+    "repairTitle": "Phone Repair Services",
+    "repairDescription": "Professional phone repair services for all major brands. Fast, reliable repairs with warranty. Expert technicians and quality parts.",
+    "repairKeywords": "phone repair, mobile repair, smartphone repair, screen repair, battery replacement, phone repair services",
+    "contactTitle": "Contact Us",
+    "contactDescription": "Get in touch with MLKPHONE. Contact us for phone repairs, product inquiries, or customer support. We are here to help!",
+    "contactKeywords": "contact, customer support, phone repair contact, MLKPHONE contact, customer service",
+    "termsTitle": "Terms and Conditions",
+    "termsDescription": "Read our terms and conditions. Understand the rules and regulations for using our services, purchasing products, and repair services.",
+    "termsKeywords": "terms and conditions, legal, user agreement, service terms",
+    "privacyTitle": "Privacy Policy",
+    "privacyDescription": "Read our privacy policy to understand how we collect, use, and protect your personal information. GDPR compliant privacy practices.",
+    "privacyKeywords": "privacy policy, data protection, GDPR, personal information, privacy rights",
+    "refundTitle": "Refund and Return Policy",
+    "refundDescription": "Learn about our refund and return policy. 30-day return window, easy returns, and full refunds for eligible products.",
+    "refundKeywords": "refund policy, return policy, money back guarantee, product returns"
   }
 }
