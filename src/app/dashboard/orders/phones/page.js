@@ -95,6 +95,7 @@ export default function PhoneOrdersPage() {
       await apiFetcher.patch(`/api/brandnew/orders/${order.id}/`, { is_read: true });
       // Invalidate query to refresh the list and remove unread styling
       queryClient.invalidateQueries({ queryKey: ['phoneOrders', selectedStatus, currentPage] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStatistics'] });
     } catch (error) {
       console.error('Failed to mark order as read:', error);
     }

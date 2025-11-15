@@ -105,6 +105,7 @@ export default function RepairOrdersPage() {
       queryClient.invalidateQueries({
         queryKey: ["repairOrders", selectedStatus, currentPage],
       });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStatistics'] });
     } catch (error) {
       console.error("Failed to mark order as read:", error);
     }

@@ -130,7 +130,7 @@ export default function BrandRepairPage({ params }) {
                     />
 
                     {/* Search Section */}
-                    <div className='mt-20'>
+                    <div className='mt-20 mb-10'>
                         <SearchSection
                             title={t('findYourModel', { brand: brandInfo?.name })}
                             description={t('searchModelDescription', { brand: brandInfo?.name })}
@@ -186,6 +186,49 @@ export default function BrandRepairPage({ params }) {
                             text: t('contactSupport'),
                             href: "/contact"
                         }}
+                        renderItem={(phone, index) => (
+                            <Link 
+                                href={`/repair/${brand}/${phone.id}`} 
+                                key={phone.id}
+                                className="group block h-full"
+                                onClick={() => {
+                                    // Store the actual phone data from filteredPhones in sessionStorage when clicked
+                                    if (typeof window !== 'undefined') {
+                                        const phoneData = {
+                                            ...phone,
+                                            brand: brandInfo?.name,
+                                            brandLogo: brandInfo?.logo
+                                        };
+                                        console.log('Phone clicked, storing data:', phoneData);
+                                        sessionStorage.setItem('selectedPhone', JSON.stringify(phoneData));
+                                    }
+                                }}
+                            >
+                                <MotionFade delay={0.3 + index * 0.1} immediate={true}>
+                                    <div className="group bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-600/20 hover:border-secondary/50 h-full overflow-hidden">
+                                        <div className="p-6 text-center h-full flex flex-col">
+                                            {/* Image container with hover effect */}
+                                            <div className="mb-6 bg-white rounded-xl border p-6 group-hover:from-gray-400/20 group-hover:to-gray-600/20 transition-all duration-500 relative overflow-hidden">
+                                                <Image
+                                                    src={phone.image || phone.icon || '/Apple.png'}
+                                                    alt={phone.name}
+                                                    width={160}
+                                                    height={160}
+                                                    className="w-full h-40 object-contain group-hover:scale-105 transition-transform duration-300 relative z-10"
+                                                />
+                                            </div>
+
+                                            {/* Title */}
+                                            <div className="flex-grow flex flex-col justify-between">
+                                                <h3 className="font-bold text-nowrap text-lg text-secondary group-hover:text-secondary transition-colors duration-300 mb-3">
+                                                    {phone.name}
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </MotionFade>
+                            </Link>
+                        )}
                     />
 
                <div className='mt-20'>

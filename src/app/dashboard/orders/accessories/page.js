@@ -95,6 +95,8 @@ export default function AccessoryOrdersPage() {
       await apiFetcher.patch(`/api/accessories/orders/${order.id}/`, { is_read: true });
       // Invalidate query to refresh the list and remove unread styling
       queryClient.invalidateQueries({ queryKey: ['accessoryOrders', selectedStatus, currentPage] });
+      // Refresh dashboard statistics after marking order as read
+      queryClient.invalidateQueries({ queryKey: ['dashboardStatistics'] });
     } catch (error) {
       console.error('Failed to mark order as read:', error);
     }
