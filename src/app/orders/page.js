@@ -266,19 +266,19 @@ function OrdersContent() {
     if (statusLower === "confirmed") {
       statusBadgeProps = {
         className:
-          "bg-green-500/20 text-green-300 border-green-500/30 flex items-center",
+          "bg-green-500/10 text-green-500 border-green-500 flex items-center",
       };
       statusIcon = <CheckCircle2 size={12} className="mr-1" />;
     } else if (statusLower === "pending" || statusLower === "processing") {
       statusBadgeProps = {
         className:
-          "bg-yellow-500/20 text-yellow-300 border-yellow-500/30 flex items-center",
+          "bg-yellow-500/10 text-yellow-500 border-yellow-500 flex items-center",
       };
       statusIcon = <Clock size={12} className="mr-1" />;
     } else if (statusLower === "cancelled") {
       statusBadgeProps = {
         className:
-          "bg-red-500/20 text-red-300 border-red-500/30 flex items-center",
+          "bg-red-500/10 text-red-500 border-red-500 flex items-center",
       };
       statusIcon = <XCircle size={12} className="mr-1" />;
     }
@@ -288,14 +288,14 @@ function OrdersContent() {
       order.payment_status_display || order.payment_status || "Unknown";
     let paymentBadgeProps = {
       className:
-        "bg-yellow-500/20 text-yellow-300 border-yellow-500/30 flex items-center",
+        "bg-yellow-500/10 text-yellow-500 border-yellow-500 flex items-center",
     };
     let paymentIcon = <Clock size={12} className="mr-1" />;
 
     if (paymentStatusLower === "paid") {
       paymentBadgeProps = {
         className:
-          "bg-green-500/20 text-green-300 border-green-500/30 flex items-center",
+          "bg-green-500/10 text-green-500 border-green-500 flex items-center",
       };
       paymentIcon = <CheckCircle2 size={12} className="mr-1" />;
     }
@@ -418,15 +418,15 @@ function OrdersContent() {
                 let statusText = "";
 
                 if (scheduleInfo.isPast) {
-                  badgeStyle = "bg-red-500/20 border-red-500/30 text-red-300";
+                  badgeStyle = "bg-red-500/10 border-red-500 text-red-500";
                   statusText = "Past";
                 } else if (scheduleInfo.isToday) {
                   badgeStyle =
-                    "bg-orange-500/20 border-orange-500/30 text-orange-300";
+                    "bg-orange-500/10 border-orange-500 text-orange-500";
                   statusText = "Today";
                 } else {
                   badgeStyle =
-                    "bg-blue-500/20 border-blue-500/30 text-blue-300";
+                    "bg-blue-500/10 border-blue-500 text-blue-500";
                   statusText = "Upcoming";
                 }
 
@@ -535,10 +535,10 @@ function OrdersContent() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen relative overflow-hidden bg-primary">
+      <div className="min-h-screen relative overflow-hidden ">
         <div className="container mx-auto px-4 py-8">
           <MotionFade delay={0.1} immediate={true}>
-            <div className=" backdrop-blur-sm rounded-xl shadow-lg ">
+            <div className="  rounded-xl ">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-secondary">My Orders</h2>
               </div>
