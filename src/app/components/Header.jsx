@@ -193,7 +193,7 @@ export default function Header() {
                       )}
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
+                        className="w-full flex items-center px-4 py-2 text-sm text-red-500 hover:bg-red-500/20 transition-colors text-left"
                       >
                         <LogOut size={16} className="mr-2" />
                         {t('logout')}
@@ -283,7 +283,7 @@ export default function Header() {
                         )}
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center px-4 py-2 text-sm text-red-300 hover:bg-red-500/20 transition-colors text-left"
+                          className="w-full flex items-center px-4 py-2 text-sm text-red-500 hover:bg-red-500/20 transition-colors text-left cursor-pointer"
                         >
                           <LogOut size={16} className="mr-2" />
                           {t('logout')}

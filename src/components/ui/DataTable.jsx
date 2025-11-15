@@ -14,7 +14,8 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Database
+  Database,
+  GripVertical
 } from 'lucide-react';
 import {
   Table,
@@ -40,8 +41,10 @@ export default function DataTable({
   onRowClick,
   onMoveUp,
   onMoveDown,
+  onDragDrop, // Callback for drag and drop: (draggedItem, targetItem) => void
   searchable = true,
   pagination = true,
+  showMore = false, // Show "Show More" button instead of pagination
   itemsPerPage = 10,
   className = "",
   loading = false,
@@ -68,6 +71,9 @@ export default function DataTable({
   const [sortField, setSortField] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [showAllItems, setShowAllItems] = useState(false);
 
   // Use server-side or client-side pagination
   const effectiveCurrentPage = isServerSidePagination ? currentPage : clientCurrentPage;
@@ -81,9 +87,13 @@ export default function DataTable({
       setSearchTerm('');
       setSortField('');
       setSortDirection('asc');
+      // Reset showAllItems when data changes in showMore mode
+      if (showMore) {
+        setShowAllItems(false);
+      }
       dataRef.current = safeData;
     }
-  }, [safeData, isServerSidePagination]);
+  }, [safeData, isServerSidePagination, showMore]);
 
   // Filter data based on search term (status filtering is handled by API)
   const filteredData = safeData.filter(item => {
@@ -107,10 +117,18 @@ export default function DataTable({
     return 0;
   });
 
-  // Pagination - server-side or client-side
+  // Pagination - server-side or client-side or showMore
   let paginatedData, validCurrentPage, startIndex, endIndex, calculatedTotalPages;
   
-  if (isServerSidePagination) {
+  if (showMore) {
+    // Show More mode: show 10 items initially, then all when showAllItems is true
+    const initialLimit = itemsPerPage;
+    paginatedData = showAllItems ? sortedData : sortedData.slice(0, initialLimit);
+    startIndex = 0;
+    endIndex = paginatedData.length;
+    validCurrentPage = 1;
+    calculatedTotalPages = 1;
+  } else if (isServerSidePagination) {
     // Server-side pagination: data is already paginated from API
     paginatedData = sortedData;
     validCurrentPage = Math.min(Math.max(1, effectiveCurrentPage), effectiveTotalPages);
@@ -143,9 +161,9 @@ export default function DataTable({
     }
   };
 
-  const renderCell = (item, column) => {
+  const renderCell = (item, column, index) => {
     if (column.render) {
-      return column.render(item);
+      return column.render(item, index);
     }
     
     if (column.accessor) {
@@ -159,6 +177,50 @@ export default function DataTable({
   // Check if any actions are provided
   const hasActions = !!(onView || onEdit || onDelete);
   const hasMoveActions = !!(onMoveUp || onMoveDown);
+  const hasDragDrop = !!onDragDrop;
+
+  // Drag and drop handlers
+  const handleDragStart = (e, item, index) => {
+    setDraggedItem({ item, index });
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('application/json', JSON.stringify({ id: item.id, index }));
+    // Find the row element and make it semi-transparent
+    const row = e.currentTarget.closest('tr');
+    if (row) {
+      row.style.opacity = '0.5';
+    }
+  };
+
+  const handleDragEnd = (e) => {
+    const row = e.currentTarget.closest('tr');
+    if (row) {
+      row.style.opacity = '1';
+    }
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (draggedItem && draggedItem.index !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  };
+
+  const handleDrop = (e, targetItem, targetIndex) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (draggedItem && draggedItem.item.id !== targetItem.id && onDragDrop) {
+      onDragDrop(draggedItem.item, targetItem, draggedItem.index, targetIndex);
+    }
+    setDraggedItem(null);
+    setDragOverIndex(null);
+  };
 
   // Show skeleton loader when loading
   if (loading) {
@@ -198,8 +260,8 @@ export default function DataTable({
             )}
            
             {onAdd && (
-              <Button onClick={onAdd} className="gap-2 text-secondary cursor-pointer">
-                <Plus className="h-4 w-4" />
+              <Button onClick={onAdd} className="gap-2 text-primary bg-black hover:bg-black/90 cursor-pointer">
+                <Plus className="h-4 w-4 text-white" />
                 Add New
               </Button>
             )}
@@ -246,13 +308,14 @@ export default function DataTable({
               ))}
               {hasActions && <TableHead>Actions</TableHead>}
               {hasMoveActions && <TableHead className="w-2"></TableHead>}
+              {hasDragDrop && <TableHead className="w-2"></TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell 
-                  colSpan={columns.length + (hasActions ? 1 : 0) + (hasMoveActions ? 1 : 0)} 
+                  colSpan={columns.length + (hasActions ? 1 : 0) + (hasMoveActions ? 1 : 0) + (hasDragDrop ? 1 : 0)} 
                   className="h-full p-0"
                 >
                   <div className="flex flex-col items-center justify-center w-full h-full min-h-[400px] px-4">
@@ -270,8 +333,15 @@ export default function DataTable({
               </TableRow>
             ) : (
               paginatedData.map((item, index) => {
-                // Calculate actual index in the full dataset (before pagination)
-                const actualIndex = startIndex + index;
+                // Calculate actual index in the full dataset (before pagination/showMore)
+                // For showMore mode, we need to find the item's index in sortedData
+                let actualIndex;
+                if (showMore) {
+                  actualIndex = sortedData.findIndex(d => d.id === item.id);
+                  if (actualIndex === -1) actualIndex = startIndex + index;
+                } else {
+                  actualIndex = startIndex + index;
+                }
                 const isMoving = movingItems[item.id];
                 const isHovered = hoveredRowIndex === actualIndex;
                 
@@ -280,17 +350,23 @@ export default function DataTable({
                   ? `${item.id}-${item.orderNumber || item.order_number || ''}-${startIndex + index}`
                   : `${item.orderNumber || item.order_number || index}-${startIndex + index}`;
                 
+                const isDragged = draggedItem && draggedItem.item.id === item.id;
+                const isDragOver = dragOverIndex === actualIndex;
+                
                 return (
                 <TableRow 
                   key={uniqueKey}
                   onClick={onRowClick ? () => onRowClick(item) : undefined}
                   onMouseEnter={() => setHoveredRowIndex(actualIndex)}
                   onMouseLeave={() => setHoveredRowIndex(null)}
-                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''} ${rowClassName ? rowClassName(item) : ''}`}
+                  onDragOver={hasDragDrop ? (e) => handleDragOver(e, actualIndex) : undefined}
+                  onDragLeave={hasDragDrop ? handleDragLeave : undefined}
+                  onDrop={hasDragDrop ? (e) => handleDrop(e, item, actualIndex) : undefined}
+                  className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''} ${isDragged ? 'opacity-50' : ''} ${isDragOver ? 'bg-blue-100 border-t-2 border-blue-500' : ''} ${rowClassName ? rowClassName(item) : ''}`}
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
-                      {renderCell(item, column)}
+                      {renderCell(item, column, actualIndex)}
                     </TableCell>
                   ))}
                   {hasActions && (
@@ -301,7 +377,7 @@ export default function DataTable({
                             variant="ghost"
                             size="sm"
                             onClick={(e) => { e.stopPropagation(); onView(item); }}
-                            className="h-8 w-8 p-0 cursor-pointer"
+                            className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-200"
                           >
                             <Eye className="h-4 w-4 cursor-pointer" />
                           </Button>
@@ -311,7 +387,7 @@ export default function DataTable({
                             variant="ghost"
                             size="sm"
                             onClick={(e) => { e.stopPropagation(); onEdit(item); }}
-                            className="h-8 w-8 p-0 cursor-pointer"
+                            className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-100"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -321,7 +397,7 @@ export default function DataTable({
                             variant="ghost"
                             size="sm"
                             onClick={(e) => { e.stopPropagation(); onDelete(item); }}
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive cursor-pointer"
+                            className="h-8 w-8 p-0 text-destructive rounded-full hover:text-destructive cursor-pointer hover:bg-gray-200"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -341,7 +417,7 @@ export default function DataTable({
                               onMoveUp(item, actualIndex); 
                             }}
                             disabled={actualIndex === 0 || isMoving}
-                            className="h-8 w-8 p-0 cursor-pointer"
+                            className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-200"
                             title="Move up"
                           >
                             <ArrowUp className="h-4 w-4" />
@@ -356,12 +432,29 @@ export default function DataTable({
                               onMoveDown(item, actualIndex); 
                             }}
                             disabled={actualIndex === sortedData.length - 1 || isMoving}
-                            className="h-8 w-8 p-0 cursor-pointer"
+                            className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-200"
                             title="Move down"
                           >
                             <ArrowDown className="h-4 w-4" />
                           </Button>
                         )}
+                      </div>
+                    </TableCell>
+                  )}
+                  {hasDragDrop && (
+                    <TableCell 
+                      className="relative w-8 cursor-move"
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStart(e, item, actualIndex)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <div className="flex items-center justify-center">
+                        <GripVertical 
+                          className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" 
+                          draggable={false}
+                        />
                       </div>
                     </TableCell>
                   )}
@@ -374,8 +467,24 @@ export default function DataTable({
         </div>
       </div>
 
-      {/* Pagination - Always show when pagination is enabled */}
-      {pagination && (
+      {/* Show More Button - Show when showMore is enabled */}
+      {showMore && sortedData.length > itemsPerPage && (
+        <div className="px-6 py-4 border-t flex-shrink-0">
+          <div className="flex items-center justify-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAllItems(!showAllItems)}
+              className="cursor-pointer hover:bg-black/20"
+            >
+              {showAllItems ? 'Show Less' : `Show All (${sortedData.length})`}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination - Always show when pagination is enabled and showMore is false */}
+      {pagination && !showMore && (
         <div className="px-6 py-4 border-t flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
@@ -400,7 +509,7 @@ export default function DataTable({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage - 1)}
                   disabled={validCurrentPage === 1}
-                  className="h-8 w-8 p-0 cursor-pointer"
+                  className="h-8 w-8 p-0 cursor-pointer hover:bg-black/20" 
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -411,7 +520,7 @@ export default function DataTable({
                     variant={validCurrentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => handlePageChange(page)}
-                    className={validCurrentPage === page ? "h-8 w-8 p-0 cursor-pointer bg-primary text-white" : "h-8 w-8 p-0 cursor-pointer"}
+                    className={validCurrentPage === page ? "h-8 w-8 p-0 cursor-pointer bg-black hover:bg-black/90 text-white" : "h-8 w-8 p-0 hover:bg-black/20 cursor-pointer"}
                   >
                     {page}
                   </Button>
@@ -422,7 +531,7 @@ export default function DataTable({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage + 1)}
                   disabled={validCurrentPage === calculatedTotalPages}
-                  className="h-8 w-8 p-0 cursor-pointer"
+                  className="h-8 w-8 p-0 cursor-pointer hover:bg-black/20"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
