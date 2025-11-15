@@ -19,6 +19,7 @@ export default function NewPhoneModelsPage() {
   const [selectedModel, setSelectedModel] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const [selectedBrandSlug, setSelectedBrandSlug] = useState('apple'); // Track selected brand slug for filtering
   const [movingModels, setMovingModels] = useState({}); // Track which models are being moved
   
   // Fetch brands for the dropdown
@@ -35,10 +36,15 @@ export default function NewPhoneModelsPage() {
   );
   const colors = colorsResponse?.data || [];
 
-  // Fetch models from API
+  // Fetch models from API - include brand filter if selected
   const { data: modelsResponse, isLoading, error, refetch } = useApiGet(
-    ['new-phone-models'],
-    () => apiFetcher.get('/api/brandnew/models/')
+    ['new-phone-models', selectedBrandSlug],
+    () => {
+      const url = selectedBrandSlug 
+        ? `/api/brandnew/models/?brand=${selectedBrandSlug}`
+        : '/api/brandnew/models/';
+      return apiFetcher.get(url);
+    }
   );
   
   const [modelsList, setModelsList] = useState([]);
@@ -284,13 +290,60 @@ export default function NewPhoneModelsPage() {
     }
   };
 
+  // Handle brand tab selection
+  const handleBrandSelect = (brandSlug) => {
+    setSelectedBrandSlug(brandSlug);
+  };
+
   return (
     <div className="space-y-6">
-    
-
       <div>
         <h1 className="text-2xl font-bold text-gray-900">New Phone Models</h1>
         <p className="text-gray-600">Manage new phone models and their information</p>
+      </div>
+
+      {/* Brand Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8 flex-wrap" aria-label="Brands">
+          {/* <button
+            onClick={() => handleBrandSelect(null)}
+            className={`
+              whitespace-nowrap py-4 cursor-pointer px-1 border-b-2 font-medium text-sm
+              ${
+                selectedBrandSlug === null
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }
+            `}
+          >
+            All Brands
+          </button> */}
+          {brands.map((brand) => (
+            <button
+              key={brand.id}
+              onClick={() => handleBrandSelect(brand.slug)}
+              className={`
+                whitespace-nowrap py-4 cursor-pointer px-1 border-b-2 font-medium text-sm flex items-center space-x-2
+                ${
+                  selectedBrandSlug === brand.slug
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }
+              `}
+            >
+              {brand.icon && (
+                <Image
+                  src={brand.icon}
+                  alt={brand.name}
+                  className="h-5 w-5 object-contain"
+                  width={20}
+                  height={20}
+                />
+              )}
+              <span>{brand.name}</span>
+            </button>
+          ))}
+        </nav>
       </div>
 
       <DataTable
@@ -306,6 +359,7 @@ export default function NewPhoneModelsPage() {
         pagination={true}
         itemsPerPage={10}
         loading={isLoading}
+        height='72vh'
         movingItems={movingModels}
       />
 

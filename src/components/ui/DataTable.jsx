@@ -198,8 +198,8 @@ export default function DataTable({
             )}
            
             {onAdd && (
-              <Button onClick={onAdd} className="gap-2 text-secondary cursor-pointer">
-                <Plus className="h-4 w-4" />
+              <Button onClick={onAdd} className="gap-2 text-primary bg-black hover:bg-black/90 cursor-pointer">
+                <Plus className="h-4 w-4 text-white" />
                 Add New
               </Button>
             )}
@@ -400,7 +400,7 @@ export default function DataTable({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage - 1)}
                   disabled={validCurrentPage === 1}
-                  className="h-8 w-8 p-0 cursor-pointer"
+                  className="h-8 w-8 p-0 cursor-pointer hover:bg-black/20" 
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -411,7 +411,7 @@ export default function DataTable({
                     variant={validCurrentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => handlePageChange(page)}
-                    className={validCurrentPage === page ? "h-8 w-8 p-0 cursor-pointer bg-primary text-white" : "h-8 w-8 p-0 cursor-pointer"}
+                    className={validCurrentPage === page ? "h-8 w-8 p-0 cursor-pointer bg-black hover:bg-black/90 text-white" : "h-8 w-8 p-0 hover:bg-black/20 cursor-pointer"}
                   >
                     {page}
                   </Button>
@@ -422,7 +422,7 @@ export default function DataTable({
                   size="sm"
                   onClick={() => handlePageChange(validCurrentPage + 1)}
                   disabled={validCurrentPage === calculatedTotalPages}
-                  className="h-8 w-8 p-0 cursor-pointer"
+                  className="h-8 w-8 p-0 cursor-pointer hover:bg-black/20"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
