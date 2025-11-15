@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import DataTable from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
@@ -11,16 +11,17 @@ import AddModelModal from './components/AddModelModal';
 import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function ModelsPage() {
+function ModelsPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedBrandSlug, setSelectedBrandSlug] = useState('apple'); // Track selected brand slug for filtering
+  const [selectedBrandSlug, setSelectedBrandSlug] = useState('apple');
   const [modelsList, setModelsList] = useState([]);
   const [movingItems, setMovingItems] = useState({});
 
@@ -41,6 +42,20 @@ export default function ModelsPage() {
     }
   );
 
+  // Initialize brand from URL params on mount and when URL changes
+  useEffect(() => {
+    const brandFromUrl = searchParams.get('brand');
+    if (brandFromUrl) {
+      setSelectedBrandSlug(brandFromUrl);
+    } else {
+      // If no brand in URL, set default and update URL
+      setSelectedBrandSlug('apple');
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('brand', 'apple');
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }
+  }, [searchParams, router]);
+
   // Initialize local models list - maintain API order
   useEffect(() => {
     if (modelsResponse) {
@@ -51,6 +66,15 @@ export default function ModelsPage() {
   }, [modelsResponse]);
 
   const columns = [
+    {
+      header: '',
+      accessor: 'index',
+      render: (item, index) => (
+        <div className="flex items-center justify-center">
+          <span className="text-sm font-medium text-gray-600">{index + 1}</span>
+        </div>
+      ),
+    },
     {
       header: 'Image',
       accessor: 'image',
@@ -129,93 +153,51 @@ export default function ModelsPage() {
     router.push(`/dashboard/repair-services/models/${model.id}`);
   };
 
-  // Move up - API calls
-  const handleMoveUp = async (model, currentIndex) => {
-    if (currentIndex === 0) {
-      toast.error('Already at the top');
-      return;
-    }
-
-    const modelAbove = modelsList[currentIndex - 1];
-    if (!modelAbove || !model) {
-      toast.error('Cannot move item');
+  // Drag and drop handler - swap any two items
+  const handleDragDrop = async (draggedModel, targetModel, draggedIndex, targetIndex) => {
+    if (!draggedModel || !targetModel || draggedModel.id === targetModel.id) {
       return;
     }
 
     // Use existing rank fields from the models
-    if (model.rank === undefined || modelAbove.rank === undefined) {
+    if (draggedModel.rank === undefined || targetModel.rank === undefined) {
       toast.error('Rank information is missing');
       return;
     }
 
-    const currentRank = model.rank;
-    const aboveRank = modelAbove.rank;
+    const draggedRank = draggedModel.rank;
+    const targetRank = targetModel.rank;
 
     // Mark both items as moving
-    setMovingItems({ [model.id]: true, [modelAbove.id]: true });
+    setMovingItems({ [draggedModel.id]: true, [targetModel.id]: true });
     
     try {
-      // Update current model: rank + 1
-      // Update model above: rank - 1
+      // Swap ranks between the two models
       await Promise.all([
-        apiFetcher.patch(`/api/repair/models/${model.id}/`, { rank: currentRank + 1 }),
-        apiFetcher.patch(`/api/repair/models/${modelAbove.id}/`, { rank: aboveRank - 1 })
+        apiFetcher.patch(`/api/repair/models/${draggedModel.id}/`, { rank: targetRank }),
+        apiFetcher.patch(`/api/repair/models/${targetModel.id}/`, { rank: draggedRank })
       ]);
       
-      toast.success('Model moved up successfully');
+      toast.success('Models reordered successfully');
       refetch();
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
+      toast.error(error.response?.data?.message || error.message || 'Failed to reorder models');
     } finally {
       setMovingItems({});
     }
   };
 
-  // Move down - API calls
-  const handleMoveDown = async (model, currentIndex) => {
-    if (currentIndex === modelsList.length - 1) {
-      toast.error('Already at the bottom');
-      return;
-    }
-
-    const modelBelow = modelsList[currentIndex + 1];
-    if (!modelBelow || !model) {
-      toast.error('Cannot move item');
-      return;
-    }
-
-    // Use existing rank fields from the models
-    if (model.rank === undefined || modelBelow.rank === undefined) {
-      toast.error('Rank information is missing');
-      return;
-    }
-
-    const currentRank = model.rank;
-    const belowRank = modelBelow.rank;
-
-    // Mark both items as moving
-    setMovingItems({ [model.id]: true, [modelBelow.id]: true });
-    
-    try {
-      // Update current model: rank - 1
-      // Update model below: rank + 1
-      await Promise.all([
-        apiFetcher.patch(`/api/repair/models/${model.id}/`, { rank: currentRank - 1 }),
-        apiFetcher.patch(`/api/repair/models/${modelBelow.id}/`, { rank: belowRank + 1 })
-      ]);
-      
-      toast.success('Model moved down successfully');
-      refetch();
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to move model');
-    } finally {
-      setMovingItems({});
-    }
-  };
-
-  // Handle brand tab selection
+  // Handle brand tab selection - update URL and state
   const handleBrandSelect = (brandSlug) => {
     setSelectedBrandSlug(brandSlug);
+    // Update URL with brand parameter
+    const params = new URLSearchParams(searchParams.toString());
+    if (brandSlug) {
+      params.set('brand', brandSlug);
+    } else {
+      params.delete('brand');
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -278,10 +260,10 @@ export default function ModelsPage() {
         onDelete={handleDelete}
         onView={handleView}
         onRowClick={handleView}
-        onMoveUp={handleMoveUp}
-        onMoveDown={handleMoveDown}
+        onDragDrop={handleDragDrop}
         searchable={true}
-        pagination={true}
+        pagination={false}
+        showMore={true}
         itemsPerPage={10}
         loading={isLoading}
         movingItems={movingItems}
@@ -318,5 +300,13 @@ export default function ModelsPage() {
         isLoading={isDeleting}
       />
     </div>
+  );
+}
+
+export default function ModelsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+      <ModelsPageContent />
+    </Suspense>
   );
 }
