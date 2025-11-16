@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
 import { CustomButton } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { decryptBkp } from '@/lib/utils';
 import { apiFetcher } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -21,6 +21,101 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
     const router = useRouter();
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState('');
+
+    // Handle Klarna redirect return
+    useEffect(() => {
+        if (!stripe || typeof window === 'undefined') return;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+        const paymentIntentId = urlParams.get('payment_intent');
+
+        // If we have payment intent info from URL (Klarna redirect return)
+        if (paymentIntentClientSecret && paymentIntentId) {
+            const confirmPaymentAfterRedirect = async () => {
+                try {
+                    const { paymentIntent, error: retrieveError } = await stripe.retrievePaymentIntent(paymentIntentClientSecret);
+                    
+                    if (retrieveError) {
+                        console.error('Error retrieving payment intent:', retrieveError);
+                        return;
+                    }
+
+                    // If payment succeeded, confirm with backend
+                    if (paymentIntent && paymentIntent.status === 'succeeded') {
+                        const orderId = bookingPayment?.orderId;
+                        if (!orderId) {
+                            console.error('Order ID not found');
+                            return;
+                        }
+
+                        let confirmPaymentEndpoint;
+                        if (bookingPayment?.type === 'repair') {
+                            confirmPaymentEndpoint = `/api/repair/orders/${orderId}/confirm_payment/`;
+                        } else if (bookingPayment?.type === 'phone') {
+                            confirmPaymentEndpoint = `/api/brandnew/orders/${orderId}/confirm_payment/`;
+                        } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                            confirmPaymentEndpoint = `/api/accessories/orders/${orderId}/confirm_payment/`;
+                        } else {
+                            console.error(`Unknown booking type: ${bookingPayment?.type}`);
+                            return;
+                        }
+
+                        await apiFetcher.post(confirmPaymentEndpoint, {
+                            payment_intent_id: paymentIntent.id
+                        });
+
+                        toast.success('Payment confirmed successfully!', {
+                            duration: 3000,
+                            position: 'top-right',
+                        });
+
+                        // Clear booking data
+                        sessionStorage.removeItem('bkp');
+                        localStorage.removeItem('bkp');
+                        localStorage.removeItem('bookingPayment');
+                        sessionStorage.removeItem('bookingPayment');
+
+                        // Determine which tab to navigate to
+                        let tabParam = 'all';
+                        if (bookingPayment?.type === 'repair') {
+                            tabParam = 'repair';
+                        } else if (bookingPayment?.type === 'phone') {
+                            tabParam = 'phone';
+                        } else if (bookingPayment?.type === 'accessory' || bookingPayment?.type === 'Accessories') {
+                            tabParam = 'accessory';
+                        }
+
+                        // Clean URL and redirect
+                        window.history.replaceState({}, '', window.location.pathname);
+                        setTimeout(() => {
+                            router.push(`/orders?tab=${tabParam}`);
+                        }, 1500);
+                    } else if (paymentIntent && paymentIntent.status === 'processing') {
+                        // Payment is still processing
+                        setMessage('Payment is being processed. Please wait...');
+                        toast.info('Your payment is being processed. You will be notified once it\'s confirmed.', {
+                            duration: 5000,
+                            position: 'top-right',
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error confirming payment after redirect:', error);
+                    toast.error(
+                        error?.response?.data?.message || 
+                        error?.message || 
+                        'Payment confirmation failed. Please contact support.',
+                        {
+                            duration: 5000,
+                            position: 'top-right',
+                        }
+                    );
+                }
+            };
+
+            confirmPaymentAfterRedirect();
+        }
+    }, [stripe, bookingPayment, router]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,6 +134,26 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
 
         if (error) {
             setMessage(error.message || 'Payment failed.');
+            setSubmitting(false);
+            return;
+        }
+
+        // Handle Klarna and other payment methods that may require additional confirmation
+        // Klarna payments might have status 'processing' or 'requires_action' initially
+        if (paymentIntent && (paymentIntent.status === 'processing' || paymentIntent.status === 'requires_action')) {
+            // For Klarna, the payment might be processing asynchronously
+            // Show a message and wait for webhook confirmation or check status
+            setMessage('Payment is being processed. Please wait...');
+            
+            // Optionally poll for payment status or wait for webhook
+            // For now, we'll show a message and let the user know
+            toast.info('Your payment is being processed. You will be notified once it\'s confirmed.', {
+                duration: 5000,
+                position: 'top-right',
+            });
+            
+            // For Klarna, sometimes we need to redirect back after confirmation
+            // The redirect: 'if_required' handles this automatically
             setSubmitting(false);
             return;
         }
@@ -118,10 +233,27 @@ function CheckoutForm({ clientSecret, amount, currency, bookingPayment }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <PaymentElement options={{ layout: 'tabs' }} />
+            <PaymentElement 
+                options={{ 
+                    layout: 'tabs',
+                    fields: {
+                        billingDetails: {
+                            email: 'auto',
+                            phone: 'auto',
+                            address: {
+                                country: 'auto',
+                                line1: 'auto',
+                                city: 'auto',
+                                postalCode: 'auto',
+                                state: 'auto',
+                            },
+                        },
+                    },
+                }} 
+            />
             {message && <div className="text-sm text-gray-600">{message}</div>}
-            <CustomButton disabled={!stripe} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
-                {`Pay ${currency} ${amount.toFixed(2)}`}
+            <CustomButton disabled={!stripe || submitting} type="submit" className="w-full bg-secondary text-primary hover:bg-secondary/90 py-3">
+                {submitting ? 'Processing...' : `Pay ${currency} ${amount.toFixed(2)}`}
             </CustomButton>
         </form>
     );
@@ -136,13 +268,19 @@ export default function BookingPage() {
     useEffect(() => {
         if (typeof window === 'undefined') return;
         try {
+            // Check for Klarna redirect return (Stripe may include payment_intent in URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentIntentClientSecret = urlParams.get('payment_intent_client_secret');
+            const paymentIntentId = urlParams.get('payment_intent');
+            
             // Prefer encrypted 'bkp'
             const enc = sessionStorage.getItem('bkp') || localStorage.getItem('bkp');
             if (enc) {
                 const parsed = decryptBkp(enc);
                 if (parsed) {
                     setBookingPayment(parsed);
-                    setClientSecret(parsed.client_secret || null);
+                    // Use client secret from URL if available (from Klarna redirect)
+                    setClientSecret(paymentIntentClientSecret || parsed.client_secret || null);
                 }
             } else {
                 // Backward compat
@@ -150,9 +288,13 @@ export default function BookingPage() {
                 if (stored) {
                     const parsed = JSON.parse(stored);
                     setBookingPayment(parsed);
-                    setClientSecret(parsed.client_secret || null);
+                    // Use client secret from URL if available (from Klarna redirect)
+                    setClientSecret(paymentIntentClientSecret || parsed.client_secret || null);
                 }
             }
+            
+            // If we have payment intent info from URL (Klarna redirect return)
+            // The CheckoutForm component will handle the payment confirmation
         } catch {}
         setIsLoading(false);
     }, []);
@@ -327,7 +469,25 @@ export default function BookingPage() {
                                         </div>
 
                                         {clientSecret && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ? (
-                                            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'flat' } }}>
+                                            <Elements 
+                                                stripe={stripePromise} 
+                                                options={{ 
+                                                    clientSecret,
+                                                    appearance: { 
+                                                        theme: 'flat',
+                                                        variables: {
+                                                            colorPrimary: '#000',
+                                                            colorBackground: '#fff',
+                                                            colorText: '#000',
+                                                            colorDanger: '#df1b41',
+                                                            fontFamily: 'system-ui, sans-serif',
+                                                            spacingUnit: '4px',
+                                                            borderRadius: '8px',
+                                                        }
+                                                    },
+                                                    locale: 'en',
+                                                }}
+                                            >
                                                 <CheckoutForm 
                                                     clientSecret={clientSecret} 
                                                     amount={amount} 

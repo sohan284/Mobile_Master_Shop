@@ -275,6 +275,7 @@ export default function DataTable({
           <Table>
           <TableHeader className="sticky top-0 bg-gray-50 z-10">
             <TableRow>
+            {hasDragDrop && <TableHead className="w-2"></TableHead>}
               {columns.map((column, index) => (
                 <TableHead
                   key={index}
@@ -308,7 +309,7 @@ export default function DataTable({
               ))}
               {hasActions && <TableHead>Actions</TableHead>}
               {hasMoveActions && <TableHead className="w-2"></TableHead>}
-              {hasDragDrop && <TableHead className="w-2"></TableHead>}
+             
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -364,6 +365,23 @@ export default function DataTable({
                   onDrop={hasDragDrop ? (e) => handleDrop(e, item, actualIndex) : undefined}
                   className={`relative ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} ${isMoving ? 'opacity-50' : ''} ${isDragged ? 'opacity-50' : ''} ${isDragOver ? 'bg-blue-100 border-t-2 border-blue-500' : ''} ${rowClassName ? rowClassName(item) : ''}`}
                 >
+                   {hasDragDrop && (
+                    <TableCell 
+                      className="relative w-8 cursor-move"
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      draggable={true}
+                      onDragStart={(e) => handleDragStart(e, item, actualIndex)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <div className="flex items-center justify-center">
+                        <GripVertical 
+                          className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" 
+                          draggable={false}
+                        />
+                      </div>
+                    </TableCell>
+                  )}
                   {columns.map((column, colIndex) => (
                     <TableCell key={colIndex}>
                       {renderCell(item, column, actualIndex)}
@@ -441,23 +459,7 @@ export default function DataTable({
                       </div>
                     </TableCell>
                   )}
-                  {hasDragDrop && (
-                    <TableCell 
-                      className="relative w-8 cursor-move"
-                      onClick={(e) => e.stopPropagation()}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      draggable={true}
-                      onDragStart={(e) => handleDragStart(e, item, actualIndex)}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <div className="flex items-center justify-center">
-                        <GripVertical 
-                          className="h-5 w-5 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" 
-                          draggable={false}
-                        />
-                      </div>
-                    </TableCell>
-                  )}
+                 
                 </TableRow>
                 );
               })

@@ -167,6 +167,15 @@ function NewPhoneModelsContent() {
       sortable: true
     },
     {
+      header: 'Stock',
+      accessor: 'stock_quantity',
+      render: (item) => (
+        <div className="text-sm">
+          {item.stock_quantity || 'N/A'}
+        </div>
+      ),
+    },
+    {
       header: 'Created At',
       accessor: 'created_at',
       render: (item) => (
@@ -255,7 +264,7 @@ function NewPhoneModelsContent() {
       // Swap ranks between the two models
       await Promise.all([
         apiFetcher.patch(`/api/brandnew/models/${draggedModel.id}/`, { rank: targetRank }),
-        apiFetcher.patch(`/api/brandnew/models/${targetModel.id}/`, { rank: draggedRank })
+        // apiFetcher.patch(`/api/brandnew/models/${targetModel.id}/`, { rank: draggedRank })
       ]);
       
       toast.success('Models reordered successfully');

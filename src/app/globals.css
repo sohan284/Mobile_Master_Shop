@@ -125,15 +125,23 @@ h3 {
 
 /* Customize text selection colors globally */
 ::selection {
-  background-color: var(--accent);
-  
-  color: var(--accent-foreground);
-  
+  background-color: #0062ff3f;
+  color: #0a1525;
+}
+
+::-moz-selection {
+  background-color: #0062ff3f;
+  color: #0a1525;
 }
 
 .dark ::selection {
-  background-color: var(--primary);
-  color: var(--secondary);
+  background-color: #0062ff3f;
+  color: #0a1525;
+}
+
+.dark ::-moz-selection {
+  background-color: #0062ff3f;
+  color: #0a1525;
 }
 
 @layer base {
@@ -231,5 +239,26 @@ h3 {
     background-color: var(--secondary);
     color: var(--primary);
     border-radius: 0.25rem;
+  }
+
+  /* Select field styles */
+  select {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  select:focus {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  .dark select {
+    background-color: var(--card);
+    color: var(--card-foreground);
+  }
+
+  .dark select:focus {
+    background-color: var(--card);
+    color: var(--card-foreground);
   }
 }
