@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import PageTransition from "@/components/animations/PageTransition";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
@@ -18,9 +18,41 @@ import {
   X,
   Loader2,
   Phone,
+  Plus,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const getInitialCustomOrderForm = () => ({
+  brandId: "",
+  brandSlug: "",
+  modelId: "",
+  problems: [],
+  customerName: "",
+  customerEmail: "",
+  customerPhone: "",
+  customerAddress: "",
+  schedule: "",
+  notes: "",
+});
 
 const formatDateKey = (date) => {
   const year = date.getFullYear();
@@ -113,11 +145,146 @@ export default function RepairCalendarPage() {
   const [editingSchedule, setEditingSchedule] = useState({});
   const [scheduleValues, setScheduleValues] = useState({});
   const [updatingSchedule, setUpdatingSchedule] = useState({});
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [formState, setFormState] = useState(() => getInitialCustomOrderForm());
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
+  const [problemOptions, setProblemOptions] = useState([]);
+  const [isFetchingBrands, setIsFetchingBrands] = useState(false);
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
+  const [isFetchingProblems, setIsFetchingProblems] = useState(false);
+  const [isSubmittingCustomOrder, setIsSubmittingCustomOrder] = useState(false);
+  const resetCustomOrderForm = useCallback(() => {
+    setFormState(getInitialCustomOrderForm());
+    setModelOptions([]);
+    setProblemOptions([]);
+  }, []);
 
+  useEffect(() => {
+    if (!isCreateModalOpen) {
+      resetCustomOrderForm();
+    }
+  }, [isCreateModalOpen, resetCustomOrderForm]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBrands = async () => {
+      setIsFetchingBrands(true);
+      try {
+        const response = await apiFetcher.get("/api/repair/brands/");
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setBrandOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load brands"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingBrands(false);
+        }
+      }
+    };
+    fetchBrands();
+    return () => {
+      isMounted = false;
+    };
+  }, [t]);
+
+  useEffect(() => {
+    if (!formState.brandId) {
+      setModelOptions([]);
+      return;
+    }
+    let isMounted = true;
+    const fetchModels = async () => {
+      setIsFetchingModels(true);
+      try {
+        const param = formState.brandSlug || formState.brandId;
+        const url = param
+          ? `/api/repair/models/?brand=${encodeURIComponent(param)}`
+          : "/api/repair/models/";
+        const response = await apiFetcher.get(url);
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setModelOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load models"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingModels(false);
+        }
+      }
+    };
+    fetchModels();
+    return () => {
+      isMounted = false;
+    };
+  }, [formState.brandId, formState.brandSlug, t]);
+
+  useEffect(() => {
+    if (!formState.modelId) {
+      setProblemOptions([]);
+      return;
+    }
+    let isMounted = true;
+    const fetchProblems = async () => {
+      setIsFetchingProblems(true);
+      try {
+        const response = await apiFetcher.get(
+          `/api/repair/problems/?model=${formState.modelId}`
+        );
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setProblemOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load problems"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingProblems(false);
+        }
+      }
+    };
+    fetchProblems();
+    return () => {
+      isMounted = false;
+    };
+  }, [formState.modelId, t]);
   const {
     data: ordersData,
-    isLoading,
-    error,
+    isLoading: isLoadingOrders,
+    error: errorOrders,
     refetch,
     isRefetching,
   } = useApiGet(["repairOrdersCalendar"], () => {
@@ -127,6 +294,128 @@ export default function RepairCalendarPage() {
     params.append("ordering", "schedule");
     return apiFetcher.get(`/api/admin/orders/?${params.toString()}`);
   });
+
+  const {
+    data: customOrdersData,
+    isLoading: isLoadingCustomOrders,
+    error: customOrdersError,
+    refetch: refetchCustomOrders,
+  } = useApiGet(["customRepairOrders"], () =>
+    apiFetcher.get("/api/repair/custom-orders/")
+  );
+  const handleBrandSelect = useCallback(
+    (value) => {
+      const brand = brandOptions.find((item) => String(item.id) === value);
+      setFormState((prev) => ({
+        ...prev,
+        brandId: value,
+        brandSlug: brand?.slug || "",
+        modelId: "",
+        problems: [],
+      }));
+    },
+    [brandOptions]
+  );
+
+  const handleModelSelect = useCallback((value) => {
+    setFormState((prev) => ({
+      ...prev,
+      modelId: value,
+      problems: [],
+    }));
+  }, []);
+
+  const handleProblemToggle = useCallback((problemId, checked) => {
+    setFormState((prev) => {
+      const exists = prev.problems.includes(problemId);
+      let updated = prev.problems;
+      if (checked && !exists) {
+        updated = [...prev.problems, problemId];
+      } else if (!checked && exists) {
+        updated = prev.problems.filter((id) => id !== problemId);
+      }
+      return { ...prev, problems: updated };
+    });
+  }, []);
+
+  const updateFormField = useCallback((field, value) => {
+    setFormState((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }, []);
+
+  const handleCreateCustomOrder = useCallback(async () => {
+    if (!formState.brandId) {
+      toast.error(t("customOrderValidationBrand"));
+      return;
+    }
+    if (!formState.modelId) {
+      toast.error(t("customOrderValidationModel"));
+      return;
+    }
+    if (formState.problems.length === 0) {
+      toast.error(t("customOrderValidationProblems"));
+      return;
+    }
+    if (!formState.customerName.trim()) {
+      toast.error(t("customOrderValidationName"));
+      return;
+    }
+    if (!formState.customerPhone.trim()) {
+      toast.error(t("customOrderValidationPhone"));
+      return;
+    }
+    if (!formState.schedule) {
+      toast.error(t("customOrderValidationSchedule"));
+      return;
+    }
+
+    const scheduleDate = new Date(formState.schedule);
+    if (Number.isNaN(scheduleDate.getTime())) {
+      toast.error(t("customOrderValidationSchedule"));
+      return;
+    }
+
+    setIsSubmittingCustomOrder(true);
+    try {
+      const problemIds = formState.problems.map((id) => Number(id));
+      const payload = {
+        brand: Number(formState.brandId),
+        model: Number(formState.modelId),
+        problem: problemIds,
+        customer_name: formState.customerName.trim(),
+        customer_email: formState.customerEmail.trim() || null,
+        customer_phone: formState.customerPhone.trim(),
+        address: formState.customerAddress.trim(),
+        notes: formState.notes.trim() || undefined,
+        schedule: scheduleDate.toISOString(),
+      };
+
+      await apiFetcher.post("/api/repair/custom-orders/", payload);
+      toast.success(t("customOrderCreated"));
+      setIsCreateModalOpen(false);
+      resetCustomOrderForm();
+      refetchCustomOrders();
+      refetch();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          t("customOrderCreateFailed") ||
+          "Failed to create custom order"
+      );
+    } finally {
+      setIsSubmittingCustomOrder(false);
+    }
+  }, [
+    formState,
+    refetch,
+    refetchCustomOrders,
+    resetCustomOrderForm,
+    t,
+  ]);
+
+
 
   const normalizedOrders = useMemo(() => {
     const source = Array.isArray(ordersData?.data)
@@ -140,6 +429,7 @@ export default function RepairCalendarPage() {
     return source
       .map((order) => ({
         ...order,
+        originalId: order.id,
         orderNumber: order.order_number || `#${order.id}`,
         customerName: order.customer_name || "N/A",
         customerPhone: order.customer_phone || "",
@@ -157,17 +447,74 @@ export default function RepairCalendarPage() {
       });
   }, [ordersData]);
 
+  const normalizedCustomOrders = useMemo(() => {
+    const source = Array.isArray(customOrdersData?.data)
+      ? customOrdersData.data
+      : Array.isArray(customOrdersData?.results)
+      ? customOrdersData.results
+      : Array.isArray(customOrdersData)
+      ? customOrdersData
+      : [];
+
+    return source.map((order) => {
+      const problemList = Array.isArray(order.problems)
+        ? order.problems
+        : Array.isArray(order.problem_details)
+        ? order.problem_details
+        : Array.isArray(order.problem_names)
+        ? order.problem_names
+        : [];
+      const problemNames = problemList
+        .map((problem) => {
+          if (typeof problem === "string") return problem;
+          return (
+            problem?.name ||
+            problem?.title ||
+            problem?.problem_name ||
+            problem?.label ||
+            ""
+          );
+        })
+        .filter(Boolean);
+
+      return {
+        ...order,
+        id: `custom-${order.id}`,
+        originalId: order.id,
+        orderNumber: order.reference || order.order_number || `CUST-${order.id}`,
+        customerName: order.customer_name || "N/A",
+        customerPhone: order.customer_phone || "",
+        productName:
+          order.model_name ||
+          order.model?.name ||
+          order.phone_model_name ||
+          "Repair Service",
+        brandName: order.brand_name || order.brand?.name || "Custom",
+        status: order.status || "custom",
+        paymentStatus: order.payment_status || "unpaid",
+        schedule: order.schedule || null,
+        problemsSummary: problemNames.join(", "),
+        isCustom: true,
+      };
+    });
+  }, [customOrdersData]);
+
+  const allOrders = useMemo(
+    () => [...normalizedOrders, ...normalizedCustomOrders],
+    [normalizedOrders, normalizedCustomOrders]
+  );
+
   const ordersByDate = useMemo(() => {
-    return normalizedOrders.reduce((acc, order) => {
+    return allOrders.reduce((acc, order) => {
       const key = getScheduleDateKey(order.schedule);
       if (!key) return acc;
       if (!acc[key]) acc[key] = [];
       acc[key].push(order);
       return acc;
     }, {});
-  }, [normalizedOrders]);
+  }, [allOrders]);
 
-  const scheduledOrders = normalizedOrders.filter((order) => order.schedule);
+  const scheduledOrders = allOrders.filter((order) => order.schedule);
 
   const selectedDateKey = formatDateKey(selectedDate);
   const ordersForSelectedDate = ordersByDate[selectedDateKey] || [];
@@ -247,18 +594,26 @@ export default function RepairCalendarPage() {
   };
 
   const handleScheduleUpdate = async (order, isoString) => {
-    const orderId = order.id;
-    if (!orderId) return;
+    const orderKey = order.id;
+    const targetId = order.originalId || order.id;
+    if (!orderKey || !targetId) return;
 
-    setUpdatingSchedule((prev) => ({ ...prev, [orderId]: true }));
+    const endpoint = order.isCustom
+      ? `/api/repair/custom-orders/${targetId}/`
+      : `/api/repair/orders/${targetId}/`;
+
+    setUpdatingSchedule((prev) => ({ ...prev, [orderKey]: true }));
     try {
-      await apiFetcher.patch(`/api/repair/orders/${orderId}/`, {
+      await apiFetcher.patch(endpoint, {
         schedule: isoString,
       });
       queryClient.invalidateQueries({ queryKey: ["repairOrdersCalendar"] });
       queryClient.invalidateQueries({ queryKey: ["repairOrders"] });
+      if (order.isCustom) {
+        refetchCustomOrders();
+      }
       toast.success(t("scheduleUpdated"));
-      cancelEditing(orderId);
+      cancelEditing(orderKey);
     } catch (err) {
       toast.error(
         err?.response?.data?.message || t("scheduleUpdateFailed")
@@ -266,7 +621,7 @@ export default function RepairCalendarPage() {
     } finally {
       setUpdatingSchedule((prev) => {
         const next = { ...prev };
-        delete next[orderId];
+        delete next[orderKey];
         return next;
       });
     }
@@ -367,7 +722,10 @@ export default function RepairCalendarPage() {
     );
   };
 
-  if (isLoading && !ordersData) {
+  const combinedLoading = isLoadingOrders || isLoadingCustomOrders;
+  const error = errorOrders || customOrdersError;
+
+  if (combinedLoading && !ordersData && !customOrdersData) {
     return (
       <PageTransition>
         <div className="flex h-[70vh] items-center justify-center">
@@ -402,6 +760,13 @@ export default function RepairCalendarPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+            >
+              <Plus className="h-4 w-4" />
+              {t("addCustomOrder")}
+            </button>
             <button
               onClick={handleToday}
               className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-500 hover:text-blue-600"
@@ -522,13 +887,28 @@ export default function RepairCalendarPage() {
                             <p className="text-sm font-semibold text-gray-500">
                               {order.orderNumber}
                             </p>
-                            <h3 className="text-lg font-bold text-gray-900">
-                              {order.customerName}
-                            </h3>
-                            {/* <p className="text-sm text-gray-500">
-                              {order.brandName && `${order.brandName} · ` }
-                              {order.productName}
-                            </p> */}
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-lg font-bold text-gray-900">
+                                {order.customerName}
+                              </h3>
+                              {order.isCustom && (
+                                <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
+                                  {t("customOrderTag")}
+                                </span>
+                              )}
+                            </div>
+                            {(order.brandName || order.productName) && (
+                              <p className="text-sm text-gray-500">
+                                {[order.brandName, order.productName]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </p>
+                            )}
+                            {order.problemsSummary && (
+                              <p className="text-xs text-gray-500">
+                                {order.problemsSummary}
+                              </p>
+                            )}
                           </div>
                           <span
                             className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
@@ -564,6 +944,202 @@ export default function RepairCalendarPage() {
           </section>
         </div>
       </div>
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-2xl border border-gray-200">
+          <DialogHeader>
+            <DialogTitle>{t("customOrderModalTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("customOrderModalDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-brand">{t("brandLabel")}</Label>
+                <Select
+                  value={formState.brandId}
+                  onValueChange={handleBrandSelect}
+                  disabled={isFetchingBrands || isSubmittingCustomOrder}
+                >
+                  <SelectTrigger id="custom-brand">
+                    <SelectValue placeholder={t("selectBrand")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brandOptions.map((brand) => (
+                      <SelectItem key={brand.id} value={String(brand.id)}>
+                        {brand.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-model">{t("modelLabel")}</Label>
+                <Select
+                  value={formState.modelId}
+                  onValueChange={handleModelSelect}
+                  disabled={
+                    !formState.brandId ||
+                    isFetchingModels ||
+                    isSubmittingCustomOrder
+                  }
+                >
+                  <SelectTrigger id="custom-model">
+                    <SelectValue placeholder={t("selectModel")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {modelOptions.map((model) => (
+                      <SelectItem key={model.id} value={String(model.id)}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>{t("problemsLabel")}</Label>
+              <div className="rounded-xl border border-dashed border-gray-200 p-3 max-h-56 overflow-y-auto">
+                {isFetchingProblems ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("loadingLabel")}
+                  </div>
+                ) : problemOptions.length === 0 ? (
+                  <p className="text-sm text-gray-500">
+                    {t("noProblemsLabel")}
+                  </p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {problemOptions.map((problem) => {
+                      const problemId = String(problem.id);
+                      const checked = formState.problems.includes(problemId);
+                      return (
+                        <label
+                          key={problem.id}
+                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
+                            checked
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-white"
+                          }`}
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={(value) =>
+                              handleProblemToggle(problemId, Boolean(value))
+                            }
+                          />
+                          <span className="text-gray-700">{problem.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-name">{t("customerNameLabel")}</Label>
+                <Input
+                  id="custom-name"
+                  value={formState.customerName}
+                  onChange={(event) =>
+                    updateFormField("customerName", event.target.value)
+                  }
+                  placeholder={t("customerNamePlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-email">{t("customerEmailLabel")}</Label>
+                <Input
+                  id="custom-email"
+                  type="email"
+                  value={formState.customerEmail}
+                  onChange={(event) =>
+                    updateFormField("customerEmail", event.target.value)
+                  }
+                  placeholder={t("customerEmailPlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-phone">{t("customerPhoneLabel")}</Label>
+                <Input
+                  id="custom-phone"
+                  value={formState.customerPhone}
+                  onChange={(event) =>
+                    updateFormField("customerPhone", event.target.value)
+                  }
+                  placeholder={t("customerPhonePlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-schedule">{t("scheduleLabel")}</Label>
+                <Input
+                  id="custom-schedule"
+                  type="datetime-local"
+                  value={formState.schedule}
+                  onChange={(event) =>
+                    updateFormField("schedule", event.target.value)
+                  }
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-address">{t("customerAddressLabel")}</Label>
+              <Textarea
+                id="custom-address"
+                value={formState.customerAddress}
+                onChange={(event) =>
+                  updateFormField("customerAddress", event.target.value)
+                }
+                placeholder={t("customerAddressPlaceholder")}
+                disabled={isSubmittingCustomOrder}
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-notes">{t("notesLabel")}</Label>
+              <Textarea
+                id="custom-notes"
+                value={formState.notes}
+                onChange={(event) =>
+                  updateFormField("notes", event.target.value)
+                }
+                placeholder={t("notesPlaceholder")}
+                disabled={isSubmittingCustomOrder}
+                rows={2}
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              disabled={isSubmittingCustomOrder}
+            >
+              {t("cancelLabel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleCreateCustomOrder}
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+              disabled={isSubmittingCustomOrder}
+            >
+              {isSubmittingCustomOrder && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {t("createOrderLabel")}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }
