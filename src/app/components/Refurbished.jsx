@@ -290,7 +290,7 @@ export default function Refurbished() {
                     </div>
 
                     <h4 className="text-xl font-bold mb-3 text-secondary">{feature.title}</h4>
-                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                    <p className="text-gray-600 leading-relaxed text-sm text-nowrap break-words">{feature.description}</p>
                   </div>
                 </motion.div>
               );

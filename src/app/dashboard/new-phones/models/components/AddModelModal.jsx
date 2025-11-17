@@ -250,21 +250,39 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       }
 
       submitData.append('name', formData.name.trim());
-      submitData.append('brand', formData.brand);
+      submitData.append('brand', Number(formData.brand));
       submitData.append('ram', formData.ram.trim());
       submitData.append('memory', formData.memory.trim());
       submitData.append('main_amount', formData.main_amount);
       submitData.append('discounted_amount', discounted_amount);
       submitData.append('description', formData.description.trim());
 
-      // Append color variants data
+      // Append stock management data
       formData.colorVariants.forEach((variant, index) => {
-        submitData.append(`colorVariants[${index}][color_id]`, variant.color_id);
-        submitData.append(`colorVariants[${index}][quantity]`, variant.quantity);
+        submitData.append(`stock_management[${index}][color]`, variant.color_id);
+        submitData.append(`stock_management[${index}][stock]`, parseInt(variant.quantity, 10));
         if (variant.image) {
-          submitData.append(`colorVariants[${index}][image]`, variant.image);
+          submitData.append(`stock_management[${index}][icon_color_based]`, variant.image);
         }
+        // If no image, backend will set icon_color_based to null
       });
+
+      // Console log payload body
+      const payloadBody = {
+        name: formData.name.trim(),
+        brand: formData.brand,
+        ram: formData.ram.trim(),
+        memory: formData.memory.trim(),
+        main_amount: formData.main_amount,
+        discounted_amount: discounted_amount,
+        description: formData.description.trim(),
+        stock_management: formData.colorVariants.map((variant) => ({
+          color: variant.color_id,
+          stock: parseInt(variant.quantity, 10),
+          icon_color_based: variant.image ? variant.image.name : null
+        }))
+      };
+      console.log('Payload Body:', payloadBody);
 
       await apiFetcher.post('/api/brandnew/models/', submitData, {
         headers: {
@@ -339,7 +357,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                 </SelectTrigger>
                 <SelectContent>
                   {brands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.slug}>
+                    <SelectItem key={brand.id} value={brand.id.toString()}>
                       <div className="flex items-center space-x-2">
                         {brand.icon && (
                           <Image 

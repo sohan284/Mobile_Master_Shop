@@ -426,10 +426,10 @@ export default function BrandPhonesClient({
                                         {parseFloat(phone.discount_percentage).toFixed(1)}% off
                                       </span>
                                     )}
-                                    <span className='font-bold text-secondary'>${parseFloat(phone.final_price).toLocaleString()}</span>
+                                    <span className='font-bold text-secondary'>€{parseFloat(phone.final_price).toLocaleString()}</span>
                                     {phone.discounted_amount && phone.discounted_amount !== phone.main_amount && (
                                       <span className="text-sm text-gray-400 line-through">
-                                        ${parseFloat(phone.main_amount).toLocaleString()}
+                                        €{parseFloat(phone.main_amount).toLocaleString()}
                                       </span>
                                     )}
                                   </p>

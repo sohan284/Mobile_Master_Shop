@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Wrench, Calendar, Eye, Clock } from "lucide-react";
+import { Wrench, Calendar, Eye, Clock, Edit2, Check, X } from "lucide-react";
 import PageTransition from "@/components/animations/PageTransition";
 import { useApiGet, useApiPatch } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
@@ -22,6 +22,9 @@ export default function RepairOrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState("all"); // 'all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const [updatingStatus, setUpdatingStatus] = useState({}); // Track which order is being updated
+  const [updatingSchedule, setUpdatingSchedule] = useState({}); // Track which order's schedule is being updated
+  const [editingSchedule, setEditingSchedule] = useState({}); // Track which order's schedule is being edited
+  const [scheduleValues, setScheduleValues] = useState({}); // Store temporary schedule values while editing
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -110,6 +113,106 @@ export default function RepairOrdersPage() {
       console.error("Failed to mark order as read:", error);
     }
     router.push(`/dashboard/orders/repairs/${order.id}`);
+  };
+
+  // Function to handle schedule update
+  const handleScheduleUpdate = async (order, newSchedule) => {
+    const orderId = order.id;
+    if (!orderId) {
+      toast.error("Order ID not found");
+      return;
+    }
+
+    setUpdatingSchedule((prev) => ({ ...prev, [orderId]: true }));
+
+    try {
+      await apiFetcher.patch(`/api/repair/orders/${orderId}/`, {
+        schedule: newSchedule,
+      });
+
+      // Invalidate query to refresh the list
+      queryClient.invalidateQueries({
+        queryKey: ["repairOrders", selectedStatus, currentPage],
+      });
+
+      // Reset editing state
+      setEditingSchedule((prev) => {
+        const newState = { ...prev };
+        delete newState[orderId];
+        return newState;
+      });
+      setScheduleValues((prev) => {
+        const newState = { ...prev };
+        delete newState[orderId];
+        return newState;
+      });
+
+      toast.success("Schedule updated successfully");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to update schedule"
+      );
+    } finally {
+      setUpdatingSchedule((prev) => {
+        const newState = { ...prev };
+        delete newState[orderId];
+        return newState;
+      });
+    }
+  };
+
+  // Function to start editing schedule
+  const startEditingSchedule = (order) => {
+    const orderId = order.id;
+    
+    // Convert schedule to local datetime-local format
+    let dateTimeValue = "";
+    if (order.schedule) {
+      const date = new Date(order.schedule);
+      if (!isNaN(date.getTime())) {
+        // Format as YYYY-MM-DDTHH:mm for datetime-local input
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        dateTimeValue = `${year}-${month}-${day}T${hours}:${minutes}`;
+      }
+    }
+
+    setEditingSchedule((prev) => ({ ...prev, [orderId]: true }));
+    setScheduleValues((prev) => ({ ...prev, [orderId]: dateTimeValue }));
+  };
+
+  // Function to cancel editing schedule
+  const cancelEditingSchedule = (orderId) => {
+    setEditingSchedule((prev) => {
+      const newState = { ...prev };
+      delete newState[orderId];
+      return newState;
+    });
+    setScheduleValues((prev) => {
+      const newState = { ...prev };
+      delete newState[orderId];
+      return newState;
+    });
+  };
+
+  // Function to save schedule
+  const saveSchedule = (order) => {
+    const orderId = order.id;
+    const dateTimeValue = scheduleValues[orderId];
+    
+    if (!dateTimeValue) {
+      toast.error("Please select a date and time");
+      return;
+    }
+
+    // Convert datetime-local value to ISO string
+    const localDate = new Date(dateTimeValue);
+    const isoString = localDate.toISOString();
+
+    handleScheduleUpdate(order, isoString);
   };
 
   // Function to handle status change
@@ -415,11 +518,61 @@ export default function RepairOrdersPage() {
       accessor: "schedule",
       sortable: true,
       render: (order) => {
+        const orderId = order.id;
+        const isEditing = editingSchedule[orderId];
+        const isUpdating = updatingSchedule[orderId];
         const scheduleInfo = formatSchedule(order.schedule);
 
+        // If editing, show input field
+        if (isEditing) {
+          return (
+            <div className="flex items-center gap-2 max-w-[300px]">
+              <input
+                type="datetime-local"
+                value={scheduleValues[orderId] || ""}
+                onChange={(e) =>
+                  setScheduleValues((prev) => ({
+                    ...prev,
+                    [orderId]: e.target.value,
+                  }))
+                }
+                disabled={isUpdating}
+                className="flex-1 px-3 py-1.5 text-xs border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <button
+                onClick={() => saveSchedule(order)}
+                disabled={isUpdating}
+                className="p-1.5 bg-green-500 cursor-pointer text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Save schedule"
+              >
+                <Check size={16} />
+              </button>
+              <button
+                onClick={() => cancelEditingSchedule(orderId)}
+                disabled={isUpdating}
+                className="p-1.5 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Cancel"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          );
+        }
+
+        // If not scheduled, show "Not scheduled" with edit button
         if (!scheduleInfo) {
           return (
-            <span className="text-gray-400 italic text-xs">Not scheduled</span>
+            <div className="flex items-center gap-2 max-w-[300px]">
+              <span className="text-gray-400 italic text-xs">Not scheduled</span>
+              <button
+                onClick={() => startEditingSchedule(order)}
+                disabled={isUpdating}
+                className="p-1.5 text-blue-600 cursor-pointer hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Add schedule"
+              >
+                <Edit2 size={14} />
+              </button>
+            </div>
           );
         }
 
@@ -445,23 +598,37 @@ export default function RepairOrdersPage() {
         }
 
         return (
-          <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 ${badgeStyle} font-semibold min-w-[180px]`}
-          >
-            <Clock size={14} className="flex-shrink-0" />
-            <div className="flex flex-col flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs leading-tight">
-                  {scheduleInfo.date}
-                </span>
-                {statusText && (
-                  <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-white/50">
-                    {statusText}
+          <div className="flex items-center gap-2 max-w-[300px]">
+            <div
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 ${badgeStyle} font-semibold flex-1`}
+            >
+              <Clock size={14} className="flex-shrink-0" />
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs leading-tight">
+                    {scheduleInfo.date}
                   </span>
-                )}
+                  {statusText && (
+                    <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-white/50">
+                      {statusText}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs font-bold">{scheduleInfo.time}</span>
               </div>
-              <span className="text-xs font-bold">{scheduleInfo.time}</span>
             </div>
+            <button
+              onClick={() => startEditingSchedule(order)}
+              disabled={isUpdating}
+              className="p-1.5 text-blue-600 cursor-pointer hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+              title="Edit schedule"
+            >
+              {isUpdating ? (
+                <Clock size={14} className="animate-spin" />
+              ) : (
+                <Edit2 size={14} />
+              )}
+            </button>
           </div>
         );
       },

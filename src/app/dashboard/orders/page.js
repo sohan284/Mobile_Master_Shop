@@ -2,8 +2,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageTransition from '@/components/animations/PageTransition';
+import { useTranslations } from 'next-intl';
 
 export default function OrdersPage() {
+  const t = useTranslations('dashboard.orders');
   const router = useRouter();
 
   useEffect(() => {
@@ -14,7 +16,7 @@ export default function OrdersPage() {
   return (
     <PageTransition>
       <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-600">Redirecting...</p>
+        <p className="text-gray-600">{t('redirecting')}</p>
       </div>
     </PageTransition>
   );

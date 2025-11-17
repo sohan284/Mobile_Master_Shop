@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import UserInfo from '@/components/UserInfo';
 import Sidebar from './components/Sidebar';
 import NotificationDropdown from './components/NotificationDropdown';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function DashboardLayout({ children }) {
             {/* <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1> */}
             <div className="flex items-center gap-4">
               {/* <NotificationDropdown /> */}
+              <LanguageSwitcher />
               <UserInfo />
             </div>
           </div>

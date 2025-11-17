@@ -23,8 +23,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import ApiErrorMessage from '@/components/ui/ApiErrorMessage';
+import { useTranslations } from 'next-intl';
 
 export default function ContactsPage() {
+  const t = useTranslations('dashboard.contacts');
   const [selectedStatus, setSelectedStatus] = useState('all'); // 'all', 'pending', 'resolved'
   const [currentPage, setCurrentPage] = useState(1);
   const [updatingStatus, setUpdatingStatus] = useState({});
@@ -49,7 +51,7 @@ export default function ContactsPage() {
         delete newState[variables.contactId];
         return newState;
       });
-      toast.success('Contact status updated successfully');
+      toast.success(t('contactStatusUpdatedSuccessfully'));
     },
     onError: (error, variables) => {
       setUpdatingStatus(prev => {
@@ -57,7 +59,7 @@ export default function ContactsPage() {
         delete newState[variables.contactId];
         return newState;
       });
-      toast.error(error.response?.data?.message || 'Failed to update contact status');
+      toast.error(error.response?.data?.message || t('failedToUpdateContactStatus'));
     }
   });
 
@@ -73,12 +75,12 @@ export default function ContactsPage() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/auth/contact/${selectedContact.id}/`);
-      toast.success('Contact deleted successfully');
+      toast.success(t('contactDeletedSuccessfully'));
       queryClient.invalidateQueries({ queryKey: ['contacts', selectedStatus, currentPage] });
       setIsDeleteDialogOpen(false);
       setSelectedContact(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete contact');
+      toast.error(error.response?.data?.message || error.message || t('failedToDeleteContact'));
     } finally {
       setIsDeleting(false);
     }
@@ -101,7 +103,7 @@ export default function ContactsPage() {
     
     const contactId = contact.id;
     if (!contactId) {
-      toast.error('Contact ID not found');
+      toast.error(t('failedToUpdateContactStatus'));
       return;
     }
     
@@ -154,16 +156,14 @@ export default function ContactsPage() {
         phone: contact.phone || contact.phone_number || 'N/A',
         message: contact.message || contact.message_text || 'N/A',
         status: isResolved, // Store as boolean
-        statusDisplay: isResolved ? 'Resolved' : 'Pending',
+        statusDisplay: isResolved ? t('resolved') : t('pending'),
         createdAt: contact.created_at || contact.createdAt || null,
         updatedAt: contact.updated_at || contact.updatedAt || null,
       };
     };
 
     // Extract contacts from response
-    const contacts = Array.isArray(contactsData?.data) ? contactsData.data : 
-                   Array.isArray(contactsData?.results) ? contactsData.results :
-                   Array.isArray(contactsData) ? contactsData : 
+    const contacts = Array.isArray(contactsData?.results.data) ? contactsData.results.data : 
                    [];
     return contacts.map(contact => normalizeContact(contact)).sort((a, b) => {
       return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
@@ -198,20 +198,20 @@ export default function ContactsPage() {
 
   // Status options for dropdown
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'resolved', label: 'Resolved' },
+    { value: 'pending', label: t('pending') },
+    { value: 'resolved', label: t('resolved') },
   ];
 
   // Status options for filter dropdown (with 'all')
   const filterStatusOptions = [
-    { value: 'all', label: 'All Statuses' },
+    { value: 'all', label: t('allStatuses') },
     ...statusOptions,
   ];
 
   // Define columns for DataTable
   const columns = [
     {
-      header: 'Name',
+      header: t('name'),
       accessor: 'name',
       sortable: true,
       render: (contact) => (
@@ -222,7 +222,7 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: 'Email',
+      header: t('email'),
       accessor: 'email',
       sortable: true,
       render: (contact) => (
@@ -233,7 +233,7 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: 'Subject',
+      header: t('subject'),
       accessor: 'subject',
       sortable: true,
       render: (contact) => (
@@ -244,7 +244,7 @@ export default function ContactsPage() {
     },
     
     {
-      header: 'Message',
+      header: t('message'),
       accessor: 'message',
       sortable: false,
       render: (contact) => (
@@ -254,7 +254,7 @@ export default function ContactsPage() {
       ),
     },
     {
-      header: 'Status',
+      header: t('status'),
       accessor: 'status',
       sortable: true,
       render: (contact) => {
@@ -275,10 +275,10 @@ export default function ContactsPage() {
             >
               <SelectValue>
                 {isUpdating ? (
-                  <span className="text-xs">Updating...</span>
+                  <span className="text-xs">{t('updating')}</span>
                 ) : (
                   <span className="text-xs font-semibold capitalize">
-                    {contact.statusDisplay || (isResolved ? 'Resolved' : 'Pending')}
+                    {contact.statusDisplay || (isResolved ? t('resolved') : t('pending'))}
                   </span>
                 )}
               </SelectValue>
@@ -295,7 +295,7 @@ export default function ContactsPage() {
       },
     },
     {
-      header: 'Date',
+      header: t('date'),
       accessor: 'createdAt',
       sortable: true,
       render: (contact) => (
@@ -324,9 +324,9 @@ export default function ContactsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <MessageSquare className="h-6 w-6" />
-            Contacts
+            {t('title')}
           </h1>
-          <p className="text-gray-600">Manage contact messages and inquiries</p>
+          <p className="text-gray-600">{t('subtitle')}</p>
         </div>
 
         {/* Contacts Table Section */}
@@ -335,16 +335,16 @@ export default function ContactsPage() {
             {error ? (
               <ApiErrorMessage
                 error={error}
-                title="Error Loading Contacts"
+                title={t('errorLoadingContacts')}
                 onRetry={() => refetch()}
-                retryLabel="Try Again"
+                retryLabel={t('tryAgain')}
                 showReload={true}
               />
             ) : (
               <DataTable
                 data={normalizedContacts}
                 columns={columns}
-                title="Contact Messages"
+                title={t('tableTitle')}
                 searchable={true}
                 pagination={true}
                 itemsPerPage={pageSize}
@@ -359,7 +359,7 @@ export default function ContactsPage() {
                 statusFilter={
                   <Select className="cursor-pointer" value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="w-[180px] h-10">
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder={t('filterByStatus')} />
                     </SelectTrigger>
                     <SelectContent>
                       {filterStatusOptions.map((option) => (
@@ -381,10 +381,10 @@ export default function ContactsPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Contact"
-        message={`Are you sure you want to delete the contact from "${selectedContact?.name || 'N/A'}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={t('deleteContact')}
+        message={t('deleteConfirm', { name: selectedContact?.name || 'N/A' })}
+        confirmText={t('yesDelete')}
+        cancelText={t('cancel')}
         type="danger"
         isLoading={isDeleting}
       />

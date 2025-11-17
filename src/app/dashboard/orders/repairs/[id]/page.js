@@ -415,7 +415,7 @@ export default function RepairOrderDetailPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Total Services</span>
-                  <Badge variant="secondary">
+                  <Badge variant="text-gray-600">
                     {order.order_items?.length || 0}
                   </Badge>
                 </div>
