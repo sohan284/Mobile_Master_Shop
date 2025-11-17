@@ -41,7 +41,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     discount_type: 'amount',
     discount_value: '',
     description: '',
-    colorVariants: []
+    stock_management: []
   });
   const [expandedColors, setExpandedColors] = useState(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,12 +60,12 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
   // Get variant for a color
   const getColorVariant = (colorId) => {
-    return formData.colorVariants.find(v => v.color_id === colorId);
+    return formData.stock_management.find(v => v.color_id === colorId);
   };
 
   // Check if color is selected
   const isColorSelected = (colorId) => {
-    return formData.colorVariants.some(v => v.color_id === colorId);
+    return formData.stock_management.some(v => v.color_id === colorId);
   };
 
   // Toggle color card expansion and selection
@@ -76,7 +76,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       // Select the color and add to variants
       setFormData(prev => ({
         ...prev,
-        colorVariants: [...prev.colorVariants, {
+        stock_management: [...prev.stock_management, {
           color_id: color.id,
           color_name: color.name,
           color_hex: color.hex_code,
@@ -106,7 +106,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     e.stopPropagation();
     setFormData(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.filter(v => v.color_id !== colorId)
+      stock_management: prev.stock_management.filter(v => v.color_id !== colorId)
     }));
     setExpandedColors(prev => {
       const newSet = new Set(prev);
@@ -132,7 +132,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
     setFormData(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.map(variant =>
+      stock_management: prev.stock_management.map(variant =>
         variant.color_id === colorId
           ? {
               ...variant,
@@ -148,7 +148,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
   const handleRemoveVariantImage = (colorId) => {
     setFormData(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.map(variant =>
+      stock_management: prev.stock_management.map(variant =>
         variant.color_id === colorId
           ? {
               ...variant,
@@ -164,7 +164,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
   const handleQuantityChange = (colorId, quantity) => {
     setFormData(prev => ({
       ...prev,
-      colorVariants: prev.colorVariants.map(variant =>
+      stock_management: prev.stock_management.map(variant =>
         variant.color_id === colorId
           ? { ...variant, quantity }
           : variant
@@ -188,8 +188,8 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
   // Get completion status
   const getCompletionStatus = () => {
-    const total = formData.colorVariants.length;
-    const complete = formData.colorVariants.filter(isVariantComplete).length;
+    const total = formData.stock_management.length;
+    const complete = formData.stock_management.filter(isVariantComplete).length;
     return { total, complete };
   };
 
@@ -200,44 +200,42 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       toast.error('Please enter model name');
       return;
     }
-
+  
     if (!formData.brand) {
       toast.error('Please select a brand');
       return;
     }
-
+  
     if (!formData.main_amount) {
       toast.error('Please enter main amount');
       return;
     }
-
+  
     if (!formData.ram) {
       toast.error('Please select RAM');
       return;
     }
-
+  
     if (!formData.memory) {
       toast.error('Please select memory');
       return;
     }
-
-    if (formData.colorVariants.length === 0) {
+  
+    if (formData.stock_management.length === 0) {
       toast.error('Please add at least one color variant');
       return;
     }
-
+  
     const status = getCompletionStatus();
     if (status.complete !== status.total) {
       toast.error('Please complete all color variants (add image and quantity)');
       return;
     }
-
+  
     setIsSubmitting(true);
     const loadingToast = toast.loading('Creating model...');
-
+  
     try {
-      const submitData = new FormData();
-      
       // Calculate discounted amount
       let discounted_amount = formData.main_amount;
       if (formData.discount_value) {
@@ -248,48 +246,69 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
           discounted_amount = (parseFloat(formData.main_amount) - parseFloat(formData.discount_value)).toString();
         }
       }
-
-      submitData.append('name', formData.name.trim());
-      submitData.append('brand', Number(formData.brand));
-      submitData.append('ram', formData.ram.trim());
-      submitData.append('memory', formData.memory.trim());
-      submitData.append('main_amount', formData.main_amount);
-      submitData.append('discounted_amount', discounted_amount);
-      submitData.append('description', formData.description.trim());
-
-      // Append stock management data
-      formData.colorVariants.forEach((variant, index) => {
-        submitData.append(`stock_management[${index}][color]`, variant.color_id);
-        submitData.append(`stock_management[${index}][stock]`, parseInt(variant.quantity, 10));
-        if (variant.image) {
-          submitData.append(`stock_management[${index}][icon_color_based]`, variant.image);
-        }
-        // If no image, backend will set icon_color_based to null
-      });
-
-      // Console log payload body
-      const payloadBody = {
+  
+      // Build the payload as a plain object (JSON only, files handled separately)
+      const payload = {
         name: formData.name.trim(),
-        brand: formData.brand,
+        brand: Number(formData.brand),
         ram: formData.ram.trim(),
         memory: formData.memory.trim(),
         main_amount: formData.main_amount,
         discounted_amount: discounted_amount,
         description: formData.description.trim(),
-        stock_management: formData.colorVariants.map((variant) => ({
+        stock_management: formData.stock_management.map((variant) => ({
           color: variant.color_id,
-          stock: parseInt(variant.quantity, 10),
-          icon_color_based: variant.image ? variant.image.name : null
+          stock: parseInt(variant.quantity, 10)
         }))
       };
-      console.log('Payload Body:', payloadBody);
+  
+      console.log('Payload:', payload);
+  
+      // Send JSON payload (server returns newly created stock rows with their ids)
+      const createdModel = await apiFetcher.post('/api/brandnew/models/', payload);
+      console.log('Model Response:', createdModel);
 
-      await apiFetcher.post('/api/brandnew/models/', submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const createdStocks = createdModel?.data?.stock_management || [];
+      if (!Array.isArray(createdStocks) || createdStocks.length !== formData.stock_management.length) {
+        throw new Error('Mismatch between requested and created stock variants.');
+      }
+
+      // Map stock records back to the variants we just submitted
+      const stockLookup = new Map();
+      createdStocks.forEach((stock, index) => {
+        const colorId =
+          stock?.color?.id ??
+          (typeof stock?.color === 'number' ? stock.color : undefined) ??
+          stock?.color_id;
+        if (colorId !== undefined) {
+          stockLookup.set(String(colorId), stock);
+        } else {
+          stockLookup.set(`index-${index}`, stock);
+        }
       });
 
+      toast.loading('Uploading color images...', { id: loadingToast });
+
+      await Promise.all(
+        formData.stock_management.map(async (variant, index) => {
+          const stockRecord =
+            stockLookup.get(String(variant.color_id)) ||
+            stockLookup.get(`index-${index}`);
+
+          if (!stockRecord?.id) {
+            throw new Error('Unable to find stock id for color variant upload.');
+          }
+
+          const stockFormData = new FormData();
+          stockFormData.append('icon_color_based', variant.image);
+
+          await apiFetcher.patch(
+            `/api/brandnew/stock-management/${stockRecord.id}/`,
+            stockFormData
+          );
+        })
+      );
+  
       toast.dismiss(loadingToast);
       toast.success('Model created successfully!');
       
@@ -303,7 +322,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
         discount_type: 'amount',
         discount_value: '',
         description: '',
-        colorVariants: []
+        stock_management: []
       });
       setExpandedColors(new Set());
       
@@ -312,6 +331,8 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       
     } catch (error) {
       toast.dismiss(loadingToast);
+      console.error('Error creating model:', error);
+      console.error('Error response:', error.response?.data);
       toast.error(error.response?.data?.message || error.message || 'Failed to create model');
     } finally {
       setIsSubmitting(false);
@@ -329,7 +350,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
         discount_type: 'amount',
         discount_value: '',
         description: '',
-        colorVariants: []
+        stock_management: []
       });
       setExpandedColors(new Set());
       onClose();
@@ -505,7 +526,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                 <Palette className="h-5 w-5 text-gray-700" />
                 <Label className="text-base font-semibold">Color Variants *</Label>
               </div>
-              {formData.colorVariants.length > 0 && (
+              {formData.stock_management.length > 0 && (
                 <div className="flex items-center space-x-2">
                   <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                     status.complete === status.total 
@@ -761,7 +782,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                 !formData.main_amount || 
                 !formData.ram || 
                 !formData.memory ||
-                formData.colorVariants.length === 0 ||
+                formData.stock_management.length === 0 ||
                 status.complete !== status.total
               }
               className="text-secondary cursor-pointer"

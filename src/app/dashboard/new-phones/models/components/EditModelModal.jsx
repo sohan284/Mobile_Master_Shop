@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Palette } from 'lucide-react';
+import { Upload, Palette, ChevronDown, ChevronUp, X, CheckCircle, Image as ImageIcon, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,20 +43,154 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
     discount_type: 'amount', // 'amount' or 'percentage'
     discount_value: '',
     description: '',
-    icon: null,
-    iconPreview: null,
-    stock_quantity: '',
-    color_ids: []
+    stock_management: []
   });
+  const [expandedColors, setExpandedColors] = useState(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [variantLoadingId, setVariantLoadingId] = useState(null);
 
-  const handleColorChange = (colorId, checked) => {
+  // Get variant for a color
+  const getColorVariant = (colorId) => {
+    return formData.stock_management.find(v => v.color_id === colorId);
+  };
+
+  // Check if color is selected
+  const isColorSelected = (colorId) => {
+    return formData.stock_management.some(v => v.color_id === colorId);
+  };
+
+  // Toggle color card expansion and selection
+  const handleColorClick = (color) => {
+    const isSelected = isColorSelected(color.id);
+    
+    if (!isSelected) {
+      // Select the color and add to variants
+      setFormData(prev => ({
+        ...prev,
+        stock_management: [...prev.stock_management, {
+          stock_id: null,
+          color_id: color.id,
+          color_name: color.name,
+          color_hex: color.hex_code,
+          image: null,
+          imagePreview: null,
+          quantity: ''
+        }]
+      }));
+      // Auto-expand
+      setExpandedColors(prev => new Set([...prev, color.id]));
+    } else {
+      // Toggle expansion
+      setExpandedColors(prev => {
+        const newSet = new Set(prev);
+        if (newSet.has(color.id)) {
+          newSet.delete(color.id);
+        } else {
+          newSet.add(color.id);
+        }
+        return newSet;
+      });
+    }
+  };
+
+  // Deselect color
+  const handleColorDeselect = async (colorId, e) => {
+    e.stopPropagation();
+    const variant = getColorVariant(colorId);
+    if (!variant) return;
+
+    if (variant.stock_id) {
+      try {
+        setVariantLoadingId(colorId);
+        await apiFetcher.delete(`/api/brandnew/stock-management/${variant.stock_id}/`);
+        toast.success('Color variant removed');
+      } catch (error) {
+        console.error('Failed to delete color variant:', error);
+        toast.error(error.response?.data?.message || 'Failed to delete color variant');
+        setVariantLoadingId(null);
+        return;
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
-      color_ids: checked 
-        ? [...prev.color_ids, colorId]
-        : prev.color_ids.filter(id => id !== colorId)
+      stock_management: prev.stock_management.filter(v => v.color_id !== colorId)
     }));
+    setExpandedColors(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(colorId);
+      return newSet;
+    });
+    setVariantLoadingId(null);
+  };
+
+  // Handle image upload for a color variant
+  const handleVariantImageUpload = (colorId, file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    const preview = URL.createObjectURL(file);
+
+    setFormData(prev => ({
+      ...prev,
+      stock_management: prev.stock_management.map(variant =>
+        variant.color_id === colorId
+          ? {
+              ...variant,
+              image: file,
+              imagePreview: preview
+            }
+          : variant
+      )
+    }));
+  };
+
+  // Remove image from color variant
+  const handleRemoveVariantImage = (colorId) => {
+    setFormData(prev => ({
+      ...prev,
+      stock_management: prev.stock_management.map(variant =>
+        variant.color_id === colorId
+          ? {
+              ...variant,
+              image: null,
+              imagePreview: null
+            }
+          : variant
+      )
+    }));
+  };
+
+  // Update quantity for a color
+  const handleQuantityChange = (colorId, quantity) => {
+    setFormData(prev => ({
+      ...prev,
+      stock_management: prev.stock_management.map(variant =>
+        variant.color_id === colorId
+          ? { ...variant, quantity }
+          : variant
+      )
+    }));
+  };
+
+  // Check if variant is complete
+  const isVariantComplete = (variant) => {
+    return (variant.image || variant.imagePreview) && variant.quantity && parseInt(variant.quantity) > 0;
+  };
+
+  // Get completion status
+  const getCompletionStatus = () => {
+    const total = formData.stock_management.length;
+    const complete = formData.stock_management.filter(isVariantComplete).length;
+    return { total, complete };
   };
 
   useEffect(() => {
@@ -80,22 +214,44 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
         }
       }
 
+      // Load stock_management from model if it exists
+      let stockManagement = [];
+      if (model.stock_management && Array.isArray(model.stock_management)) {
+        stockManagement = model.stock_management.map((item) => ({
+          stock_id: item.id,
+          color_id: item.color || item.color_id,
+          color_name: item.color_name || colors.find(c => c.id === (item.color || item.color_id))?.name || '',
+          color_hex: colors.find(c => c.id === (item.color || item.color_id))?.hex_code || '',
+          image: null,
+          imagePreview: item.icon_color_based || null,
+          quantity: item.stock?.toString() || item.quantity?.toString() || ''
+        }));
+        // Auto-expand all existing colors
+        setExpandedColors(new Set(stockManagement.map(item => item.color_id)));
+      }
+
+      // Find brand ID from slug or use brand ID directly
+      let brandId = '';
+      if (model.brand_slug) {
+        const brand = brands.find(b => b.slug === model.brand_slug);
+        brandId = brand ? brand.id.toString() : '';
+      } else if (model.brand) {
+        brandId = model.brand.toString();
+      }
+
       setFormData({
         name: model.name || '',
-        brand: model.brand_slug || '',
+        brand: brandId,
         ram: model.ram || '',
         memory: model.memory || '',
         main_amount: model.main_amount?.toString() || '',
         discount_type: discount_type,
         discount_value: discount_value,
         description: model.description || '',
-        icon: null,
-        iconPreview: model.icon || null,
-        stock_quantity: model.stock_quantity?.toString() || '',
-        color_ids: model.colors|| []
+        stock_management: stockManagement
       });
     }
-  }, [model]);
+  }, [model, colors, brands]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -103,29 +259,6 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-  };
-
-  const handleIconChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
-        return;
-      }
-
-      setFormData(prev => ({
-        ...prev,
-        icon: file,
-        iconPreview: URL.createObjectURL(file)
-      }));
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -160,41 +293,79 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
         }
       }
 
-      // Create FormData for file upload
-      const submitData = new FormData();
-      submitData.append('name', formData.name.trim());
-      submitData.append('brand', formData.brand);
-      submitData.append('ram', formData.ram.trim());
-      submitData.append('memory', formData.memory.trim());
-      submitData.append('main_amount', formData.main_amount);
-      submitData.append('discounted_amount', discounted_amount);
-      submitData.append('description', formData.description.trim());
-      submitData.append('stock_quantity', formData.stock_quantity || '0');
-      
-     
-      if (formData.color_ids.length > 0) {
-        Object.keys(formData).forEach(key => {
-          if (key === 'color_ids') {
-            // Append each color ID separately
-            formData.color_ids.forEach(colorId => {
-              submitData.append('color_ids', parseInt(colorId));
-            });
-          } else if (formData[key] !== undefined && formData[key] !== null) {
-            submitData.append(key, formData[key]);
+      const newVariants = formData.stock_management.filter((variant) => !variant.stock_id);
+
+      // Build JSON payload for model-level fields only
+      const payloadBody = {
+        name: formData.name.trim(),
+        brand: Number(formData.brand),
+        ram: formData.ram.trim(),
+        memory: formData.memory.trim(),
+        main_amount: formData.main_amount,
+        discounted_amount: discounted_amount,
+        description: formData.description.trim()
+      };
+
+      console.log('Payload Body:', payloadBody);
+
+      await apiFetcher.patch(`/api/brandnew/models/${model.id}/`, payloadBody);
+
+      const createdStockIds = new Map();
+
+      if (newVariants.length > 0) {
+        await Promise.all(
+          newVariants.map(async (variant) => {
+            const createPayload = {
+              phone_model: model.id,
+              color: variant.color_id,
+              stock: parseInt(variant.quantity, 10),
+              icon_color_based: variant.image
+            };
+
+            const createdStock = await apiFetcher.post(
+              '/api/brandnew/stock-management/',
+              createPayload,
+              {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              },
+            );
+
+            const createdStockId =
+              createdStock?.id ??
+              createdStock?.data?.id ??
+              createdStock?.stock?.id ??
+              createdStock?.data?.stock?.id;
+
+            createdStockIds.set(String(variant.color_id), createdStockId);
+          })
+        );
+      }
+
+      toast.loading('Saving color variants...', { id: loadingToast });
+
+      await Promise.all(
+        formData.stock_management.map(async (variant) => {
+          const resolvedStockId =
+            variant.stock_id ||
+            createdStockIds.get(String(variant.color_id));
+
+         
+
+          const stockFormData = new FormData();
+          stockFormData.append('stock', parseInt(variant.quantity, 10).toString());
+          if (variant.image) {
+            stockFormData.append('icon_color_based', variant.image);
           }
-        });
-      }
 
-      if (formData.icon) {
-        submitData.append('icon', formData.icon);
-      }
+          await apiFetcher.patch(
+            `/api/brandnew/stock-management/${resolvedStockId}/`,
+            stockFormData
+          );
+        })
+      );
 
-      // Make API call using apiFetcher
-      await apiFetcher.patch(`/api/brandnew/models/${model.id}/`, submitData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
       toast.dismiss(loadingToast);
       toast.success('Model updated successfully!');
       
@@ -221,14 +392,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
         discount_type: 'amount',
         discount_value: '',
         description: '',
-        icon: null,
-        iconPreview: null,
-        stock_quantity: '',
-        color_ids: []
+        stock_management: []
       });
+      setExpandedColors(new Set());
       onClose();
     }
   };
+
+  const status = getCompletionStatus();
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -249,7 +420,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                 </SelectTrigger>
                 <SelectContent>
                   {brands.map((brand) => (
-                    <SelectItem key={brand.id} value={brand.slug}>
+                    <SelectItem key={brand.id} value={brand.id.toString()}>
                       <div className="flex items-center space-x-2">
                         {brand.icon && (
                           <Image 
@@ -331,8 +502,8 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             </div>
           </div>
 
-          {/* Third Row - Main Amount and Stock Quantity */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Third Row - Main Amount, Discount Type, and Discount Value */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Main Amount */}
             <div className="space-y-2">
               <Label htmlFor="main_amount">Main Amount *</Label>
@@ -350,24 +521,6 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
               />
             </div>
 
-            {/* Stock Quantity */}
-            <div className="space-y-2">
-              <Label htmlFor="stock_quantity">Stock Quantity</Label>
-              <Input
-                id="stock_quantity"
-                name="stock_quantity"
-                type="number"
-                value={formData.stock_quantity}
-                onChange={handleInputChange}
-                placeholder="Enter stock quantity"
-                disabled={isSubmitting}
-                min="0"
-              />
-            </div>
-          </div>
-
-          {/* Fourth Row - Discount Type and Discount Value */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Discount Type */}
             <div className="space-y-2">
               <Label htmlFor="discount_type">Discount Type</Label>
@@ -408,122 +561,243 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             </div>
           </div>
 
-         
-
-      
-
-          {/* Color Selection */}
-          <div className="space-y-2">
-            <Label className="flex items-center space-x-2">
-              <Palette className="h-4 w-4" />
-              <span>Available Colors</span>
-            </Label>
-            {colors.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-lg">
-                {colors.map((color) => (
-                    <div key={color.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`color-${color.id}`}
-                        checked={formData.color_ids.includes(color.id)}
-                        onCheckedChange={(checked) => handleColorChange(color.id, checked)}
-                        disabled={isSubmitting}
-                        className="data-[state=checked]:bg-transparent cursor-pointer data-[state=checked]:border-green-600 data-[state=checked]:text-green-600"
+          {/* Color Variants Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Palette className="h-5 w-5 text-gray-700" />
+                <Label className="text-base font-semibold">Color Variants *</Label>
+              </div>
+              {formData.stock_management.length > 0 && (
+                <div className="flex items-center space-x-2">
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    status.complete === status.total 
+                      ? 'bg-green-100 text-green-700 border border-green-200' 
+                      : 'bg-amber-100 text-amber-700 border border-amber-200'
+                  }`}>
+                    {status.complete}/{status.total} Complete
+                  </div>
+                  {status.complete !== status.total && (
+                    <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-amber-500 transition-all duration-300"
+                        style={{ width: `${(status.complete / status.total) * 100}%` }}
                       />
-                      <div className="flex items-center space-x-2 flex-1">
-                        <div 
-                          className="w-4 h-4 rounded border border-gray-300"
-                          style={{ backgroundColor: color.hex_code }}
-                          title={color.name}
-                        />
-                        <label 
-                          htmlFor={`color-${color.id}`}
-                          className="text-sm cursor-pointer flex-1"
-                        >
-                          {color.name}
-                        </label>
-                      </div>
                     </div>
-                  ))}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500 p-4 border border-gray-200 rounded-lg">
-                No colors available. Please add colors first.
-              </div>
-            )}
-            <p className="text-xs text-gray-500">
-              Select the colors available for this phone model
-            </p>
-          </div>
-
-          {/* Icon Upload */}
-          <div className="space-y-2">
-            <Label htmlFor="icon">Model Icon</Label>
-            
-            {/* Icon Preview */}
-            {formData.iconPreview && (
-              <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
-                <div className="relative w-16 h-16">
-                  <Image
-                    src={formData.iconPreview}
-                    alt="Icon preview"
-                    fill
-                    className="object-contain rounded"
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {formData.icon?.name || 'Current icon'}
-                  </p>
-                  {formData.icon && (
-                    <p className="text-xs text-gray-500">
-                      {(formData.icon.size / 1024).toFixed(1)} KB
-                    </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setFormData(prev => ({
-                    ...prev,
-                    icon: null,
-                    iconPreview: null
-                  }))}
-                  className="text-red-500 hover:text-red-700"
-                  disabled={isSubmitting}
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Upload Button */}
-            {!formData.iconPreview && (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                <input
-                  id="icon"
-                  name="icon"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleIconChange}
-                  className="hidden"
-                  disabled={isSubmitting}
-                />
-                <label
-                  htmlFor="icon"
-                  className="cursor-pointer flex flex-col items-center space-y-2"
-                >
-                  <div className="p-3 bg-gray-100 rounded-full">
-                    <Upload className="h-6 w-6 text-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">Upload icon</p>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
-                  </div>
-                </label>
+            <p className="text-xs text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-2">
+              💡 <strong>Tip:</strong> Click on a color card to select it, then expand to add product image and stock quantity.
+            </p>
+
+            {/* All Colors as Collapsible Items */}
+            {colors.length > 0 ? (
+              <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                {colors.map((color) => {
+                  const variant = getColorVariant(color.id);
+                  const isSelected = isColorSelected(color.id);
+                  const isExpanded = expandedColors.has(color.id);
+                  const isComplete = variant && isVariantComplete(variant);
+
+                  return (
+                    <div 
+                      key={color.id}
+                      className={`border-2 rounded-xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md ${
+                        isSelected
+                          ? isComplete
+                            ? 'border-green-500 bg-gradient-to-br from-green-50/50 to-white shadow-green-100'
+                            : 'border-blue-400 bg-gradient-to-br from-blue-50/50 to-white shadow-blue-100'
+                          : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50'
+                      }`}
+                    >
+                      {/* Color Header - Clickable */}
+                      <div 
+                        className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/60 transition-all duration-200 rounded-t-xl"
+                        onClick={() => handleColorClick(color)}
+                      >
+                        <div className="flex items-center space-x-3 flex-1">
+                          {/* Color Circle */}
+                          <div className="relative flex-shrink-0">
+                            <div 
+                              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                                isSelected ? 'ring-2 ring-offset-2' : ''
+                              }`}
+                              style={{ 
+                                backgroundColor: color.hex_code,
+                                borderColor: isSelected ? '#10b981' : '#d1d5db',
+                                ringColor: isSelected ? '#10b981' : 'transparent',
+                                boxShadow: isSelected ? '0 0 0 2px rgba(16, 185, 129, 0.2)' : '0 2px 4px rgba(0,0,0,0.1)'
+                              }}
+                            />
+                            {isSelected && (
+                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-1 shadow-lg animate-in zoom-in duration-200">
+                                <Check className="h-3 w-3 text-white" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Color Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              <p className="font-semibold text-gray-900 truncate">{color.name}</p>
+                             
+                            </div>
+                            <p className={`text-xs mt-1 ${
+                              isSelected 
+                                ? isComplete
+                                  ? 'text-green-600 font-medium'
+                                  : 'text-amber-600 font-medium'
+                                : 'text-gray-500'
+                            }`}>
+                              {isSelected 
+                                ? isComplete
+                                  ? `✓ Complete - ${variant.quantity} units in stock`
+                                  : '⚠️ Add image and quantity'
+                                : 'Click to select this color'
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Right Side Icons */}
+                        <div className="flex items-center space-x-2 flex-shrink-0">
+                          {isSelected && (
+                            <>
+                              {isComplete ? (
+                                <CheckCircle className="h-5 w-5 text-green-600 animate-in zoom-in duration-200" />
+                              ) : (
+                               <></>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => handleColorDeselect(color.id, e)}
+                                className="p-1.5 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
+                                disabled={isSubmitting || variantLoadingId === color.id}
+                                title="Remove color"
+                              >
+                                <X className="h-4 w-4 text-red-500" />
+                              </button>
+                            </>
+                          )}
+                          {isSelected && (
+                            <div className="transition-transform duration-300">
+                              {isExpanded ? (
+                                <ChevronUp className="h-5 w-5 text-gray-500" />
+                              ) : (
+                                <ChevronDown className="h-5 w-5 text-gray-500" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Expanded Content - Image and Quantity */}
+                      {isSelected && (
+                        <div 
+                          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                          }`}
+                        >
+                          <div className="p-4 pt-2 space-y-4 border-t border-gray-200 bg-gradient-to-b from-white to-gray-50/30">
+                            <div className="grid grid-cols-1 gap-4">
+                              {/* Image Upload */}
+                              <div className="space-y-2">
+                                <Label className="text-sm font-semibold flex items-center space-x-2 text-gray-700">
+                                  <ImageIcon className="h-4 w-4 text-blue-600" />
+                                  <span>Product Image *</span>
+                                </Label>
+                                
+                                {variant.imagePreview ? (
+                                  <div className="relative group rounded-lg overflow-hidden border-2 border-gray-200 bg-white">
+                                    <img
+                                      src={variant.imagePreview}
+                                      alt={`${variant.color_name} preview`}
+                                      className="w-full h-48 object-contain bg-gray-50"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRemoveVariantImage(variant.color_id)}
+                                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                                      disabled={isSubmitting}
+                                      title="Remove image"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </button>
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-3">
+                                      <p className="font-medium truncate">{variant.image?.name || 'Current image'}</p>
+                                      {variant.image && (
+                                        <p className="text-xs opacity-90">
+                                          {(variant.image.size / 1024).toFixed(1)} KB
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-200 cursor-pointer group">
+                                    <input
+                                      id={`variant-image-${variant.color_id}`}
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => handleVariantImageUpload(variant.color_id, e.target.files[0])}
+                                      className="hidden"
+                                      disabled={isSubmitting}
+                                    />
+                                    <label
+                                      htmlFor={`variant-image-${variant.color_id}`}
+                                      className="cursor-pointer flex flex-col items-center justify-center h-48 space-y-3"
+                                    >
+                                      <div className="p-4 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                                        <Upload className="h-8 w-8 text-blue-600" />
+                                      </div>
+                                      <div className="text-center">
+                                        <p className="text-sm font-semibold text-gray-900">Click to upload image</p>
+                                        <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                                      </div>
+                        </label>
+                      </div>
+                                )}
+                              </div>
+
+                              {/* Quantity Input */}
+                              <div className="space-y-2">
+                                <Label htmlFor={`quantity-${variant.color_id}`} className="text-sm font-semibold text-gray-700">
+                                  Stock Quantity *
+                                </Label>
+                                <Input
+                                  id={`quantity-${variant.color_id}`}
+                                  type="number"
+                                  min="0"
+                                  value={variant.quantity}
+                                  onChange={(e) => handleQuantityChange(variant.color_id, e.target.value)}
+                                  placeholder="Enter stock quantity"
+                                  className="text-lg font-semibold border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                  disabled={isSubmitting}
+                                />
+                                <p className="text-xs text-gray-500 flex items-center space-x-1">
+                                  <span>📦</span>
+                                  <span>Available units in stock</span>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-lg">
+                <Palette className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                <p className="text-sm">No colors available. Please add colors first.</p>
               </div>
             )}
-                {/* Description - Full Width */}
+          </div>
+
+          {/* Description - Full Width */}
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <RichTextEditor
@@ -532,9 +806,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
               disabled={isSubmitting}
             />
           </div>
-          </div>
-
-
+          
           {/* Form Actions */}
           <DialogFooter>
             <Button
@@ -547,7 +819,12 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formData.name.trim() || !formData.brand || !formData.main_amount}
+              disabled={
+                isSubmitting || 
+                !formData.name.trim() || 
+                !formData.brand || 
+                !formData.main_amount 
+              }
               className="text-secondary cursor-pointer"
             >
               {isSubmitting ? 'Updating...' : 'Update Model'}

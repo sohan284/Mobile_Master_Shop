@@ -96,9 +96,9 @@ function NewPhoneModelsContent() {
       accessor: 'icon',
       render: (item) => (
         <div className="flex items-center">
-          {item?.icon ? (
+          {item?.icon || item?.stock_management[0]?.icon_color_based ? (
             <Image 
-              src={item.icon} 
+              src={item?.icon || item?.stock_management[0]?.icon_color_based || '/Apple.png'} 
               alt={item?.name}
               className="h-12 w-12 object-contain rounded"
               width={48}
@@ -168,10 +168,10 @@ function NewPhoneModelsContent() {
     },
     {
       header: 'Stock',
-      accessor: 'stock_quantity',
+      accessor: 'stock_management',
       render: (item) => (
         <div className="text-sm">
-          {item.stock_quantity || 'N/A'}
+          {item.stock_management.reduce((acc, curr) => acc + curr.stock, 0) || 'N/A'}
         </div>
       ),
     },
