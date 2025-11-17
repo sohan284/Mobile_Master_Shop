@@ -170,12 +170,12 @@ export default function RepairOrdersPage() {
     if (order.schedule) {
       const date = new Date(order.schedule);
       if (!isNaN(date.getTime())) {
-        // Format as YYYY-MM-DDTHH:mm for datetime-local input
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
+        // Format as YYYY-MM-DDTHH:mm using UTC components to avoid timezone shifts
+        const year = date.getUTCFullYear();
+        const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+        const day = String(date.getUTCDate()).padStart(2, "0");
+        const hours = String(date.getUTCHours()).padStart(2, "0");
+        const minutes = String(date.getUTCMinutes()).padStart(2, "0");
         dateTimeValue = `${year}-${month}-${day}T${hours}:${minutes}`;
       }
     }

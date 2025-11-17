@@ -666,7 +666,9 @@
     "sidebar": {
       "adminPanel": "Panneau d'administration",
       "dashboard": "Tableau de bord",
-      "orderManagement": "Gestion des commandes",
+      "orderManagement": "Commandes",
+      "calendar": "Calendrier",
+      "repairCalendar": "Calendrier",
       "repair": "Réparation",
       "newPhone": "Nouveau téléphone",
       "accessories": "Accessoires",
@@ -748,6 +750,21 @@
       "repair": "Commandes de réparation",
       "phone": "Commandes de téléphone",
       "accessory": "Commandes d'accessoires"
+    },
+    "repairCalendar": {
+      "title": "Calendrier des réparations",
+      "subtitle": "Visualisez et gérez les plannings de réparation jour par jour.",
+      "calendar": "Calendrier",
+      "ordersFor": "Commandes du {date}",
+      "noOrders": "Aucune commande de réparation planifiée pour ce jour.",
+      "refresh": "Rafraîchir",
+      "today": "Aujourd'hui",
+      "scheduleUpdated": "Planning mis à jour avec succès",
+      "scheduleUpdateFailed": "Échec de la mise à jour du planning",
+      "scheduledCount": "{count} planifiées",
+      "schedulePlaceholder": "Sélectionnez la date et l'heure",
+      "addSchedule": "Ajouter un planning",
+      "editSchedule": "Modifier le planning"
     },
     "common": {
       "loading": "Chargement...",

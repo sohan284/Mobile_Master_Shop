@@ -27,6 +27,7 @@ import {
   ShoppingBag,
   LayoutDashboard,
   MessageSquare,
+  Calendar,
 } from "lucide-react";
 
 // Navigation will be created inside component to use translations
@@ -52,6 +53,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           href: "/dashboard/orders/repairs",
           icon: Wrench,
           unreadKey: "repair_unread",
+        },
+        {
+          name: t('sidebar.repairCalendar'),
+          href: "/dashboard/orders/repairs/calendar",
+          icon: Calendar,
         },
         {
           name: t('sidebar.newPhone'),

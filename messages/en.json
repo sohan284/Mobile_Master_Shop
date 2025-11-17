@@ -666,7 +666,9 @@
     "sidebar": {
       "adminPanel": "Admin Panel",
       "dashboard": "Dashboard",
-      "orderManagement": "Order Management",
+      "orderManagement": "Orders",
+      "calendar": "Calendar",
+      "repairCalendar": "Repair Calendar",
       "repair": "Repair",
       "newPhone": "New Phone",
       "accessories": "Accessories",
@@ -748,6 +750,21 @@
       "repair": "Repair Orders",
       "phone": "Phone Orders",
       "accessory": "Accessory Orders"
+    },
+    "repairCalendar": {
+      "title": "Repair Calendar",
+      "subtitle": "Visualize and manage repair schedules day by day.",
+      "calendar": "Calendar",
+      "ordersFor": "Orders for {date}",
+      "noOrders": "No repair orders scheduled for this day.",
+      "refresh": "Refresh",
+      "today": "Today",
+      "scheduleUpdated": "Schedule updated successfully",
+      "scheduleUpdateFailed": "Failed to update schedule",
+      "scheduledCount": "{count} scheduled",
+      "schedulePlaceholder": "Select date and time",
+      "addSchedule": "Add schedule",
+      "editSchedule": "Edit schedule"
     },
     "common": {
       "loading": "Loading...",
