@@ -148,7 +148,7 @@ export default function AccessoriesClient({ initialAccessories = [], isLoading: 
             renderItem={(item) => (
               <Link href={`/accessories/${item.id}`} className="group block h-full">
                 <div className="group bg-gradient-to-br from-gray-100/40 to-gray-300/40 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-600/20 hover:border-secondary/50 h-full overflow-hidden">
-                  <div className="p-6 text-center h-full flex flex-col">
+                  <div className="p-3 text-center h-full flex flex-col">
                     {/* Image container with hover effect */}
                     <div className="mb-6 bg-white rounded-xl border p-6 group-hover:from-gray-400/20 group-hover:to-gray-600/20 transition-all duration-500 relative overflow-hidden">
                       <Image
@@ -162,7 +162,7 @@ export default function AccessoriesClient({ initialAccessories = [], isLoading: 
 
                     {/* Title, description, price */}
                     <div className="flex-grow flex flex-col justify-between">
-                      <h3 className="font-bold text-lg text-secondary group-hover:text-secondary transition-colors duration-300 mb-3">
+                      <h3 className="font-bold text-sm text-secondary group-hover:text-secondary transition-colors duration-300 mb-3">
                         {item.title}
                       </h3>
 
@@ -178,11 +178,11 @@ export default function AccessoriesClient({ initialAccessories = [], isLoading: 
                               </span>
                             )}
                             <span className="font-bold text-secondary">
-                              ${parseFloat(item.final_price || 0).toLocaleString()}
+                              €{parseFloat(item.final_price || 0).toLocaleString()}
                             </span>
                             {item.main_amount && item.main_amount !== item.final_price && (
                               <span className="text-sm text-gray-400 line-through">
-                                ${parseFloat(item.main_amount || 0).toLocaleString()}
+                                €{parseFloat(item.main_amount || 0).toLocaleString()}
                               </span>
                             )}
                           </p>

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   MapPin,
   Calendar,
@@ -78,25 +78,76 @@ export default function PhoneDetailClient({
   });
 
   const phone = initialPhone;
+  const stockManagement = phone?.stock_management || [];
 
-  // Ensure initial selected color is first available color
+  const colorOptions = useMemo(() => {
+    if (stockManagement.length) {
+      return stockManagement.map((item) => ({
+        name: item.color_name,
+        hex: item.color_hex,
+        icon: item.icon_color_based,
+        stockId: item.id,
+      }));
+    }
+    return (phone?.colors || []).map((color) => ({
+      name: color.name,
+      hex: color.hex_code,
+      icon: null,
+      stockId: null,
+    }));
+  }, [stockManagement, phone?.colors]);
+
+  const selectedStock = useMemo(() => {
+    if (!stockManagement.length) return null;
+    return (
+      stockManagement.find(
+        (entry) => entry.color_name === selectedOptions.color
+      ) || stockManagement[0]
+    );
+  }, [stockManagement, selectedOptions.color]);
+
+  const heroImageSrc = useMemo(() => {
+    const fallbackIcon =
+      selectedStock?.icon_color_based ||
+      phone?.icon ||
+      stockManagement[0]?.icon_color_based;
+    return getImageSrc(fallbackIcon);
+  }, [selectedStock, phone?.icon, stockManagement]);
+
+  const handleColorSelect = useCallback((colorName) => {
+    setSelectedOptions((prev) => ({
+      ...prev,
+      color: colorName,
+    }));
+  }, []);
+
+  // Ensure initial selected color matches available options
   useEffect(() => {
-    if (phone?.colors?.length) {
-      const availableColorNames = phone.colors.map(c => c.name);
-      if (!selectedOptions.color || !availableColorNames.includes(selectedOptions.color)) {
-        setSelectedOptions(prev => ({ ...prev, color: phone.colors[0].name }));
+    if (colorOptions.length) {
+      const availableColorNames = colorOptions.map((c) => c.name);
+      if (
+        !selectedOptions.color ||
+        !availableColorNames.includes(selectedOptions.color)
+      ) {
+        setSelectedOptions((prev) => ({
+          ...prev,
+          color: colorOptions[0].name,
+        }));
       }
     }
-  }, [phone?.colors, selectedOptions.color]);
+  }, [colorOptions, selectedOptions.color]);
 
   // Save phone data to sessionStorage
   useEffect(() => {
     if (!phone || !phoneId) return;
     try {
-      const selectedColorObj = phone?.colors?.find(c => 
-        c.name === selectedOptions.color
-      ) || (selectedOptions.color ? { name: selectedOptions.color } : null);
-      
+      const selectedColorObj =
+        phone?.colors?.find((c) => c.name === selectedOptions.color) ||
+        stockManagement.find(
+          (entry) => entry.color_name === selectedOptions.color
+        ) ||
+        (selectedOptions.color ? { name: selectedOptions.color } : null);
+
       const payload = {
         ...phone,
         id: parseInt(phoneId),
@@ -108,7 +159,7 @@ export default function PhoneDetailClient({
     } catch (e) {
       console.error('Error saving phone to sessionStorage:', e);
     }
-  }, [phone, phoneId, quantity, selectedOptions.color]);
+  }, [phone, phoneId, quantity, selectedOptions.color, stockManagement]);
 
   const handleProceedToCheckout = () => {
     router.push(`/phones/${brand}/${phoneId}/breakdown`);
@@ -202,15 +253,57 @@ export default function PhoneDetailClient({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-4 items-start">
               {/* Left: Image */}
               <div>
-                <div className="relative flex justify-center items-start lg:sticky lg:top-24">
+                <div className="relative h-[480px] flex justify-center items-start lg:sticky lg:top-24">
                   <SafeImage
-                    src={getImageSrc(phone?.icon)}
+                    key={heroImageSrc}
+                    src={heroImageSrc}
                     alt={phone?.name || 'Phone'}
                     width={480}
                     height={480}
-                    className="w-full max-w-md h-auto object-contain rounded-xl p-4"
+                    className="w-full max-w-md h-full object-contain rounded-xl p-4"
                   />
                 </div>
+                {stockManagement.length > 0 && (
+                  <div className="mt-6">
+                    <p className="text-sm font-semibold uppercase text-accent tracking-wide">
+                      {t('chooseTheColor')}
+                    </p>
+                    <div className="mt-3  grid grid-cols-4 gap-2 justify-center items-center">
+                      {stockManagement.map((item) => {
+                        const isActive = selectedStock?.id === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => handleColorSelect(item.color_name)}
+                            className={`flex w-full max-w-[220px] cursor-pointer items-center gap-3 rounded-2xl border p-1 transition hover:shadow-md sm:w-auto ${
+                              isActive
+                                ? 'border-secondary bg-secondary/10'
+                                : 'border-accent/20 bg-white/5'
+                            }`}
+                          >
+                            <div className="h-10 w-10 overflow-hidden rounded-xl bg-white p-1">
+                              <SafeImage
+                                src={getImageSrc(item.icon_color_based)}
+                                alt={`${phone?.name || 'Phone'} ${item.color_name}`}
+                                width={64}
+                                height={64}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                            <div className="text-left">
+                              <p className="text-xs font-semibold text-accent">
+                                {item.color_name}
+                              </p>
+                              <p className="text-xs text-accent/70">
+                                {item.stock} {t('units')}
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div className='flex flex-col gap-4 pt-12'>
                   {/* Pricing */}
                   <div className="">
@@ -222,8 +315,12 @@ export default function PhoneDetailClient({
                         €{parseFloat(phone.main_amount).toLocaleString()}
                       </div>
                     )}
-                    {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                    {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 ? (
                       <div className="text-green-500 text-sm">
+                        {parseFloat(phone.discount_percentage).toFixed(1)}% {t('off')}
+                      </div>
+                    ) : (
+                      <div className="text-gray-500 text-sm">
                         {parseFloat(phone.discount_percentage).toFixed(1)}% {t('off')}
                       </div>
                     )}
@@ -245,9 +342,9 @@ export default function PhoneDetailClient({
                       </div>
                       <button 
                         onClick={handleProceedToCheckout}
-                        disabled={!phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0)}
+                        disabled={!phone?.is_in_stock || (phone?.stock_management?.find(item => item.color_name === selectedOptions.color)?.stock <= 0)}
                         className={`px-6 py-2 rounded-full flex items-center gap-2 transition-colors ${
-                          !phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0)
+                          !phone?.is_in_stock || (phone?.stock_management?.find(item => item.color_name === selectedOptions.color)?.stock <= 0)
                             ? 'bg-accent/20 text-accent/50 cursor-not-allowed'
                             : 'bg-secondary text-primary hover:bg-secondary/90 cursor-pointer'
                         }`}
@@ -291,31 +388,33 @@ export default function PhoneDetailClient({
                   </div>
 
                   {/* Colors */}
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-accent">{t('chooseTheColor')}</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(phone.colors || []).map((color) => {
-                        const isSelected = selectedOptions.color === color.name;
-                        return (
-                          <button
+                  {colorOptions.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-accent">{t('chooseTheColor')}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {colorOptions.map((color) => {
+                          const isSelected = selectedOptions.color === color.name;
+                          return (
+                            <button
                             key={color.name}
-                            onClick={() => setSelectedOptions(prev => ({ ...prev, color: color.name }))}
-                            className={`px-3 py-2 cursor-pointer rounded-full border transition-all duration-200 flex items-center gap-2 ${
-                              isSelected
-                                ? 'bg-secondary text-primary border-secondary hover:shadow-md'
-                                : 'border-accent/30 text-accent hover:shadow-md'
-                            }`}
-                          >
-                            <span
-                              className="inline-block w-4 h-4 rounded-full border"
-                              style={{ backgroundColor: color.hex_code || '#ccc' }}
-                            />
-                            <span>{color.name}</span>
-                          </button>
-                        );
-                      })}
+                            onClick={() => handleColorSelect(color.name)}
+                              className={`px-3 py-2 cursor-pointer rounded-full border transition-all duration-200 flex items-center gap-2 ${
+                                isSelected
+                                  ? 'bg-secondary text-primary border-secondary hover:shadow-md'
+                                  : 'border-accent/30 text-accent hover:shadow-md'
+                              }`}
+                            >
+                              <span
+                                className="inline-block w-4 h-4 rounded-full border"
+                                style={{ backgroundColor: color.hex || '#ccc' }}
+                              />
+                              <span>{color.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 {/* Phone Specifications */}
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-accent/20">
@@ -331,7 +430,7 @@ export default function PhoneDetailClient({
                     </div>
                     <div>
                       <span className="text-accent/80">{t('stock')}:</span>
-                      <span className="text-accent ml-2">{phone.stock_quantity} {t('units')}</span>
+                      <span className="text-accent ml-2">{phone?.stock_management?.find(item => item.color_name === selectedOptions.color)?.stock} {t('units')}</span>
                     </div>
                     <div>
                       <span className="text-accent/80">{t('status')}:</span>

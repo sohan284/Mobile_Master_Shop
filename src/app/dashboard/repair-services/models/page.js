@@ -175,7 +175,7 @@ function ModelsPageContent() {
       // Swap ranks between the two models
       await Promise.all([
         apiFetcher.patch(`/api/repair/models/${draggedModel.id}/`, { rank: targetRank }),
-        apiFetcher.patch(`/api/repair/models/${targetModel.id}/`, { rank: draggedRank })
+        // apiFetcher.patch(`/api/repair/models/${targetModel.id}/`, { rank: draggedRank })
       ]);
       
       toast.success('Models reordered successfully');

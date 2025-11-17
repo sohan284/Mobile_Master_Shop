@@ -5,6 +5,7 @@ import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslations } from 'next-intl';
 import {
   ShoppingBag, 
   Package, 
@@ -22,6 +23,7 @@ import {
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function Dashboard() {
+  const t = useTranslations('dashboard.main');
   const [hoveredOrderStatus, setHoveredOrderStatus] = useState(null);
 
   // Fetch statistics from orders API without order_type parameter
@@ -50,15 +52,15 @@ export default function Dashboard() {
     Object.entries(statistics.revenue_by_type).forEach(([type, revenue]) => {
       switch (type.toLowerCase()) {
         case 'phone':
-          categories.push('New Phones');
+          categories.push(t('phones'));
           barColors.push('#10B981'); // green
           break;
         case 'repair':
-          categories.push('Repairs');
+          categories.push(t('repairs'));
           barColors.push('#3B82F6'); // blue
           break;
         case 'accessory':
-          categories.push('Accessories');
+          categories.push(t('accessories'));
           barColors.push('#8B5CF6'); // purple
           break;
         default:
@@ -143,15 +145,15 @@ export default function Dashboard() {
     Object.entries(statistics.order_type_summary).forEach(([type, count]) => {
       switch (type.toLowerCase()) {
         case 'phone':
-          labels.push('New Phones');
+          labels.push(t('phones'));
           colors.push('#10B981');
           break;
       case 'repair':
-          labels.push('Repairs');
+          labels.push(t('repairs'));
           colors.push('#3B82F6');
         break;
       case 'accessory':
-          labels.push('Accessories');
+          labels.push(t('accessories'));
           colors.push('#8B5CF6');
         break;
       default:
@@ -191,7 +193,7 @@ export default function Dashboard() {
         },
         tooltip: {
           y: {
-            formatter: (val) => `${val} orders`
+            formatter: (val) => `${val} ${t('orders')}`
           }
         }
       }
@@ -263,7 +265,7 @@ export default function Dashboard() {
         },
         tooltip: {
           y: {
-            formatter: (val) => `${val} orders`
+            formatter: (val) => `${val} ${t('orders')}`
           }
         },
         chart: {
@@ -297,7 +299,7 @@ export default function Dashboard() {
                   show: true,
                   fontSize: '14px',
                   fontWeight: 600,
-                  label: hoveredOrderStatus ? hoveredOrderStatus.label : 'Total',
+                  label: hoveredOrderStatus ? hoveredOrderStatus.label : t('total'),
                   formatter: function() {
                     if (hoveredOrderStatus) {
                       return hoveredOrderStatus.value?.toString();
@@ -397,7 +399,7 @@ export default function Dashboard() {
         colors: barColors,
         tooltip: {
           y: {
-            formatter: (val) => `${val} orders`
+            formatter: (val) => `${val} ${t('orders')}`
           }
         },
         grid: {
@@ -473,7 +475,7 @@ export default function Dashboard() {
       <PageTransition>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center">
-            <p className="text-red-600">Error loading statistics: {error.message || 'Unknown error'}</p>
+            <p className="text-red-600">{t('errorLoadingStatistics')} {error.message || 'Unknown error'}</p>
           </div>
         </div>
       </PageTransition>
@@ -484,7 +486,7 @@ export default function Dashboard() {
     return (
       <PageTransition>
         <div className="flex items-center justify-center h-screen">
-          <p className="text-gray-600">No statistics available</p>
+          <p className="text-gray-600">{t('noStatisticsAvailable')}</p>
         </div>
       </PageTransition>
     );
@@ -494,8 +496,8 @@ export default function Dashboard() {
     <PageTransition>
       <div className="flex flex-col">
         <div className="mb-3">
-          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-gray-600">Overview of your business statistics</p>
+          <h1 className="text-xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-sm text-gray-600">{t('subtitle')}</p>
         </div>
 
         <div className="flex-1 overflow-y-auto">
@@ -506,7 +508,7 @@ export default function Dashboard() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-gray-600 mb-1">Total Orders</p>
+                    <p className="text-xs font-medium text-gray-600 mb-1">{t('totalOrders')}</p>
                     <p className="text-xl font-bold text-gray-900">{statistics.total_orders || 0}</p>
                   </div>
                   <div className="bg-blue-100 rounded-full p-2">
@@ -519,7 +521,7 @@ export default function Dashboard() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-gray-600 mb-1">Total Revenue</p>
+                    <p className="text-xs font-medium text-gray-600 mb-1">{t('totalRevenue')}</p>
                     <p className="text-xl font-bold text-gray-900">
                       €{formatCurrency(statistics.total_revenue)}
                     </p>
@@ -534,7 +536,7 @@ export default function Dashboard() {
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-gray-600 mb-1">Pending Revenue</p>
+                    <p className="text-xs font-medium text-gray-600 mb-1">{t('pendingRevenue')}</p>
                     <p className="text-xl font-bold text-gray-900">
                       €{formatCurrency(statistics.pending_revenue)}
                     </p>
@@ -547,19 +549,19 @@ export default function Dashboard() {
 
               {/* Order Types Summary */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <p className="text-xs font-medium text-gray-600 mb-2">Order Types</p>
+                <p className="text-xs font-medium text-gray-600 mb-2">{t('orderTypes')}</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5">
                     <Smartphone className="h-3 w-3 text-green-600" />
-                    <span className="text-xs text-gray-700">Phones: {statistics.order_type_summary?.phone || 0}</span>
+                    <span className="text-xs text-gray-700">{t('phones')}: {statistics.order_type_summary?.phone || 0}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Wrench className="h-3 w-3 text-blue-600" />
-                    <span className="text-xs text-gray-700">Repairs: {statistics.order_type_summary?.repair || 0}</span>
+                    <span className="text-xs text-gray-700">{t('repairs')}: {statistics.order_type_summary?.repair || 0}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Package className="h-3 w-3 text-purple-600" />
-                    <span className="text-xs text-gray-700">Accessories: {statistics.order_type_summary?.accessory || 0}</span>
+                    <span className="text-xs text-gray-700">{t('accessories')}: {statistics.order_type_summary?.accessory || 0}</span>
                   </div>
                 </div>
               </div>
@@ -569,7 +571,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
               {/* Bar Chart - Revenue by Order Type - Takes 2 columns */}
               <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Revenue by Order Type</h2>
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('revenueByOrderType')}</h2>
                 {barChartData && typeof window !== 'undefined' ? (
                   <Chart
                     options={barChartData.options}
@@ -579,14 +581,14 @@ export default function Dashboard() {
                   />
                 ) : (
                   <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-                    Loading chart...
+                    {t('loadingChart')}
                   </div>
                 )}
               </div>
 
               {/* Pie Chart - Order Type Distribution - Takes 1 column */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Type Distribution</h2>
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('orderTypeDistribution')}</h2>
                 {pieChartData && typeof window !== 'undefined' ? (
                   <Chart
                     options={pieChartData.options}
@@ -596,7 +598,7 @@ export default function Dashboard() {
                   />
                 ) : (
                   <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-                    Loading chart...
+                    {t('loadingChart')}
                   </div>
                 )}
               </div>
@@ -606,7 +608,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {/* Order Status Chart */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Order Status</h2>
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('orderStatus')}</h2>
                 {orderStatusChartData && typeof window !== 'undefined' ? (
                   <Chart
                     options={orderStatusChartData.options}
@@ -616,14 +618,14 @@ export default function Dashboard() {
                   />
                 ) : (
                   <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-                    Loading chart...
+                    {t('loadingChart')}
                   </div>
                 )}
               </div>
 
               {/* Payment Status Chart */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <h2 className="text-sm font-semibold text-gray-900 mb-3">Payment Status</h2>
+                <h2 className="text-sm font-semibold text-gray-900 mb-3">{t('paymentStatus')}</h2>
                 {paymentStatusChartData && typeof window !== 'undefined' ? (
                   <Chart
                     options={paymentStatusChartData.options}
@@ -633,7 +635,7 @@ export default function Dashboard() {
                   />
                 ) : (
                   <div className="h-[250px] flex items-center justify-center text-gray-500 text-sm">
-                    Loading chart...
+                    {t('loadingChart')}
                   </div>
                 )}
               </div>
