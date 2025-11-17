@@ -61,10 +61,17 @@ export default function PhoneBreakdownPage({ params }) {
       setIsLoading(true);
       setError('');
       try {
+        const stockManagementId =
+          selectedColor?.stock_management_id ??
+          selectedColor?.stock_managementId ??
+          selectedColor?.id ??
+          null;
+
         const body = {
           phone_model_id: parseInt(phoneId),
           quantity: quantity,
           color_id: selectedColor?.id || null,
+          stock_management_id: stockManagementId,
         };
         const res = await apiFetcher.post('/api/brandnew/orders/calculate_price/', body);
         const data = res?.data || res;
@@ -146,7 +153,11 @@ export default function PhoneBreakdownPage({ params }) {
       const customerName = user?.name || user?.username || customerInfo.username || 'Customer';
       const customerEmail = user?.email || customerInfo.email || '';
       const customerPhone = user?.phone || customerInfo.phone || '01788175088';
-
+      const stockManagementId =
+        selectedColor?.stock_management_id ??
+        selectedColor?.stock_managementId ??
+        selectedColor?.id ??
+        null;
       const body = {
         phone_model_id: parseInt(phoneId),
         quantity: quantity,
@@ -159,7 +170,8 @@ export default function PhoneBreakdownPage({ params }) {
         city: phone?.city || 'a',
         postal_code: phone?.postal_code || 'aa',
         country: phone?.country || 'a',
-        notes: phone?.notes || ''
+        notes: phone?.notes || '',
+        stock_management_id: stockManagementId,
       };
 
       const res = await apiFetcher.post('/api/brandnew/orders/', body);
@@ -403,7 +415,7 @@ export default function PhoneBreakdownPage({ params }) {
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
+                  <div className="flex flex-wrap flex-col sm:flex-row gap-3 justify-center mt-10">
               <CustomButton onClick={handleBack} className="bg-gray-200 text-secondary hover:bg-gray-300 px-6 py-2 text-sm">
                 {t('backToProduct')}
               </CustomButton>

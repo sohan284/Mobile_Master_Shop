@@ -404,7 +404,7 @@ export default function BrandPhonesClient({
                           <div className="p-6 text-center h-full flex flex-col">
                             <div className="mb-6 bg-white rounded-xl border p-6 group-hover:from-gray-400/20 group-hover:to-gray-600/20 transition-all duration-500 relative overflow-hidden">
                               <Image
-                                src={phone.icon || '/SAMSUNG_GalaxyS23Ultra.png'}
+                                src={phone.icon || phone.stock_management[0]?.icon_color_based|| phone.stock_management[1]?.image || '/SAMSUNG_GalaxyS23Ultra.png'}
                                 alt={phone.name}
                                 width={160}
                                 height={160}
@@ -421,8 +421,12 @@ export default function BrandPhonesClient({
                                 <p className="text-gray-600 text-sm">{phone.memory}GB - {phone.ram}GB RAM</p>
                                 <div className="space-y-1">
                                   <p className="text-lg text-gray-600 flex items-center justify-center gap-2">
-                                    {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 && (
+                                    {phone.discount_percentage && parseFloat(phone.discount_percentage) > 0 ? (
                                       <span className="text-xs text-green-600">
+                                        {parseFloat(phone.discount_percentage).toFixed(1)}% off
+                                      </span>
+                                    ) : (
+                                      <span className="text-xs text-gray-600">
                                         {parseFloat(phone.discount_percentage).toFixed(1)}% off
                                       </span>
                                     )}
