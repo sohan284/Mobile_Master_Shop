@@ -19,6 +19,7 @@ import {
   Loader2,
   Phone,
   Plus,
+  Trash2,
 } from "lucide-react";
 import {
   Select,
@@ -52,6 +53,7 @@ const getInitialCustomOrderForm = () => ({
   customerAddress: "",
   schedule: "",
   notes: "",
+  amount: "",
 });
 
 const formatDateKey = (date) => {
@@ -133,6 +135,28 @@ const getStatusBadge = (status) => {
   return "bg-gray-100 text-gray-700 border-gray-200";
 };
 
+const formatDateTimeLocal = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const formatCurrencyValue = (value, currency = "EUR") => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return null;
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+    }).format(numericValue);
+  } catch {
+    return numericValue.toFixed(2);
+  }
+};
+
 export default function RepairCalendarPage() {
   const t = useTranslations("dashboard.repairCalendar");
   const queryClient = useQueryClient();
@@ -154,17 +178,68 @@ export default function RepairCalendarPage() {
   const [isFetchingModels, setIsFetchingModels] = useState(false);
   const [isFetchingProblems, setIsFetchingProblems] = useState(false);
   const [isSubmittingCustomOrder, setIsSubmittingCustomOrder] = useState(false);
+  const [isAmountCustom, setIsAmountCustom] = useState(false);
+  const [editingCustomOrder, setEditingCustomOrder] = useState(null);
+  const [customOrderToDelete, setCustomOrderToDelete] = useState(null);
+  const [isDeletingCustomOrder, setIsDeletingCustomOrder] = useState(false);
   const resetCustomOrderForm = useCallback(() => {
     setFormState(getInitialCustomOrderForm());
     setModelOptions([]);
     setProblemOptions([]);
+    setIsAmountCustom(false);
   }, []);
 
   useEffect(() => {
     if (!isCreateModalOpen) {
       resetCustomOrderForm();
+      setEditingCustomOrder(null);
     }
   }, [isCreateModalOpen, resetCustomOrderForm]);
+  const getProblemPrice = useCallback(
+    (problemId, partType) => {
+      const problem = problemOptions.find(
+        (item) => String(item.problem_id) === String(problemId)
+      );
+      if (!problem) return 0;
+      if (partType === "original" && problem.original) {
+        return parseFloat(problem.original.final_price || problem.original.base_price || 0) || 0;
+      }
+      if (partType === "duplicate" && problem.duplicate) {
+        return parseFloat(problem.duplicate.final_price || problem.duplicate.base_price || 0) || 0;
+      }
+      const fallback =
+        parseFloat(problem.final_price || problem.base_price || 0) || 0;
+      return fallback;
+    },
+    [problemOptions]
+  );
+  const calculateProblemsTotal = useCallback(
+    (problems) => {
+      return problems.reduce((sum, problem) => {
+        return sum + getProblemPrice(problem.problem_id, problem.part_type);
+      }, 0);
+    },
+    [getProblemPrice]
+  );
+  useEffect(() => {
+    if (!isAmountCustom) {
+      setFormState((prev) => {
+        const total = calculateProblemsTotal(prev.problems);
+        const nextAmount = total ? total.toString() : "";
+        if (nextAmount === prev.amount) {
+          return prev;
+        }
+        return {
+          ...prev,
+          amount: nextAmount,
+        };
+      });
+    }
+  }, [formState.problems, calculateProblemsTotal, isAmountCustom]);
+
+  
+
+ 
 
   useEffect(() => {
     let isMounted = true;
@@ -303,6 +378,12 @@ export default function RepairCalendarPage() {
   } = useApiGet(["customRepairOrders"], () =>
     apiFetcher.get("/api/repair/custom-orders/")
   );
+  const openCreateModal = useCallback(() => {
+    resetCustomOrderForm();
+    setEditingCustomOrder(null);
+    setIsCreateModalOpen(true);
+  }, [resetCustomOrderForm]);
+
   const handleBrandSelect = useCallback(
     (value) => {
       const brand = brandOptions.find((item) => String(item.id) === value);
@@ -312,7 +393,9 @@ export default function RepairCalendarPage() {
         brandSlug: brand?.slug || "",
         modelId: "",
         problems: [],
+        amount: "",
       }));
+      setIsAmountCustom(false);
     },
     [brandOptions]
   );
@@ -322,28 +405,33 @@ export default function RepairCalendarPage() {
       ...prev,
       modelId: value,
       problems: [],
+      amount: "",
     }));
+    setIsAmountCustom(false);
   }, []);
 
   const handleProblemToggle = useCallback((problemId, checked, partType = null) => {
     setFormState((prev) => {
+      let updatedProblems;
       if (checked) {
-        // Remove any existing selection for this problem (original or duplicate)
-        // Then add the new selection
         const filtered = prev.problems.filter(
           (p) => p.problem_id !== problemId
         );
         const newProblem = { problem_id: problemId, part_type: partType };
-        return { ...prev, problems: [...filtered, newProblem] };
+        updatedProblems = [...filtered, newProblem];
       } else {
-        // Remove problem
-        const updated = prev.problems.filter(
+        updatedProblems = prev.problems.filter(
           (p) => !(p.problem_id === problemId && p.part_type === partType)
         );
-        return { ...prev, problems: updated };
       }
+      const nextState = { ...prev, problems: updatedProblems };
+      if (!isAmountCustom) {
+        const total = calculateProblemsTotal(updatedProblems);
+        nextState.amount = total ? total.toString() : "";
+      }
+      return nextState;
     });
-  }, []);
+  }, [isAmountCustom, calculateProblemsTotal]);
 
   const isProblemSelected = useCallback((problemId, partType) => {
     return formState.problems.some(
@@ -358,7 +446,82 @@ export default function RepairCalendarPage() {
     }));
   }, []);
 
-  const handleCreateCustomOrder = useCallback(async () => {
+  const handleAmountInputChange = useCallback((value) => {
+    setIsAmountCustom(true);
+    setFormState((prev) => ({
+      ...prev,
+      amount: value,
+    }));
+  }, []);
+
+  const handleUseAutoAmount = useCallback(() => {
+    const total = calculateProblemsTotal(formState.problems);
+    setIsAmountCustom(false);
+    setFormState((prev) => ({
+      ...prev,
+      amount: total ? total.toString() : "",
+    }));
+  }, [calculateProblemsTotal, formState.problems]);
+
+  const handleEditCustomOrder = useCallback(
+    (order) => {
+      const brandId =
+        order.brand ||
+        order.brand_id ||
+        order.brandId ||
+        (order.brand_details && order.brand_details.id);
+      const modelId =
+        order.model ||
+        order.model_id ||
+        order.modelId ||
+        (order.model_details && order.model_details.id);
+      const problemsSource =
+        order.rawProblems ||
+        order.problem_details ||
+        order.problems ||
+        [];
+      const mappedProblems = problemsSource
+        .map((problem) => {
+          const id = problem.problem_id || problem.problem || problem.id;
+          if (!id) return null;
+          return {
+            problem_id: String(id),
+            part_type: problem.part_type || null,
+          };
+        })
+        .filter(Boolean);
+      const scheduleValue = order.schedule
+        ? new Date(order.schedule)
+        : null;
+      const scheduleInput =
+        scheduleValue && !Number.isNaN(scheduleValue.getTime())
+          ? formatDateTimeLocal(scheduleValue)
+          : "";
+
+      setFormState({
+        brandId: brandId ? String(brandId) : "",
+        brandSlug: order.brandSlug || order.brand_slug || "",
+        modelId: modelId ? String(modelId) : "",
+        problems: mappedProblems,
+        customerName: order.customerName || order.customer_name || "",
+        customerEmail: order.customerEmail || order.customer_email || "",
+        customerPhone: order.customerPhone || order.customer_phone || "",
+        customerAddress: order.customer_address || "",
+        schedule: scheduleInput,
+        notes: order.notes || "",
+        amount:
+          order.amount !== undefined && order.amount !== null
+            ? String(order.amount)
+            : "",
+      });
+      setIsAmountCustom(true);
+      setEditingCustomOrder(order);
+      setIsCreateModalOpen(true);
+    },
+    []
+  );
+
+  const handleSubmitCustomOrder = useCallback(async () => {
     if (!formState.brandId) {
       toast.error(t("customOrderValidationBrand"));
       return;
@@ -393,11 +556,23 @@ export default function RepairCalendarPage() {
     setIsSubmittingCustomOrder(true);
     try {
       // Format problems for API: array of objects with problem_id and part_type
-      const problemPayload = formState.problems.map((p) => ({
-        problem_id: Number(p.problem_id),
-        part_type: p.part_type,
-      }));
-      
+      const problemPayload = formState.problems.map((p) => {
+        const price = getProblemPrice(p.problem_id, p.part_type);
+        return {
+          problem_id: Number(p.problem_id),
+          part_type: p.part_type,
+          amount: price,
+        };
+      });
+      const derivedAmount = problemPayload.reduce(
+        (acc, problem) => acc + (problem.amount || 0),
+        0
+      );
+      const manualAmount = parseFloat(formState.amount);
+      const finalAmount = Number.isFinite(manualAmount)
+        ? manualAmount
+        : derivedAmount;
+
       const payload = {
         brand: Number(formState.brandId),
         model: Number(formState.modelId),
@@ -405,15 +580,27 @@ export default function RepairCalendarPage() {
         customer_name: formState.customerName.trim(),
         customer_email: formState.customerEmail.trim() || null,
         customer_phone: formState.customerPhone.trim(),
-        address: formState.customerAddress.trim(),
+        customer_address: formState.customerAddress.trim(),
         notes: formState.notes.trim() || undefined,
         schedule: scheduleDate.toISOString(),
+        amount: finalAmount,
       };
 
-      await apiFetcher.post("/api/repair/custom-orders/", payload);
-      toast.success(t("customOrderCreated"));
+      if (editingCustomOrder) {
+        const targetId =
+          editingCustomOrder.originalId || editingCustomOrder.id;
+        await apiFetcher.patch(
+          `/api/repair/custom-orders/${targetId}/`,
+          payload
+        );
+        toast.success(t("customOrderUpdated"));
+      } else {
+        await apiFetcher.post("/api/repair/custom-orders/", payload);
+        toast.success(t("customOrderCreated"));
+      }
       setIsCreateModalOpen(false);
       resetCustomOrderForm();
+      setEditingCustomOrder(null);
       refetchCustomOrders();
       refetch();
     } catch (error) {
@@ -426,7 +613,9 @@ export default function RepairCalendarPage() {
       setIsSubmittingCustomOrder(false);
     }
   }, [
+    editingCustomOrder,
     formState,
+    getProblemPrice,
     refetch,
     refetchCustomOrders,
     resetCustomOrderForm,
@@ -434,6 +623,31 @@ export default function RepairCalendarPage() {
   ]);
 
 
+
+  const handleRequestDeleteCustomOrder = useCallback((order) => {
+    setCustomOrderToDelete(order);
+  }, []);
+
+  const handleDeleteCustomOrder = useCallback(async () => {
+    if (!customOrderToDelete) return;
+    const targetId =
+      customOrderToDelete.originalId || customOrderToDelete.id;
+    setIsDeletingCustomOrder(true);
+    try {
+      await apiFetcher.delete(`/api/repair/custom-orders/${targetId}/`);
+      toast.success(t("customOrderDeleted"));
+      setCustomOrderToDelete(null);
+      refetchCustomOrders();
+      refetch();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          t("customOrderDeleteFailed")
+      );
+    } finally {
+      setIsDeletingCustomOrder(false);
+    }
+  }, [customOrderToDelete, refetch, refetchCustomOrders, t]);
 
   const normalizedOrders = useMemo(() => {
     const source = Array.isArray(ordersData?.data)
@@ -456,6 +670,21 @@ export default function RepairCalendarPage() {
         status: order.status || "pending",
         paymentStatus: order.payment_status || "unknown",
         schedule: order.schedule || null,
+        amount:
+          order.total_amount !== undefined && order.total_amount !== null
+            ? parseFloat(order.total_amount)
+            : null,
+        currency: order.currency || "EUR",
+        problemsSummary: (
+          Array.isArray(order.repair_items)
+            ? order.repair_items
+            : Array.isArray(order.problems)
+            ? order.problems
+            : []
+        )
+          .map((item) => item.problem || item.problem_name || "")
+          .filter(Boolean)
+          .join(", "),
       }))
       .sort((a, b) => {
         if (!a.schedule && !b.schedule) return 0;
@@ -479,6 +708,8 @@ export default function RepairCalendarPage() {
         ? order.problems
         : Array.isArray(order.problem_details)
         ? order.problem_details
+        : Array.isArray(order.problems_detail)
+        ? order.problems_detail
         : Array.isArray(order.problem_names)
         ? order.problem_names
         : [];
@@ -513,6 +744,13 @@ export default function RepairCalendarPage() {
         schedule: order.schedule || null,
         problemsSummary: problemNames.join(", "),
         isCustom: true,
+        rawProblems: problemList,
+        amount:
+          order.amount !== undefined && order.amount !== null
+            ? parseFloat(order.amount)
+            : null,
+        currency: order.currency || "EUR",
+        customerAddress: order.customer_address || "",
       };
     });
   }, [customOrdersData]);
@@ -535,7 +773,26 @@ export default function RepairCalendarPage() {
   const scheduledOrders = allOrders.filter((order) => order.schedule);
 
   const selectedDateKey = formatDateKey(selectedDate);
-  const ordersForSelectedDate = ordersByDate[selectedDateKey] || [];
+  const ordersForSelectedDate = useMemo(
+    () => ordersByDate[selectedDateKey] || [],
+    [ordersByDate, selectedDateKey]
+  );
+  const totalAmountForSelectedDate = useMemo(() => {
+    return ordersForSelectedDate.reduce((sum, order) => {
+      const value =
+        order.amount ??
+        order.totalAmount ??
+        order.total_amount ??
+        0;
+      return sum + (Number(value) || 0);
+    }, 0);
+  }, [ordersForSelectedDate]);
+  const selectedDateCurrency =
+    ordersForSelectedDate.find((order) => order.currency)?.currency || "EUR";
+  const totalAmountDisplay =
+    totalAmountForSelectedDate > 0
+      ? formatCurrencyValue(totalAmountForSelectedDate, selectedDateCurrency)
+      : null;
 
   const calendarDays = useMemo(() => {
     const startOfMonth = new Date(
@@ -779,8 +1036,8 @@ export default function RepairCalendarPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-2 rounded-xl border border-blue-200 px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
+              onClick={openCreateModal}
+              className="flex items-center gap-2 text-white border border-gray-200 px-4 py-2 text-sm font-semibold bg-black transition hover:bg-gray-800"
             >
               <Plus className="h-4 w-4" />
               {t("addCustomOrder")}
@@ -795,7 +1052,7 @@ export default function RepairCalendarPage() {
             <button
               onClick={() => refetch()}
               disabled={isRefetching}
-              className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+              className="flex items-center gap-2 rounded-xl border border-blue-500 px-4 py-2 text-sm font-semibold text-blue-500 transition disabled:opacity-60"
             >
               {isRefetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -884,6 +1141,11 @@ export default function RepairCalendarPage() {
               <p className="text-sm text-gray-500">
                 {t("scheduledCount", { count: ordersForSelectedDate.length })}
               </p>
+              {totalAmountDisplay && (
+                <p className="text-sm font-semibold text-gray-700">
+                  {t("amountLabel")}: {totalAmountDisplay}
+                </p>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               {ordersForSelectedDate.length === 0 ? (
@@ -895,25 +1157,31 @@ export default function RepairCalendarPage() {
                   {ordersForSelectedDate.map((order) => {
                     const isEditing = editingSchedule[order.id];
                     const isUpdating = updatingSchedule[order.id];
+                    const orderAmountDisplay = formatCurrencyValue(
+                      order.amount ??
+                        order.totalAmount ??
+                        order.total_amount,
+                      order.currency || "EUR"
+                    );
+                    const address =
+                      order.customerAddress ||
+                      order.customer_address ||
+                      "";
                     return (
                       <article
                         key={order.id}
                         className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
                       >
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
                             <p className="text-sm font-semibold text-gray-500">
                               {order.orderNumber}
                             </p>
                             <div className="flex items-center gap-2">
-                              <h3 className="text-lg font-bold text-gray-900">
+                              <h3 className="text-sm font-bold text-gray-900">
                                 {order.customerName}
                               </h3>
-                              {order.isCustom && (
-                                <span className="rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">
-                                  {t("customOrderTag")}
-                                </span>
-                              )}
+                              
                             </div>
                             {(order.brandName || order.productName) && (
                               <p className="text-sm text-gray-500">
@@ -927,14 +1195,46 @@ export default function RepairCalendarPage() {
                                 {order.problemsSummary}
                               </p>
                             )}
+                            {address && (
+                              <p className="mt-1 text-xs text-gray-500">
+                                {address}
+                              </p>
+                            )}
+                            {orderAmountDisplay && (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {t("amountLabel")}: {orderAmountDisplay}
+                              </p>
+                            )}
                           </div>
-                          <span
-                            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
-                              order.status
-                            )}`}
-                          >
-                            {order.status}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
+                                order.status
+                              )}`}
+                            >
+                              {order.status}
+                            </span>
+                            {order.isCustom && (
+                              <>
+                                <button
+                                  onClick={() => handleEditCustomOrder(order)}
+                                  className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:border-blue-500 hover:text-blue-600"
+                                  title={t("editCustomOrderAction")}
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleRequestDeleteCustomOrder(order)
+                                  }
+                                  className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:border-red-500 hover:text-red-600"
+                                  title={t("deleteOrderLabel")}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
 
                         <div className="mt-4 space-y-3">
@@ -963,11 +1263,17 @@ export default function RepairCalendarPage() {
         </div>
       </div>
       <Dialog className="w-[75vw]" open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent style={{ width: '75vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[75vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto   border border-gray-200">
+        <DialogContent style={{ width: '75vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[75vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
           <DialogHeader>
-            <DialogTitle>{t("customOrderModalTitle")}</DialogTitle>
+            <DialogTitle>
+              {editingCustomOrder
+                ? t("editCustomOrderTitle")
+                : t("customOrderModalTitle")}
+            </DialogTitle>
             <DialogDescription>
-              {t("customOrderModalDescription")}
+              {editingCustomOrder
+                ? t("editCustomOrderDescription")
+                : t("customOrderModalDescription")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -1119,6 +1425,31 @@ export default function RepairCalendarPage() {
                 )}
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-amount">{t("amountLabel")}</Label>
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <Input
+                  id="custom-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formState.amount}
+                  onChange={(event) => handleAmountInputChange(event.target.value)}
+                  placeholder={t("amountPlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                  className="md:flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleUseAutoAmount}
+                  disabled={isSubmittingCustomOrder || formState.problems.length === 0}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-60"
+                >
+                  {t("amountAuto")}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">{t("amountAutoHint")}</p>
+            </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="custom-name">{t("customerNameLabel")}</Label>
@@ -1172,6 +1503,7 @@ export default function RepairCalendarPage() {
                 />
               </div>
             </div>
+           
             <div className="space-y-2">
               <Label htmlFor="custom-address">{t("customerAddressLabel")}</Label>
               <Textarea
@@ -1210,15 +1542,61 @@ export default function RepairCalendarPage() {
             </button>
             <button
               type="button"
-              onClick={handleCreateCustomOrder}
-              className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+              onClick={handleSubmitCustomOrder}
+              className="flex items-center gap-2 text-white border border-gray-200 px-4 py-2 text-sm font-semibold bg-black transition hover:bg-gray-800 disabled:opacity-60"
               disabled={isSubmittingCustomOrder}
             >
               {isSubmittingCustomOrder && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              {t("createOrderLabel")}
+              {editingCustomOrder
+                ? t("updateOrderLabel")
+                : t("createOrderLabel")}
             </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(customOrderToDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCustomOrderToDelete(null);
+          }
+        }}
+      >
+        <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("customOrderDelete")}</DialogTitle>
+            <DialogDescription>
+              {t("customOrderDeleteConfirm", {
+                order: customOrderToDelete?.orderNumber || "",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-gray-600">
+              {t("customOrderDeleteWarning")}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCustomOrderToDelete(null)}
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              >
+                {t("cancelLabel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteCustomOrder}
+                disabled={isDeletingCustomOrder}
+                className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+              >
+                {isDeletingCustomOrder && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                {t("deleteOrderLabel")}
+              </button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

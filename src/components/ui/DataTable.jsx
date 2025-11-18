@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -59,6 +60,8 @@ export default function DataTable({
   currentPage = null,
   onPageChange = null
 }) {
+  const t = useTranslations('dashboard.dataTable');
+
   // Ensure data is always an array
   const safeData = Array.isArray(data) ? data : [];
   const dataRef = useRef(safeData);
@@ -251,7 +254,7 @@ export default function DataTable({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   type="text"
-                  placeholder="Search..."
+                  placeholder={t('searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -260,9 +263,9 @@ export default function DataTable({
             )}
            
             {onAdd && (
-              <Button onClick={onAdd} className="gap-2 text-primary bg-black hover:bg-black/90 cursor-pointer">
+                <Button onClick={onAdd} className="gap-2 text-primary bg-black hover:bg-black/90 cursor-pointer">
                 <Plus className="h-4 w-4 text-white" />
-                Add New
+                  {t('addNew')}
               </Button>
             )}
           </div>
@@ -307,7 +310,7 @@ export default function DataTable({
                   </div>
                 </TableHead>
               ))}
-              {hasActions && <TableHead>Actions</TableHead>}
+              {hasActions && <TableHead>{t('actions')}</TableHead>}
               {hasMoveActions && <TableHead className="w-2"></TableHead>}
              
             </TableRow>
@@ -323,11 +326,11 @@ export default function DataTable({
                     <div className="rounded-full p-4 mb-4">
                       <Database className="h-8 w-8 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No data found</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('noDataTitle')}</h3>
                     <p className="text-sm text-gray-500 text-center max-w-sm">
-                      {searchTerm 
-                        ? `No results match your search "${searchTerm}". Try adjusting your search terms.`
-                        : 'There are no items to display at the moment.'}
+                      {searchTerm
+                        ? t('noSearchResults', { term: searchTerm })
+                        : t('noDataDescription')}
                     </p>
                   </div>
                 </TableCell>
@@ -436,7 +439,7 @@ export default function DataTable({
                             }}
                             disabled={actualIndex === 0 || isMoving}
                             className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-200"
-                            title="Move up"
+                            title={t('moveUp')}
                           >
                             <ArrowUp className="h-4 w-4" />
                           </Button>
@@ -451,7 +454,7 @@ export default function DataTable({
                             }}
                             disabled={actualIndex === sortedData.length - 1 || isMoving}
                             className="h-8 w-8 p-0 rounded-full cursor-pointer hover:bg-gray-200"
-                            title="Move down"
+                            title={t('moveDown')}
                           >
                             <ArrowDown className="h-4 w-4" />
                           </Button>
@@ -479,7 +482,7 @@ export default function DataTable({
               onClick={() => setShowAllItems(!showAllItems)}
               className="cursor-pointer hover:bg-black/20"
             >
-              {showAllItems ? 'Show Less' : `Show All (${sortedData.length})`}
+              {showAllItems ? t('showLess') : t('showAll', { count: sortedData.length })}
             </Button>
           </div>
         </div>
@@ -492,16 +495,24 @@ export default function DataTable({
             <div className="text-sm text-muted-foreground">
               {isServerSidePagination ? (
                 effectiveTotalCount > 0 ? (
-                  `Showing ${startIndex + 1} to ${endIndex} of ${effectiveTotalCount} ${effectiveTotalCount === 1 ? 'result' : 'results'}`
+                  t('showingRange', {
+                    start: startIndex + 1,
+                    end: endIndex,
+                    total: effectiveTotalCount,
+                    resultLabel: effectiveTotalCount === 1 ? t('result') : t('results'),
+                  })
                 ) : (
-                  'No results'
+                  t('noResults')
                 )
+              ) : sortedData.length > 0 ? (
+                t('showingRange', {
+                  start: startIndex + 1,
+                  end: endIndex,
+                  total: sortedData.length,
+                  resultLabel: sortedData.length === 1 ? t('result') : t('results'),
+                })
               ) : (
-                sortedData.length > 0 ? (
-                  `Showing ${startIndex + 1} to ${endIndex} of ${sortedData.length} ${sortedData.length === 1 ? 'result' : 'results'}`
-                ) : (
-                  'No results'
-                )
+                t('noResults')
               )}
             </div>
             {calculatedTotalPages > 1 && (

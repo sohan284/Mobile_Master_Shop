@@ -743,13 +743,172 @@
       "failedToUpdateContactStatus": "Failed to update contact status",
       "failedToDeleteContact": "Failed to delete contact"
     },
+      "dataTable": {
+      "searchPlaceholder": "Rechercher...",
+      "addNew": "Ajouter",
+      "noDataTitle": "Aucune donnée trouvée",
+      "noDataDescription": "Il n'y a aucun élément à afficher pour le moment.",
+      "noSearchResults": "Aucun résultat ne correspond à votre recherche \"{term}\". Essayez d'ajuster vos termes.",
+      "showLess": "Afficher moins",
+      "showAll": "Tout afficher ({count})",
+      "showingRange": "Affichage de {start} à {end} sur {total} {resultLabel}",
+      "result": "résultat",
+      "results": "résultats",
+      "noResults": "Aucun résultat",
+      "actions": "Actions",
+      "moveUp": "Monter",
+      "moveDown": "Descendre"
+    },
     "orders": {
       "redirecting": "Redirecting...",
       "title": "Orders",
       "subtitle": "Manage all orders",
       "repair": "Repair Orders",
       "phone": "Phone Orders",
-      "accessory": "Accessory Orders"
+      "accessory": "Accessory Orders",
+      "common": {
+        "orderNumber": "Order Number",
+        "amount": "Amount",
+        "status": "Status",
+        "payment": "Payment",
+        "schedule": "Schedule",
+        "date": "Date",
+        "filterByStatus": "Filter by status",
+        "allStatuses": "All Statuses",
+        "updating": "Updating...",
+        "deleteOrder": "Delete Order",
+        "deleteConfirm": "Are you sure you want to delete order \"{order}\"? This action cannot be undone.",
+        "yesDelete": "Yes, delete it!",
+        "deleteSuccess": "Order deleted successfully",
+        "deleteFailed": "Failed to delete order",
+        "statusUpdated": "Order status updated successfully",
+        "statusUpdateFailed": "Failed to update order status",
+        "orderIdMissing": "Order ID not found",
+        "markReadFailed": "Failed to mark order as read",
+        "loadError": "Error loading orders: {message}",
+        "unknownError": "Unknown error"
+      },
+      "detailCommon": {
+        "back": "Back",
+        "orderHeading": "Order {number}",
+        "errorTitle": "Error Loading Order",
+        "orderNotFound": "Order not found",
+        "retry": "Retry",
+        "goBack": "Go Back",
+        "orderInformation": "Order Information",
+        "orderNumber": "Order Number",
+        "orderDate": "Order Date",
+        "orderStatus": "Order Status",
+        "paymentStatus": "Payment Status",
+        "quantity": "Quantity",
+        "schedule": "Scheduled Date/Time",
+        "lastUpdated": "Last Updated",
+        "statusHistory": "Status History",
+        "statusConfirmed": "Confirmed",
+        "statusShipped": "Shipped",
+        "statusDelivered": "Delivered",
+        "statusCompleted": "Completed",
+        "productInformation": "Product Information",
+        "deviceInformation": "Device Information",
+        "repairServices": "Repair Services",
+        "customerInformation": "Customer Information",
+        "shippingInformation": "Shipping Information",
+        "paymentSummary": "Payment Summary",
+        "orderSummary": "Order Summary",
+        "unitPrice": "Unit Price",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "discountWithPercentage": "Discount ({percentage}%)",
+        "websiteDiscount": "Website Discount ({percentage}%)",
+        "shipping": "Shipping",
+        "totalDiscount": "Total Discount",
+        "totalAmount": "Total Amount",
+        "brand": "Brand",
+        "deviceModel": "Device Model",
+        "ram": "RAM",
+        "storage": "Storage",
+        "color": "Color",
+        "name": "Name",
+        "phone": "Phone",
+        "email": "Email",
+        "address": "Address",
+        "added": "Added",
+        "partType": "Part Type",
+        "basePrice": "Base Price",
+        "itemDiscount": "Item Discount",
+        "warranty": "Warranty",
+        "warrantyDuration": "{count} days",
+        "warrantyExpires": "Expires",
+        "totalServices": "Total Services",
+        "orderStatusLabel": "Order Status",
+        "paymentStatusLabel": "Payment Status",
+        "notAvailable": "N/A",
+        "loading": "Loading..."
+      },
+      "phoneDetail": {
+        "subtitle": "New Phone Order Details"
+      },
+      "accessoryDetail": {
+        "subtitle": "Accessory Order Details"
+      },
+      "repairDetail": {
+        "subtitle": "Repair Order Details",
+        "servicesEmpty": "No repair services available for this order."
+      },
+      "phonePage": {
+        "title": "New Phone Orders",
+        "subtitle": "Manage new phone orders",
+        "tableTitle": "New Phone Orders",
+        "statusFilterLabel": "Filter by status",
+        "markReadFailed": "Failed to mark order as read"
+      },
+      "repairPage": {
+        "title": "Repair Orders",
+        "subtitle": "Manage repair service orders",
+        "tableTitle": "Repair Orders",
+        "scheduleColumn": "Schedule",
+        "scheduleNotSet": "Not scheduled",
+        "schedulePast": "Past",
+        "scheduleToday": "Today",
+        "scheduleUpcoming": "Upcoming",
+        "scheduleAddTooltip": "Add schedule",
+        "scheduleEditTooltip": "Edit schedule",
+        "scheduleSaveTooltip": "Save schedule",
+        "scheduleCancelTooltip": "Cancel",
+        "scheduleUpdated": "Schedule updated successfully",
+        "scheduleUpdateFailed": "Failed to update schedule",
+        "scheduleSelectPlaceholder": "Please select a date and time"
+      },
+      "accessoryPage": {
+        "title": "Accessories Orders",
+        "subtitle": "Manage accessory orders",
+        "tableTitle": "Accessories Orders"
+      }
+    },
+    
+    "globalDiscount": {
+      "title": "Global Discount Settings",
+      "subtitle": "Set global discount rates for repair services, new phones, and accessories",
+      "refresh": "Refresh",
+      "save": "Save",
+      "saving": "Saving...",
+      "percentagePlaceholder": "Percentage",
+      "amountPlaceholder": "Amount",
+      "percentageSuffix": "%",
+      "amountSuffix": "€",
+      "percentageRequired": "{category}: Percentage field cannot be empty",
+      "loadFailed": "Failed to load discount settings",
+      "updateSuccess": "{category} discount updated successfully!",
+      "updateFailed": "Failed to update {category} discount",
+      "categoryRepair": "Repair Services",
+      "categoryNewPhones": "New Phones",
+      "categoryAccessories": "Accessories",
+      "repairCardTitle": "Repair Services Discount",
+      "repairCardDescription": "Set global discount for all repair services",
+      "newPhonesCardTitle": "New Phones Discount",
+      "newPhonesCardDescription": "Set global discount for all new phone models",
+      "accessoriesCardTitle": "Accessories Discount",
+      "accessoriesCardDescription": "Set global discount for all accessories"
     },
     "accessories": {
       "title": "Accessories Management",
@@ -1099,6 +1258,38 @@
         "failedToUpdate": "Failed to update model",
         "loadingEditor": "Loading editor...",
         "failedToFetchBrands": "Failed to fetch brands"
+      },
+      "problemsManagement": {
+        "title": "Problems Management",
+        "subtitle": "Manage repair problems and their pricing",
+        "tableTitle": "Repair Problems",
+        "problemName": "Problem Name",
+        "description": "Description",
+        "createdAt": "Created At",
+        "deleteProblem": "Delete Problem",
+        "deleteConfirm": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+        "yesDelete": "Yes, delete it!",
+        "deletedSuccessfully": "{name} deleted successfully",
+        "failedToDelete": "Failed to delete problem",
+        "addNewProblem": "Add New Problem",
+        "editProblem": "Edit Problem",
+        "problemNameLabel": "Problem Name",
+        "problemNamePlaceholder": "Enter problem name",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Enter description",
+        "problemDescriptionPlaceholder": "Enter problem description",
+        "pleaseEnterProblemName": "Please enter problem name",
+        "pleaseEnterDescription": "Please enter description",
+        "creating": "Creating...",
+        "creatingProblem": "Creating problem...",
+        "createProblem": "Create Problem",
+        "updating": "Updating...",
+        "updatingProblem": "Updating problem...",
+        "updateProblem": "Update Problem",
+        "createdSuccessfully": "Problem created successfully!",
+        "updatedSuccessfully": "Problem updated successfully!",
+        "failedToCreate": "Failed to create problem",
+        "failedToUpdate": "Failed to update problem"
       }
     },
     "repairCalendar": {
@@ -1136,10 +1327,18 @@
       "customerAddressPlaceholder": "Enter customer address",
       "notesLabel": "Notes",
       "notesPlaceholder": "Add any internal notes (optional)",
+      "amountLabel": "Order Amount",
+      "amountPlaceholder": "Enter total amount",
+      "amountAuto": "Use auto total",
+      "amountAutoHint": "We sum the selected problems automatically. Override it if you need a custom price.",
       "cancelLabel": "Cancel",
       "createOrderLabel": "Create order",
+      "updateOrderLabel": "Update order",
       "customOrderTag": "Custom",
       "customOrderCreated": "Custom order created successfully",
+      "customOrderUpdated": "Custom order updated successfully",
+      "customOrderDeleted": "Custom order deleted successfully",
+      "customOrderDeleteFailed": "Failed to delete custom order",
       "customOrderCreateFailed": "Failed to create custom order",
       "customOrderLoadFailed": "Failed to load data",
       "customOrderValidationBrand": "Please select a brand",
@@ -1147,7 +1346,14 @@
       "customOrderValidationProblems": "Select at least one problem",
       "customOrderValidationName": "Customer name is required",
       "customOrderValidationPhone": "Customer phone is required",
-      "customOrderValidationSchedule": "Please provide a valid schedule"
+      "customOrderValidationSchedule": "Please provide a valid schedule",
+      "editCustomOrderTitle": "Edit Custom Repair Order",
+      "editCustomOrderDescription": "Update the device, issues, schedule, or customer details for this custom order.",
+      "editCustomOrderAction": "Edit custom order",
+      "customOrderDelete": "Delete Custom Order",
+      "customOrderDeleteWarning": "This will permanently remove the custom order and its schedule.",
+      "customOrderDeleteConfirm": "Are you sure you want to delete custom order \"{order}\"? This action cannot be undone.",
+      "deleteOrderLabel": "Delete order"
     },
     "common": {
       "loading": "Loading...",
@@ -1183,7 +1389,82 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded",
       "paid": "Paid",
-      "failed": "Failed"
+      "failed": "Failed",
+      "unknown": "Unknown"
     }
+  },
+  "ordersPage": {
+    "loginRequiredTitle": "Please log in to view your orders",
+    "loginButton": "Go to Login",
+    "title": "My Orders",
+    "notAvailable": "N/A",
+    "tabs": {
+      "all": "All Orders",
+      "repair": "Repair Services",
+      "phone": "New Phones",
+      "accessory": "Accessories"
+    },
+    "sectionHeaders": {
+      "repair": "Repair Services",
+      "phone": "New Phones",
+      "accessory": "Accessories"
+    },
+    "countsLabel": "{count, plural, one {# order} other {# orders}}",
+    "orderTypeLabels": {
+      "repair": "Repair Service",
+      "phone": "New Phone",
+      "accessory": "Accessory",
+      "default": "Order"
+    },
+    "orderTypeSentences": {
+      "repair": "repair service",
+      "phone": "phone",
+      "accessory": "accessory",
+      "default": "order"
+    },
+    "productLabels": {
+      "repair": "Repair Service",
+      "phone": "Phone Model",
+      "accessory": "Product",
+      "default": "Product"
+    },
+    "scheduleStatus": {
+      "past": "Past",
+      "today": "Today",
+      "upcoming": "Upcoming"
+    },
+    "labels": {
+      "brand": "Brand",
+      "customer": "Customer",
+      "phone": "Phone",
+      "quantity": "Qty",
+      "totalAmount": "Total Amount",
+      "perItem": "{count} × {amount} {currency}"
+    },
+    "buttons": {
+      "addReview": "Add Review",
+      "showMore": "Show More ({count} remaining)",
+      "cancel": "Cancel",
+      "submitReview": "Submit Review",
+      "submittingReview": "Submitting..."
+    },
+    "empty": {
+      "allTitle": "No orders found.",
+      "allDescription": "Your orders will appear here once you place an order.",
+      "filteredTitle": "No {type} orders found.",
+      "filteredDescription": "Try switching to a different tab or place a {type} order."
+    },
+    "reviewDialog": {
+      "title": "Add Review",
+      "description": "Review for {product}",
+      "ratingLabel": "Rating",
+      "commentLabel": "Your Review",
+      "commentPlaceholder": "Share your experience with this product...",
+      "validationError": "Please enter your review",
+      "loading": "Submitting review...",
+      "success": "Review submitted successfully!",
+      "error": "Failed to submit review. Please try again."
+    },
+    "orderNumberFallback": "Order #{id}"
   }
 }

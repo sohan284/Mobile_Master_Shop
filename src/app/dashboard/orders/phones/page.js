@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Smartphone,
@@ -20,6 +20,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 export default function PhoneOrdersPage() {
   const router = useRouter();
@@ -32,6 +33,25 @@ export default function PhoneOrdersPage() {
   
   const queryClient = useQueryClient();
   const orderType = 'phone'; // Fixed order type
+  const t = useTranslations('dashboard.orders.phonePage');
+  const tOrdersCommon = useTranslations('dashboard.orders.common');
+  const tDetail = useTranslations('dashboard.orders.detailCommon');
+  const tGlobal = useTranslations('dashboard.common');
+
+  const translateStatus = useCallback(
+    (value) => {
+      if (!value) return tDetail('notAvailable');
+      const normalized = value.toLowerCase();
+      try {
+        return tGlobal(normalized);
+      } catch {
+        return value;
+      }
+    },
+    [tDetail, tGlobal]
+  );
+
+  const notAvailableLabel = tDetail('notAvailable');
 
   // Reset page when status filter changes
   React.useEffect(() => {
@@ -49,7 +69,7 @@ export default function PhoneOrdersPage() {
         delete newState[variables.orderId];
         return newState;
       });
-      toast.success('Order status updated successfully');
+      toast.success(tOrdersCommon('statusUpdated'));
     },
     onError: (error, variables) => {
       setUpdatingStatus(prev => {
@@ -57,7 +77,7 @@ export default function PhoneOrdersPage() {
         delete newState[variables.orderId];
         return newState;
       });
-      toast.error(error.response?.data?.message || 'Failed to update order status');
+      toast.error(error.response?.data?.message || tOrdersCommon('statusUpdateFailed'));
     }
   });
 
@@ -73,12 +93,12 @@ export default function PhoneOrdersPage() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/api/brandnew/orders/${selectedOrder.id}/`);
-      toast.success('Order deleted successfully');
+      toast.success(tOrdersCommon('deleteSuccess'));
       queryClient.invalidateQueries({ queryKey: ['phoneOrders', selectedStatus, currentPage] });
       setIsDeleteDialogOpen(false);
       setSelectedOrder(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete order');
+      toast.error(error.response?.data?.message || error.message || tOrdersCommon('deleteFailed'));
     } finally {
       setIsDeleting(false);
     }
@@ -97,7 +117,7 @@ export default function PhoneOrdersPage() {
       queryClient.invalidateQueries({ queryKey: ['phoneOrders', selectedStatus, currentPage] });
       queryClient.invalidateQueries({ queryKey: ['dashboardStatistics'] });
     } catch (error) {
-      console.error('Failed to mark order as read:', error);
+      toast.error(error?.response?.data?.message || t('markReadFailed'));
     }
     router.push(`/dashboard/orders/phones/${order.id}`);
   };
@@ -110,7 +130,7 @@ export default function PhoneOrdersPage() {
     // Ensure we have the order ID
     const orderId = order.id;
     if (!orderId) {
-      toast.error('Order ID not found');
+      toast.error(tOrdersCommon('orderIdMissing'));
       return;
     }
     
@@ -158,41 +178,40 @@ export default function PhoneOrdersPage() {
 
   // Extract and normalize orders from unified API
   const normalizedOrders = useMemo(() => {
-    const normalizeOrder = (order) => {
-      const normalized = {
-        ...order,
-        orderType: orderType,
-        // Normalize common fields
-        productName: order.phone_model_name || order.product_title || 'N/A',
-        brandName: order.brand_name || order.phone_model_brand || 'N/A',
-        productImage: order.phone_image || order.product_image || null,
-        quantity: order.quantity || order.items_count || 1,
-        orderNumber: order.order_number || `#${order.id}`,
-        customerName: order.customer_name || 'N/A',
-        customerPhone: order.customer_phone || 'N/A',
-        totalAmount: parseFloat(order.total_amount) || 0,
-        currency: order.currency || 'EUR',
-        status: order.status || 'unknown',
-        statusDisplay: order.status_display || order.status || 'Unknown',
-        paymentStatus: order.payment_status || 'unknown',
-        paymentStatusDisplay: order.payment_status_display || order.payment_status || 'Unknown',
-        createdAt: order.created_at || null,
-        // Color information for phone orders
-        colorName: order.color_name || order.color?.name || order.color || null,
-        colorCode: order.color_code || order.color?.hex_code || order.color?.code || null,
-      };
-      return normalized;
-    };
-
-    // Extract orders from response - could be in data, results, or root array
-    const orders = Array.isArray(ordersData?.data) ? ordersData.data : 
-                   Array.isArray(ordersData?.results) ? ordersData.results :
-                   Array.isArray(ordersData) ? ordersData : 
-                   [];
-    return orders.map(order => normalizeOrder(order)).sort((a, b) => {
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    const normalizeOrder = (order) => ({
+      ...order,
+      orderType,
+      productName: order.phone_model_name || order.product_title || notAvailableLabel,
+      brandName: order.brand_name || order.phone_model_brand || notAvailableLabel,
+      productImage: order.phone_image || order.product_image || null,
+      quantity: order.quantity || order.items_count || 1,
+      orderNumber: order.order_number || `#${order.id}`,
+      customerName: order.customer_name || notAvailableLabel,
+      customerPhone: order.customer_phone || notAvailableLabel,
+      totalAmount: parseFloat(order.total_amount) || 0,
+      currency: order.currency || 'EUR',
+      status: order.status || 'unknown',
+      statusDisplay: order.status_display || translateStatus(order.status) || tGlobal('unknown'),
+      paymentStatus: order.payment_status || 'unknown',
+      paymentStatusDisplay:
+        order.payment_status_display || translateStatus(order.payment_status) || tGlobal('unknown'),
+      createdAt: order.created_at || null,
+      colorName: order.color_name || order.color?.name || order.color || null,
+      colorCode: order.color_code || order.color?.hex_code || order.color?.code || null,
     });
-  }, [ordersData]);
+
+    const orders = Array.isArray(ordersData?.data)
+      ? ordersData.data
+      : Array.isArray(ordersData?.results)
+      ? ordersData.results
+      : Array.isArray(ordersData)
+      ? ordersData
+      : [];
+
+    return orders
+      .map((order) => normalizeOrder(order))
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  }, [ordersData, orderType, notAvailableLabel, translateStatus, tGlobal]);
 
   // Extract pagination info from API response
   const pagination = ordersData?.pagination || {};
@@ -209,7 +228,7 @@ export default function PhoneOrdersPage() {
 
   // Get status badge styling
   const getStatusBadge = (status) => {
-    const statusLower = status.toLowerCase();
+    const statusLower = (status || '').toLowerCase();
     if (statusLower === 'confirmed' || statusLower === 'completed' || statusLower === 'delivered') {
       return 'bg-green-100 text-green-800';
     } else if (statusLower === 'pending' || statusLower === 'processing') {
@@ -228,26 +247,22 @@ export default function PhoneOrdersPage() {
   };
 
   // Status options for dropdown
-  const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' },
-  ];
+  const statusValues = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+  const statusOptions = statusValues.map((value) => ({
+    value,
+    label: translateStatus(value),
+  }));
 
   // Status options for filter dropdown (with 'all')
   const filterStatusOptions = [
-    { value: 'all', label: 'All Statuses' },
+    { value: 'all', label: tOrdersCommon('allStatuses') },
     ...statusOptions,
   ];
 
   // Define columns for DataTable - simplified
   const columns = [
     {
-      header: 'Order Number',
+      header: tOrdersCommon('orderNumber'),
       accessor: 'orderNumber',
       sortable: true,
       render: (order) => (
@@ -260,7 +275,7 @@ export default function PhoneOrdersPage() {
       ),
     },
     {
-      header: 'Amount',
+      header: tOrdersCommon('amount'),
       accessor: 'totalAmount',
       sortable: true,
       render: (order) => (
@@ -270,7 +285,7 @@ export default function PhoneOrdersPage() {
       ),
     },
     {
-      header: 'Status',
+      header: tOrdersCommon('status'),
       accessor: 'status',
       sortable: true,
       render: (order) => {
@@ -289,7 +304,7 @@ export default function PhoneOrdersPage() {
             >
               <SelectValue>
                 {isUpdating ? (
-                  <span className="text-xs">Updating...</span>
+                  <span className="text-xs">{tOrdersCommon('updating')}</span>
                 ) : (
                   <span className="text-xs font-semibold capitalize">
                     {statusOptions.find(opt => opt.value === currentStatus)?.label || order.statusDisplay}
@@ -309,7 +324,7 @@ export default function PhoneOrdersPage() {
       },
     },
     {
-      header: 'Payment',
+      header: tOrdersCommon('payment'),
       accessor: 'paymentStatus',
       sortable: true,
       render: (order) => (
@@ -319,7 +334,7 @@ export default function PhoneOrdersPage() {
       ),
     },
     {
-      header: 'Date',
+      header: tOrdersCommon('date'),
       accessor: 'createdAt',
       sortable: true,
       render: (order) => (
@@ -335,7 +350,7 @@ export default function PhoneOrdersPage() {
             </span>
           </div>
         ) : (
-          'N/A'
+          tDetail('notAvailable')
         )
       ),
     },
@@ -346,20 +361,24 @@ export default function PhoneOrdersPage() {
       <div className="flex flex-col gap-6" style={{ height: 'calc(100vh - 10rem)' }}>
         {/* Scrollable Orders Table Section */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">New Phone Orders</h1>
-          <p className="text-gray-600">Manage new phone orders</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-gray-600">{t('subtitle')}</p>
         </div>
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex flex-col ">
             {error ? (
               <div className="p-6 text-center bg-white rounded-lg shadow-sm border border-gray-200">
-                <p className="text-red-600">Error loading orders: {error.message || 'Unknown error'}</p>
+                <p className="text-red-600">
+                  {tOrdersCommon('loadError', {
+                    message: error?.message || tOrdersCommon('unknownError'),
+                  })}
+                </p>
               </div>
             ) : (
               <DataTable
                 data={filteredOrders}
                 columns={columns}
-                title="New Phone Orders"
+                title={t('tableTitle')}
                 searchable={true}
                 pagination={true}
                 itemsPerPage={pageSize}
@@ -376,7 +395,7 @@ export default function PhoneOrdersPage() {
                 statusFilter={
                   <Select className="cursor-pointer" value={selectedStatus} onValueChange={setSelectedStatus}>
                     <SelectTrigger className="w-[180px] h-10">
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder={t('statusFilterLabel')} />
                     </SelectTrigger>
                     <SelectContent>
                       {filterStatusOptions.map((option) => (
@@ -398,10 +417,12 @@ export default function PhoneOrdersPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Order"
-        message={`Are you sure you want to delete order "${selectedOrder?.orderNumber || selectedOrder?.id}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={tOrdersCommon('deleteOrder')}
+        message={tOrdersCommon('deleteConfirm', {
+          order: selectedOrder?.orderNumber || selectedOrder?.id || '',
+        })}
+        confirmText={tOrdersCommon('yesDelete')}
+        cancelText={tGlobal('cancel')}
         type="danger"
         isLoading={isDeleting}
       />

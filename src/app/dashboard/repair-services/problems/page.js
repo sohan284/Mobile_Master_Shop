@@ -11,8 +11,11 @@ import AddProblemModal from './components/AddProblemModal';
 import EditProblemModal from './components/EditProblemModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslations } from 'next-intl';
 
 export default function ProblemsPage() {
+  const t = useTranslations('dashboard.repairServices.problemsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -26,12 +29,12 @@ export default function ProblemsPage() {
 
   const columns = [
     {
-      header: 'Problem Name',
+      header: t('problemName'),
       accessor: 'name',
       sortable: true
     },
     {
-      header: 'Description',
+      header: t('description'),
       accessor: 'description',
       render: (item) => (
         <div className="max-w-[200px]">
@@ -51,7 +54,7 @@ export default function ProblemsPage() {
     },
 
     {
-      header: 'Created At',
+      header: t('createdAt'),
       accessor: 'created_at',
       render: (item) => (
         <div className="text-sm text-gray-500">
@@ -99,12 +102,12 @@ export default function ProblemsPage() {
     setIsDeleting(true);
     try {
       await deleteProblem(selectedProblem.id);
-      toast.success(`${selectedProblem.name} deleted successfully`);
+      toast.success(t('deletedSuccessfully', { name: selectedProblem.name }));
       refetch(); // Refresh the data after successful deletion
       setIsDeleteDialogOpen(false);
       setSelectedProblem(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete problem');
+      toast.error(error.response?.data?.message || error.message || t('failedToDelete'));
     } finally {
       setIsDeleting(false);
     }
@@ -123,14 +126,14 @@ export default function ProblemsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Problems Management</h1>
-        <p className="text-gray-600">Manage repair problems and their pricing</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       <DataTable
         data={problems}
         columns={columns}
-        title="Repair Problems"
+        title={t('tableTitle')}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -160,10 +163,10 @@ export default function ProblemsPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Problem"
-        message={`Are you sure you want to delete "${selectedProblem?.name}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={t('deleteProblem')}
+        message={t('deleteConfirm', { name: selectedProblem?.name || '' })}
+        confirmText={t('yesDelete')}
+        cancelText={tCommon('cancel')}
         type="danger"
         isLoading={isDeleting}
       />

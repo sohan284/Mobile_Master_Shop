@@ -15,7 +15,11 @@ import toast from 'react-hot-toast';
 import { apiFetcher } from '@/lib/api';
 import { Textarea } from '@/components/ui/textarea';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+
 export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }) {
+  const t = useTranslations('dashboard.repairServices.problemsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: '',
@@ -46,18 +50,18 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter problem name');
+      toast.error(t('pleaseEnterProblemName'));
       return;
     }
 
     if (!formData.description.trim()) {
-      toast.error('Please enter description');
+      toast.error(t('pleaseEnterDescription'));
       return;
     }
 
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Updating problem...');
+    const loadingToast = toast.loading(t('updatingProblem'));
 
     try {
       // Make API call using apiFetcher
@@ -67,13 +71,13 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
       });
 
       toast.dismiss(loadingToast);
-      toast.success("Problem updated successfully!");
+      toast.success(t('updatedSuccessfully'));
       queryClient.invalidateQueries({ queryKey: ['problems'] });
       onClose();
 
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to update problem');
+      toast.error(error.response?.data?.message || error.message || t('failedToUpdate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -93,20 +97,20 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Problem</DialogTitle>
+          <DialogTitle>{t('editProblem')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Problem Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Problem Name *</Label>
+            <Label htmlFor="name">{t('problemNameLabel')} *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter problem name"
+              placeholder={t('problemNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -114,7 +118,7 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">{t('descriptionLabel')} *</Label>
             <Textarea
               id="description"
                 name="description"
@@ -122,7 +126,7 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
                 rows={2}
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter problem description"
+              placeholder={t('problemDescriptionPlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -136,14 +140,14 @@ export default function EditProblemModal({ isOpen, onClose, onSuccess, problem }
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim() || !formData.description.trim() }
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Updating...' : 'Update Problem'}
+              {isSubmitting ? t('updating') : t('updateProblem')}
             </Button>
           </DialogFooter>
         </form>

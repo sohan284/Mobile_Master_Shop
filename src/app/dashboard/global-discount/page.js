@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,9 +10,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 import {  Settings, Save, RefreshCw, Smartphone, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 // Move DiscountCard outside to prevent re-creation on each render
-const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isLoading, isSaving, onUpdate, discountSettings, updateDiscountSetting }) => (
+const DiscountCard = ({
+  icon: Icon,
+  iconColor,
+  title,
+  description,
+  category,
+  isLoading,
+  isSaving,
+  onUpdate,
+  discountSettings,
+  updateDiscountSetting,
+  saveLabel,
+  savingLabel,
+  percentagePlaceholder,
+  amountPlaceholder,
+  percentageSuffix,
+  amountSuffix,
+}) => (
   <Card>
     <CardHeader className="p-4">
       <div className="flex items-center justify-between">
@@ -30,7 +48,7 @@ const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isL
           className="h-8 px-3 text-secondary cursor-pointer"
         >
           <Save className="h-3.5 w-3.5 mr-1.5" />
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? savingLabel : saveLabel}
         </Button>
       </div>
     </CardHeader>
@@ -47,12 +65,12 @@ const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isL
               type="number"
               value={discountSettings[category].percentage}
               onChange={(e) => updateDiscountSetting(category, 'percentage', e.target.value)}
-              placeholder="Percentage"
+              placeholder={percentagePlaceholder}
               min="0"
               step="0.01"
               className="h-9 pr-7"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">%</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{percentageSuffix}</span>
           </div>
           <div className="relative">
             <Input
@@ -65,12 +83,12 @@ const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isL
                   updateDiscountSetting(category, 'amount', '0');
                 }
               }}
-              placeholder="Amount"
+              placeholder={amountPlaceholder}
               min="0"
               step="0.01"
               className="h-9 pr-7"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">{amountSuffix}</span>
           </div>
         </div>
       )}
@@ -79,6 +97,7 @@ const DiscountCard = ({ icon: Icon, iconColor, title, description, category, isL
 );
 
 export default function GlobalDiscountPage() {
+  const t = useTranslations('dashboard.globalDiscount');
   const [discountSettings, setDiscountSettings] = useState({
     repairServices: {
       id: null,
@@ -106,13 +125,12 @@ export default function GlobalDiscountPage() {
   const [isSavingRepairServices, setIsSavingRepairServices] = useState(false);
   const [isSavingNewPhones, setIsSavingNewPhones] = useState(false);
   const [isSavingAccessories, setIsSavingAccessories] = useState(false);
-
-  // Load discount settings on component mount
-  useEffect(() => {
-    loadDiscountSettings();
-  }, []);
-
-  const loadDiscountSettings = async () => {
+  const categoryLabels = {
+    repairServices: t('categoryRepair'),
+    newPhones: t('categoryNewPhones'),
+    accessories: t('categoryAccessories'),
+  };
+  const loadDiscountSettings = useCallback(async () => {
     setIsLoading(true);
     setIsLoadingRepairServices(true);
     setIsLoadingNewPhones(true);
@@ -169,21 +187,27 @@ export default function GlobalDiscountPage() {
       setIsLoadingAccessories(false);
     } catch (error) {
       console.error('Error loading discount settings:', error);
-      toast.error('Failed to load discount settings');
+      toast.error(t('loadFailed'));
       setIsLoadingRepairServices(false);
       setIsLoadingNewPhones(false);
       setIsLoadingAccessories(false);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [t]);
+  // Load discount settings on component mount
+  useEffect(() => {
+    loadDiscountSettings();
+  }, [loadDiscountSettings]);
+
+  
 
   const validateAndPrepareData = (category) => {
     const data = discountSettings[category];
     
     // Check if percentage is empty
     if (!data.percentage || data.percentage.trim() === '') {
-      toast.error(`${category === 'repairServices' ? 'Repair Services' : category === 'newPhones' ? 'New Phones' : 'Accessories'}: Percentage field cannot be empty`);
+      toast.error(t('percentageRequired', { category: categoryLabels[category] }));
       return null;
     }
     
@@ -210,11 +234,11 @@ export default function GlobalDiscountPage() {
         if (!discountSettings.repairServices.amount || discountSettings.repairServices.amount.trim() === '') {
           updateDiscountSetting('repairServices', 'amount', '0');
         }
-        toast.success('Repair services discount updated successfully!');
+        toast.success(t('updateSuccess', { category: categoryLabels.repairServices }));
       }
     } catch (error) {
       console.error('Error updating repair services discount:', error);
-      toast.error('Failed to update repair services discount');
+      toast.error(t('updateFailed', { category: categoryLabels.repairServices }));
     } finally {
       setIsSavingRepairServices(false);
     }
@@ -234,11 +258,11 @@ export default function GlobalDiscountPage() {
         if (!discountSettings.newPhones.amount || discountSettings.newPhones.amount.trim() === '') {
           updateDiscountSetting('newPhones', 'amount', '0');
         }
-        toast.success('New phones discount updated successfully!');
+        toast.success(t('updateSuccess', { category: categoryLabels.newPhones }));
       }
     } catch (error) {
       console.error('Error updating new phones discount:', error);
-      toast.error('Failed to update new phones discount');
+      toast.error(t('updateFailed', { category: categoryLabels.newPhones }));
     } finally {
       setIsSavingNewPhones(false);
     }
@@ -258,11 +282,11 @@ export default function GlobalDiscountPage() {
         if (!discountSettings.accessories.amount || discountSettings.accessories.amount.trim() === '') {
           updateDiscountSetting('accessories', 'amount', '0');
         }
-        toast.success('Accessories discount updated successfully!');
+        toast.success(t('updateSuccess', { category: categoryLabels.accessories }));
       }
     } catch (error) {
       console.error('Error updating accessories discount:', error);
-      toast.error('Failed to update accessories discount');
+      toast.error(t('updateFailed', { category: categoryLabels.accessories }));
     } finally {
       setIsSavingAccessories(false);
     }
@@ -293,9 +317,9 @@ export default function GlobalDiscountPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Global Discount Settings</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
           <p className="text-gray-600 mt-1">
-            Set global discount rates for repair services, new phones, and accessories
+            {t('subtitle')}
           </p>
         </div>
         <Button
@@ -305,7 +329,7 @@ export default function GlobalDiscountPage() {
           className="flex items-center gap-2"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Refresh</span>
+          <span>{t('refresh')}</span>
         </Button>
       </div>
 
@@ -314,40 +338,58 @@ export default function GlobalDiscountPage() {
      <DiscountCard
         icon={Settings}
         iconColor="text-blue-600"
-        title="Repair Services Discount"
-        description="Set global discount for all repair services"
+        title={t('repairCardTitle')}
+        description={t('repairCardDescription')}
         category="repairServices"
         isLoading={isLoadingRepairServices}
         isSaving={isSavingRepairServices}
         onUpdate={handleUpdateRepairServices}
         discountSettings={discountSettings}
         updateDiscountSetting={updateDiscountSetting}
+        saveLabel={t('save')}
+        savingLabel={t('saving')}
+        percentagePlaceholder={t('percentagePlaceholder')}
+        amountPlaceholder={t('amountPlaceholder')}
+        percentageSuffix={t('percentageSuffix')}
+        amountSuffix={t('amountSuffix')}
       />
 
       <DiscountCard
         icon={Smartphone}
         iconColor="text-primary"
-        title="New Phones Discount"
-        description="Set global discount for all new phone models"
+        title={t('newPhonesCardTitle')}
+        description={t('newPhonesCardDescription')}
         category="newPhones"
         isLoading={isLoadingNewPhones}
         isSaving={isSavingNewPhones}
         onUpdate={handleUpdateNewPhones}
         discountSettings={discountSettings}
         updateDiscountSetting={updateDiscountSetting}
+        saveLabel={t('save')}
+        savingLabel={t('saving')}
+        percentagePlaceholder={t('percentagePlaceholder')}
+        amountPlaceholder={t('amountPlaceholder')}
+        percentageSuffix={t('percentageSuffix')}
+        amountSuffix={t('amountSuffix')}
       />
 
       <DiscountCard
         icon={ShoppingBag}
         iconColor="text-purple-600"
-        title="Accessories Discount"
-        description="Set global discount for all accessories"
+        title={t('accessoriesCardTitle')}
+        description={t('accessoriesCardDescription')}
         category="accessories"
         isLoading={isLoadingAccessories}
         isSaving={isSavingAccessories}
         onUpdate={handleUpdateAccessories}
         discountSettings={discountSettings}
         updateDiscountSetting={updateDiscountSetting}
+        saveLabel={t('save')}
+        savingLabel={t('saving')}
+        percentagePlaceholder={t('percentagePlaceholder')}
+        amountPlaceholder={t('amountPlaceholder')}
+        percentageSuffix={t('percentageSuffix')}
+        amountSuffix={t('amountSuffix')}
       />
      </div>
     </div>
