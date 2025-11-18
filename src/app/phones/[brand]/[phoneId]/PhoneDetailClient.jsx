@@ -337,7 +337,7 @@ export default function PhoneDetailClient({
                         </div>
                         <div className="text-accent/80 flex items-center gap-2">
                           <MapPin className="w-5 h-5 text-accent/60" />
-                          11 Avenue of Marshal de Lattre de Tassigny 88000 Épinal
+                          11 avenue DU maréchal de Lattre de Tassigny 88000 Épinal
                         </div>
                       </div>
                       <button 
@@ -350,7 +350,7 @@ export default function PhoneDetailClient({
                         }`}
                       >
                         <Calendar className="w-5 h-5" />
-                        {!phone?.is_in_stock || (phone?.stock_quantity !== undefined && phone.stock_quantity <= 0) 
+                        {!phone?.is_in_stock || (phone?.stock_management?.find(item => item.color_name === selectedOptions.color)?.stock <= 0) 
                           ? t('outOfStock') || 'Out of Stock'
                           : t('buyNow')
                         }

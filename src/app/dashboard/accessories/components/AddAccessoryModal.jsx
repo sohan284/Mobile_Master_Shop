@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Dynamically import RichTextEditor with no SSR
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
@@ -28,6 +29,8 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
 });
 
 export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
+  const t = useTranslations('dashboard.accessories');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     subtitle: '',
@@ -59,12 +62,12 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('pleaseSelectImageFile'));
         return;
       }
 
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error(t('imageSizeLimit'));
         return;
       }
 
@@ -80,22 +83,22 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter accessory name');
+      toast.error(t('pleaseEnterName'));
       return;
     }
 
     if (!formData.price || parseFloat(formData.price) < 0) {
-      toast.error('Please enter a valid price');
+      toast.error(t('pleaseEnterValidPrice'));
       return;
     }
 
     if (!formData.image) {
-      toast.error('Please select an image');
+      toast.error(t('pleaseSelectImage'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating accessory...');
+    const loadingToast = toast.loading(t('creatingAccessory'));
 
     try {
       const submitData = new FormData();
@@ -113,7 +116,7 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Accessory created successfully!');
+      toast.success(t('createdSuccessfully'));
       
       // Reset form
       setFormData({
@@ -132,7 +135,7 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create accessory');
+      toast.error(error.response?.data?.message || error.message || t('failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -158,7 +161,7 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
     <Dialog size='lg' open={isOpen} onOpenChange={handleClose}>
       <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Accessory</DialogTitle>
+          <DialogTitle>{t('addNewAccessory')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 ">
@@ -166,27 +169,27 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
             {/* Left Column */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2 w-full">
-                <Label htmlFor="name">Accessory Name *</Label>
+                <Label htmlFor="name">{t('accessoryName')} *</Label>
                 <Input
                   id="name"
                   name="name"
                   type="text"
                   value={formData.name}
                   onChange={handleInputChange}
-                  placeholder="Enter accessory name"
+                  placeholder={t('accessoryNamePlaceholder')}
                   disabled={isSubmitting}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subtitle"> Subtitle</Label>
+                <Label htmlFor="subtitle">{t('subtitle2')}</Label>
                 <Input
                   id="subtitle"
                   name="subtitle"
                   type="text"
                   value={formData.subtitle}
                   onChange={handleInputChange}
-                  placeholder="Enter accessory subtitle"
+                  placeholder={t('subtitlePlaceholder')}
                   disabled={isSubmitting}
                 />
               </div>
@@ -196,7 +199,7 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
               
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price *</Label>
+                <Label htmlFor="price">{t('priceLabel')} *</Label>
                 <Input
                   id="price"
                   name="price"
@@ -205,14 +208,14 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
                   min="0"
                   value={formData.price}
                   onChange={handleInputChange}
-                  placeholder="0.00"
+                  placeholder={t('pricePlaceholder')}
                   disabled={isSubmitting}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stock_quantity">Stock Quantity</Label>
+                <Label htmlFor="stock_quantity">{t('stockQuantity')}</Label>
                 <Input
                   id="stock_quantity"
                   name="stock_quantity"
@@ -220,21 +223,21 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
                   min="0"
                   value={formData.stock_quantity}
                   onChange={handleInputChange}
-                  placeholder="0"
+                  placeholder={t('stockQuantityPlaceholder')}
                   disabled={isSubmitting}
                 />
               </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="image">Accessory Image *</Label>
+                <Label htmlFor="image">{t('accessoryImage')} *</Label>
                 
                 {formData.imagePreview && (
                   <div className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                     <div className="relative w-24 h-24">
                       <Image
                         src={formData.imagePreview}
-                        alt="Image preview"
+                        alt={t('imagePreview')}
                         fill
                         className="object-contain rounded"
                       />
@@ -281,8 +284,8 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
                         <Upload className="h-6 w-6 text-gray-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Upload image</p>
-                        <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                        <p className="text-sm font-medium text-gray-900">{t('uploadImage')}</p>
+                        <p className="text-xs text-gray-500">{t('imageFormat')}</p>
                       </div>
                     </label>
                   </div>
@@ -294,14 +297,14 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
           </div>
           {/* Right Column - Rich Text Editor */}
           <div className="space-y-2">
-              <Label>Description</Label>
+              <Label>{t('description')}</Label>
               <RichTextEditor
                 content={formData.description}
                 onChange={handleDescriptionChange}
                 disabled={isSubmitting}
               />
               <p className="text-xs text-gray-500">
-                Use the toolbar to format your text with headers, lists, tables, etc.
+                {t('descriptionHint')}
               </p>
             </div>
 
@@ -312,14 +315,14 @@ export default function AddAccessoryModal({ isOpen, onClose, onSuccess }) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting || !formData.name.trim() || !formData.price || !formData.image}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Accessory'}
+              {isSubmitting ? t('creating') : t('createAccessory')}
             </Button>
           </DialogFooter>
         </div>

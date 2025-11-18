@@ -15,8 +15,11 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
+  const t = useTranslations('dashboard.repairServices.brandsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     logo: null,
@@ -48,13 +51,13 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('pleaseSelectImageFile'));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error(t('imageSizeLimit'));
         return;
       }
 
@@ -70,12 +73,12 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter brand name');
+      toast.error(t('pleaseEnterBrandName'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Updating brand...');
+    const loadingToast = toast.loading(t('updatingBrand'));
 
     try {
       // Create FormData for file upload
@@ -95,7 +98,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Brand updated successfully!');
+      toast.success(t('updatedSuccessfully'));
       
       // Reset form
       setFormData({
@@ -110,7 +113,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to update brand');
+      toast.error(error.response?.data?.message || error.message || t('failedToUpdate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -131,20 +134,20 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Brand</DialogTitle>
+          <DialogTitle>{t('editBrand')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Brand Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Brand Name *</Label>
+            <Label htmlFor="name">{t('brandNameLabel')} *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter brand name"
+              placeholder={t('brandNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -152,7 +155,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
 
           {/* Logo Upload */}
           <div className="space-y-2">
-            <Label htmlFor="logo">Brand Logo</Label>
+            <Label htmlFor="logo">{t('brandLogo')}</Label>
             
             {/* Current Logo Preview */}
             {formData.logoPreview && !formData.logo && (
@@ -160,14 +163,14 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.logoPreview}
-                    alt="Current logo"
+                    alt={t('currentLogo')}
                     fill
                     className="object-contain rounded"
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Current logo</p>
-                  <p className="text-xs text-gray-500">Click upload to change</p>
+                  <p className="text-sm font-medium text-gray-900">{t('currentLogo')}</p>
+                  <p className="text-xs text-gray-500">{t('clickUploadToChange')}</p>
                 </div>
               </div>
             )}
@@ -178,7 +181,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.logoPreview}
-                    alt="New logo preview"
+                    alt={t('logoPreview')}
                     fill
                     className="object-contain rounded"
                   />
@@ -227,9 +230,9 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {formData.logoPreview ? 'Change logo' : 'Upload new logo'}
+                      {formData.logoPreview ? t('changeLogo') : t('uploadNewLogo')}
                     </p>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                    <p className="text-xs text-gray-500">{t('imageFormat')}</p>
                   </div>
                 </label>
               </div>
@@ -244,14 +247,14 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim()}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Updating...' : 'Update Brand'}
+              {isSubmitting ? t('updating') : t('updateBrand')}
             </Button>
           </DialogFooter>
         </form>

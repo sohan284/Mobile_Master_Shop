@@ -11,8 +11,11 @@ import Link from 'next/link';
 import AddColorModal from './components/AddColorModal';
 import EditColorModal from './components/EditColorModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 export default function ColorsPage() {
+  const t = useTranslations('dashboard.newPhones.colorsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -28,12 +31,12 @@ export default function ColorsPage() {
 
   const columns = [
     {
-      header: 'Color Name',
+      header: t('colorName'),
       accessor: 'name',
       sortable: true
     },
     {
-      header: 'Color Code',
+      header: t('colorCode'),
       accessor: 'hex_code',
       render: (item) => (
         <div className="flex items-center space-x-2">
@@ -76,12 +79,12 @@ export default function ColorsPage() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/api/brandnew/color/${selectedColor.id}/`);
-      toast.success('Color deleted successfully!');
+      toast.success(t('deletedSuccessfully'));
       setIsDeleteDialogOpen(false);
       setSelectedColor(null);
       refetch();
     } catch (error) {
-      toast.error('Failed to delete color');
+      toast.error(t('failedToDelete'));
     } finally {
       setIsDeleting(false);
     }
@@ -91,12 +94,12 @@ export default function ColorsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-red-600 mb-4">Failed to load colors</p>
+          <p className="text-red-600 mb-4">{t('failedToLoad')}</p>
           <button
             onClick={() => refetch()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Try Again
+            {t('tryAgain')}
           </button>
         </div>
       </div>
@@ -108,15 +111,15 @@ export default function ColorsPage() {
    
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Phone Colors</h1>
-        <p className="text-gray-600">Manage phone colors for new phone models</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       {/* Data Table */}
       <DataTable
         data={colors}
         columns={columns}
-        title="Colors"
+        title={t('tableTitle')}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -146,10 +149,10 @@ export default function ColorsPage() {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title="Delete Color"
-        description={`Are you sure you want to delete "${selectedColor?.name}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('deleteColor')}
+        description={t('deleteConfirm', { name: selectedColor?.name || '' })}
+        confirmText={tCommon('delete')}
+        cancelText={tCommon('cancel')}
         isLoading={isDeleting}
         variant="destructive"
       />

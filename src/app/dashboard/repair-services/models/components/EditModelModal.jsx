@@ -318,6 +318,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
           <DialogFooter>
             <Button
               type="button"
+              className='bg-white hover:bg-white/60 cursor-pointer'
               variant="outline"
               onClick={handleClose}
               disabled={isSubmitting}
@@ -327,7 +328,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim() || !formData.brand}
-              className="text-secondary cursor-pointer"
+              className="bg-black text-white hover:bg-black/90 cursor-pointer"
             >
               {isSubmitting ? 'Updating...' : 'Update Model'}
             </Button>

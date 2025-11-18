@@ -855,7 +855,7 @@ export default function RepairCalendarPage() {
             </div>
           </section>
 
-          <section className="flex max-h-[640px] flex-col rounded-3xl border border-gray-200 bg-white shadow-sm">
+          <section className="flex max-h-[75vh] flex-col rounded-3xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 p-6">
               <p className="text-sm font-semibold uppercase text-blue-600 tracking-widest">
                 {t("ordersFor", { date: selectedDateLabel })}

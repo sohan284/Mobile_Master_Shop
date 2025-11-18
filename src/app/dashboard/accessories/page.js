@@ -12,8 +12,11 @@ import AddAccessoryModal from './components/AddAccessoryModal';
 import EditAccessoryModal from './components/EditAccessoryModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import PageTransition from '@/components/animations/PageTransition';
+import { useTranslations } from 'next-intl';
 
 export default function AccessoriesPage() {
+  const t = useTranslations('dashboard.accessories');
+  const tCommon = useTranslations('dashboard.common');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -27,13 +30,13 @@ export default function AccessoriesPage() {
 
   const columns = [
     {
-      header: 'Image',
+      header: t('image'),
       accessor: 'image',
       render: (item) => (
         <div className="flex items-center">
           <Image
             src={item?.picture || '/placeholder-image.png'}
-            alt={item?.name || item?.title || 'Product image'}
+            alt={item?.name || item?.title || t('productImage')}
             className="h-12 w-12 object-contain rounded"
             width={48}
             height={48}
@@ -42,13 +45,13 @@ export default function AccessoriesPage() {
       )
     },
     {
-      header: 'Name',
+      header: t('name'),
       accessor: 'title',
       sortable: true
     },
   
     {
-      header: 'Price',
+      header: t('price'),
       accessor: 'main_amount',
       render: (item) => (
         <div className="font-medium text-green-600">
@@ -58,17 +61,17 @@ export default function AccessoriesPage() {
       sortable: true
     },
     {
-      header: 'Stock',
+      header: t('stock'),
       accessor: 'stock_quantity',
       render: (item) => (
         <div className={`text-sm ${item.stock_quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {item.stock_quantity || 0} in stock
+          {item.stock_quantity || 0} {t('inStock')}
         </div>
       ),
       sortable: true
     },
     {
-      header: 'Created At',
+      header: t('createdAt'),
       accessor: 'created_at',
       render: (item) => (
         <div className="text-sm text-gray-500">
@@ -116,12 +119,12 @@ export default function AccessoriesPage() {
     setIsDeleting(true);
     try {
       await deleteAccessory(selectedAccessory.id);
-      toast.success(`${selectedAccessory.name} deleted successfully`);
+      toast.success(t('deletedSuccessfully', { name: selectedAccessory.name || selectedAccessory.title }));
       refetch(); // Refresh the data after successful deletion
       setIsDeleteDialogOpen(false);
       setSelectedAccessory(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete accessory');
+      toast.error(error.response?.data?.message || error.message || t('failedToDelete'));
     } finally {
       setIsDeleting(false);
     }
@@ -137,14 +140,14 @@ export default function AccessoriesPage() {
     <PageTransition>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Accessories Management</h1>
-          <p className="text-gray-600">Manage phone accessories and their information</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+          <p className="text-gray-600">{t('subtitle')}</p>
         </div>
 
         <DataTable
           data={accessories}
           columns={columns}
-          title="Accessories"
+          title={t('tableTitle')}
           onAdd={handleAdd}
           onEdit={handleEdit}
           onDelete={handleDelete}
@@ -174,10 +177,10 @@ export default function AccessoriesPage() {
           isOpen={isDeleteDialogOpen}
           onClose={handleDeleteCancel}
           onConfirm={handleDeleteConfirm}
-          title="Delete Accessory"
-          message={`Are you sure you want to delete "${selectedAccessory?.name}"? This action cannot be undone.`}
-          confirmText="Yes, delete it!"
-          cancelText="Cancel"
+          title={t('deleteAccessory')}
+          message={t('deleteConfirm', { name: selectedAccessory?.name || selectedAccessory?.title || '' })}
+          confirmText={t('yesDelete')}
+          cancelText={tCommon('cancel')}
           type="danger"
           isLoading={isDeleting}
         />
