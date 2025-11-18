@@ -16,8 +16,11 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
+  const t = useTranslations('dashboard.newPhones.brandsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -50,13 +53,13 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('pleaseSelectImageFile'));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error(t('imageSizeLimit'));
         return;
       }
 
@@ -80,12 +83,12 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter brand name');
+      toast.error(t('pleaseEnterBrandName'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Updating brand...');
+    const loadingToast = toast.loading(t('updatingBrand'));
 
     try {
       // Create FormData for file upload
@@ -105,7 +108,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Brand updated successfully!');
+      toast.success(t('updatedSuccessfully'));
       
       // Close modal and refresh data
       onClose();
@@ -113,7 +116,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to update brand');
+      toast.error(error.response?.data?.message || error.message || t('failedToUpdate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -135,20 +138,20 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Brand</DialogTitle>
+          <DialogTitle>{t('editBrand')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Brand Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Brand Name *</Label>
+            <Label htmlFor="name">{t('brandNameLabel')} *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleNameChange}
-              placeholder="Enter brand name"
+              placeholder={t('brandNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -156,13 +159,13 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('descriptionLabel')}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter brand description"
+              placeholder={t('descriptionPlaceholder')}
               disabled={isSubmitting}
               rows={3}
             />
@@ -170,7 +173,7 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
 
           {/* Icon Upload */}
           <div className="space-y-2">
-            <Label htmlFor="icon">Brand Icon</Label>
+            <Label htmlFor="icon">{t('brandIcon')}</Label>
             
             {/* Icon Preview */}
             {formData.iconPreview && (
@@ -178,14 +181,14 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.iconPreview}
-                    alt="Icon preview"
+                    alt={t('iconPreview')}
                     fill
                     className="object-contain rounded"
                   />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">
-                    {formData.icon?.name || 'Current icon'}
+                    {formData.icon?.name || t('currentIcon')}
                   </p>
                   {formData.icon && (
                     <p className="text-xs text-gray-500">
@@ -230,8 +233,8 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
                     <Upload className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Upload icon</p>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                    <p className="text-sm font-medium text-gray-900">{t('uploadIcon')}</p>
+                    <p className="text-xs text-gray-500">{t('imageFormat')}</p>
                   </div>
                 </label>
               </div>
@@ -247,14 +250,14 @@ export default function EditBrandModal({ isOpen, onClose, onSuccess, brand }) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim()}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Updating...' : 'Update Brand'}
+              {isSubmitting ? t('updating') : t('updateBrand')}
             </Button>
           </DialogFooter>
         </form>

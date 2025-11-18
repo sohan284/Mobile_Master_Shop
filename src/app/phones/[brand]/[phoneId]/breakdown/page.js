@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import PageTransition from '@/components/animations/PageTransition';
 import MotionFade from '@/components/animations/MotionFade';
@@ -10,11 +10,11 @@ import { encryptBkp } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { Home, Smartphone, Settings, User, Mail, Phone } from 'lucide-react';
 import { apiFetcher } from '@/lib/api';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import SafeImage from '@/components/ui/SafeImage';
 
 export default function PhoneBreakdownPage({ params }) {
   const t = useTranslations('phones');
@@ -45,7 +45,11 @@ export default function PhoneBreakdownPage({ params }) {
         const parsed = JSON.parse(raw);
         if (parsed && String(parsed.id) === String(phoneId)) {
           setPhone(parsed);
-          setSelectedColor(parsed.selectedColor || parsed.color || null);
+          // Get color name from selectedColor object or string
+          const colorName = typeof parsed.color === 'string' 
+            ? parsed.color 
+            : parsed.selectedColor?.name || parsed.color?.name || parsed.selectedColor || null;
+          setSelectedColor(colorName);
           setQuantity(parsed.quantity || 1);
           setDeliveryAddress(parsed.deliveryAddress || parsed.address || '');
         }
@@ -54,6 +58,53 @@ export default function PhoneBreakdownPage({ params }) {
     setIsLoading(false);
   }, [phoneId]);
 
+  // Get stock management array
+  const stockManagement = useMemo(() => {
+    return phone?.stock_management || [];
+  }, [phone?.stock_management]);
+
+  // Find selected stock item based on color name
+  const selectedStock = useMemo(() => {
+    if (!stockManagement.length || !selectedColor) return null;
+    const colorName = typeof selectedColor === 'string' ? selectedColor : selectedColor.name;
+    return stockManagement.find((entry) => entry.color_name === colorName) || stockManagement[0];
+  }, [stockManagement, selectedColor]);
+
+  // Helper function to get the correct image source
+  const getImageSrc = (imageSrc, fallback = '/SAMSUNG_GalaxyS23Ultra.png') => {
+    if (!imageSrc) return fallback;
+    if (imageSrc.startsWith('http')) return imageSrc;
+    return imageSrc.startsWith('/') ? imageSrc : `/${imageSrc}`;
+  };
+
+  // Get the phone image from stock_management or fallback
+  const phoneImageSrc = useMemo(() => {
+    if (selectedStock?.icon_color_based) {
+      return getImageSrc(selectedStock.icon_color_based);
+    }
+    if (phone?.icon) {
+      return getImageSrc(phone.icon);
+    }
+    if (stockManagement[0]?.icon_color_based) {
+      return getImageSrc(stockManagement[0].icon_color_based);
+    }
+    return getImageSrc(phone?.picture);
+  }, [selectedStock, phone?.icon, phone?.picture, stockManagement]);
+
+  // Get color name to display
+  const displayColorName = useMemo(() => {
+    if (selectedStock?.color_name) {
+      return selectedStock.color_name;
+    }
+    if (typeof selectedColor === 'string') {
+      return selectedColor;
+    }
+    if (selectedColor?.name) {
+      return selectedColor.name;
+    }
+    return null;
+  }, [selectedStock, selectedColor]);
+
   // Calculate price from API
   useEffect(() => {
     const calc = async () => {
@@ -61,16 +112,12 @@ export default function PhoneBreakdownPage({ params }) {
       setIsLoading(true);
       setError('');
       try {
-        const stockManagementId =
-          selectedColor?.stock_management_id ??
-          selectedColor?.stock_managementId ??
-          selectedColor?.id ??
-          null;
+        const stockManagementId = selectedStock?.id || null;
 
         const body = {
           phone_model_id: parseInt(phoneId),
           quantity: quantity,
-          color_id: selectedColor?.id || null,
+          color_id: selectedStock?.color_id || null,
           stock_management_id: stockManagementId,
         };
         const res = await apiFetcher.post('/api/brandnew/orders/calculate_price/', body);
@@ -95,7 +142,7 @@ export default function PhoneBreakdownPage({ params }) {
       }
     };
     calc();
-  }, [phoneId, phone?.id, quantity, selectedColor, t]);
+  }, [phoneId, phone?.id, quantity, selectedStock, t]);
 
   // Use API response directly - don't calculate from frontend
   const unitPrice = priceData?.unit_price ? parseFloat(priceData.unit_price) : parseFloat(phone?.final_price || '0');
@@ -153,18 +200,14 @@ export default function PhoneBreakdownPage({ params }) {
       const customerName = user?.name || user?.username || customerInfo.username || 'Customer';
       const customerEmail = user?.email || customerInfo.email || '';
       const customerPhone = user?.phone || customerInfo.phone || '01788175088';
-      const stockManagementId =
-        selectedColor?.stock_management_id ??
-        selectedColor?.stock_managementId ??
-        selectedColor?.id ??
-        null;
+      const stockManagementId = selectedStock?.id || null;
       const body = {
         phone_model_id: parseInt(phoneId),
         quantity: quantity,
         customer_name: customerName,
         customer_email: customerEmail,
         customer_phone: customerPhone,
-        color_id: selectedColor?.id || null,
+        color_id: selectedStock?.color_id || null,
         address: deliveryAddress || '',
         shipping_address: phone?.shipping_address || deliveryAddress || 'a',
         city: phone?.city || 'a',
@@ -265,33 +308,23 @@ export default function PhoneBreakdownPage({ params }) {
                 <div className="md:col-span-2 space-y-4">
                   <div className="bg-white rounded-lg border p-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                        {(() => {
-                          const imageSrc = phone.icon || phone.picture || `/SAMSUNG_GalaxyS23Ultra.png`;
-                          const getImageSrc = (src) => {
-                            if (!src) return '/SAMSUNG_GalaxyS23Ultra.png';
-                            if (src.startsWith('http')) return src;
-                            return src.startsWith('/') ? src : `/${src}`;
-                          };
-                          return (
-                            <Image 
-                              src={getImageSrc(imageSrc)} 
-                              alt={phone.name || phone.title} 
-                              width={40} 
-                              height={40} 
-                              className="rounded"
-                            />
-                          );
-                        })()}
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <SafeImage
+                          src={phoneImageSrc}
+                          alt={phone.name || phone.title}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain rounded"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-base text-secondary truncate">{phone.name || phone.title}</h3>
                         <div className="flex flex-wrap gap-2 mt-1 text-xs text-gray-600">
                           <span>{phone.brand_name || brand}</span>
-                          {selectedColor && (
+                          {displayColorName && (
                             <>
                               <span>•</span>
-                              <span>{t('color')}: {typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</span>
+                              <span>{t('color')}: {displayColorName}</span>
                             </>
                           )}
                           <span>•</span>
@@ -314,10 +347,10 @@ export default function PhoneBreakdownPage({ params }) {
                           <span>{t('unitPrice')}: <span className="font-medium">€{unitPrice.toFixed(2)}</span></span>
                           <span>•</span>
                           <span>{t('quantity')}: <span className="font-medium">{quantity}</span></span>
-                          {selectedColor && (
+                          {displayColorName && (
                             <>
                               <span>•</span>
-                              <span>{t('color')}: <span className="font-medium">{typeof selectedColor === 'string' ? selectedColor : selectedColor.name}</span></span>
+                              <span>{t('color')}: <span className="font-medium">{displayColorName}</span></span>
                             </>
                           )}
                         </div>

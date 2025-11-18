@@ -292,7 +292,7 @@ export default function RichTextEditor({ content, onChange, disabled = false }) 
       }),
       TableHeader.configure({
         HTMLAttributes: {
-          class: 'border border-gray-600 bg-gray-400 font-bold p-2 text-left text-primary',
+          class: 'border border-gray-600 bg-gray-400 font-bold p-2 text-left text-black',
         },
       }),
       TableCell.configure({

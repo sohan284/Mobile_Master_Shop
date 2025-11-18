@@ -23,6 +23,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Dynamically import RichTextEditor with no SSR
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
@@ -35,6 +36,8 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
 });
 
 export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
+  const t = useTranslations('dashboard.repairServices.modelsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -68,13 +71,13 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('pleaseSelectImageFile'));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error(t('imageSizeLimit'));
         return;
       }
 
@@ -90,22 +93,22 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter model name');
+      toast.error(t('pleaseEnterModelName'));
       return;
     }
 
     if (!formData.brand) {
-      toast.error('Please select a brand');
+      toast.error(t('pleaseSelectBrand'));
       return;
     }
 
     if (!formData.image) {
-      toast.error('Please select an image');
+      toast.error(t('pleaseSelectImage'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating model...');
+    const loadingToast = toast.loading(t('creatingModel'));
 
     try {
       // Create FormData for file upload
@@ -123,7 +126,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Model created successfully!');
+      toast.success(t('createdSuccessfully'));
       
       // Reset form
       setFormData({
@@ -139,7 +142,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create model');
+      toast.error(error.response?.data?.message || error.message || t('failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -161,21 +164,21 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
        <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto">
        <DialogHeader>
-          <DialogTitle>Add New Model</DialogTitle>
+          <DialogTitle>{t('addNewModel')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
            {/* Brand Selection */}
            <div className="space-y-2">
-            <Label htmlFor="brand">Brand *</Label>
+            <Label htmlFor="brand">{t('brandLabel')} *</Label>
             <Select
               value={formData.brand}
               onValueChange={(value) => handleSelectChange('brand', value)}
               disabled={isSubmitting || isLoadingBrands}
             >
               <SelectTrigger>
-                <SelectValue placeholder={isLoadingBrands ? "Loading brands..." : "Select a brand"} />
+                <SelectValue placeholder={isLoadingBrands ? t('loadingBrands') : t('selectBrand')} />
               </SelectTrigger>
               <SelectContent>
                 {brands.map((brand) => (
@@ -188,14 +191,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
           </div>
           {/* Model Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Model Name *</Label>
+            <Label htmlFor="name">{t('modelNameLabel')} *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter model name"
+              placeholder={t('modelNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -204,7 +207,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
          </div>
 {/* Image Upload */}
 <div className="space-y-2">
-            <Label htmlFor="image">Model Image *</Label>
+            <Label htmlFor="image">{t('modelImage')} *</Label>
             
             {/* Image Preview */}
             {formData.imagePreview && (
@@ -212,7 +215,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.imagePreview}
-                    alt="Image preview"
+                    alt={t('imagePreview')}
                     fill
                     className="object-contain rounded"
                   />
@@ -260,8 +263,8 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
                     <Upload className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Upload image</p>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                    <p className="text-sm font-medium text-gray-900">{t('uploadImage')}</p>
+                    <p className="text-xs text-gray-500">{t('imageFormat')}</p>
                   </div>
                 </label>
               </div>
@@ -279,14 +282,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands }) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim() || !formData.brand || !formData.image}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Model'}
+              {isSubmitting ? t('creating') : t('createModel')}
             </Button>
           </DialogFooter>
         </form>

@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useApiGet } from "@/hooks/useApi";
+import { useTranslations } from "next-intl";
 
 function OrdersContent() {
   const { isAuthenticated, user } = useAuth();
@@ -47,6 +48,39 @@ function OrdersContent() {
   });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10); // Show 10 orders initially
+  const t = useTranslations("ordersPage");
+  const notAvailableLabel = t("notAvailable");
+  const orderTypeLabels = {
+    repair: t("orderTypeLabels.repair"),
+    phone: t("orderTypeLabels.phone"),
+    accessory: t("orderTypeLabels.accessory"),
+    default: t("orderTypeLabels.default"),
+  };
+  const orderTypeSentences = {
+    repair: t("orderTypeSentences.repair"),
+    phone: t("orderTypeSentences.phone"),
+    accessory: t("orderTypeSentences.accessory"),
+    default: t("orderTypeSentences.default"),
+  };
+  const productLabels = {
+    repair: t("productLabels.repair"),
+    phone: t("productLabels.phone"),
+    accessory: t("productLabels.accessory"),
+    default: t("productLabels.default"),
+  };
+  const scheduleStatusLabels = {
+    past: t("scheduleStatus.past"),
+    today: t("scheduleStatus.today"),
+    upcoming: t("scheduleStatus.upcoming"),
+  };
+  const getOrderTypeLabel = (type) =>
+    orderTypeLabels[type] || orderTypeLabels.default;
+  const getOrderTypeSentence = (type) =>
+    orderTypeSentences[type] || orderTypeSentences.default;
+  const getProductLabel = (type) =>
+    productLabels[type] || productLabels.default;
+  const getCountsLabel = (count) => t("countsLabel", { count });
+  const getShowMoreLabel = (count) => t("buttons.showMore", { count });
 
   // Fetch orders from all three APIs
   const {
@@ -142,9 +176,11 @@ function OrdersContent() {
       ...order,
       orderType: type, // 'repair', 'phone', or 'accessory'
       // Normalize product name
-      productName: order.phone_model_name || order.product_title || "N/A",
+      productName:
+        order.phone_model_name || order.product_title || notAvailableLabel,
       // Normalize brand
-      brandName: order.brand_name || order.phone_model_brand || "N/A",
+      brandName:
+        order.brand_name || order.phone_model_brand || notAvailableLabel,
       // Normalize image
       productImage: order.phone_image || order.product_image || null,
       // Normalize quantity
@@ -253,23 +289,24 @@ function OrdersContent() {
     }
   };
 
-  const getOrderTypeLabel = (orderType) => {
-    switch (orderType) {
-      case "repair":
-        return "Repair Service";
-      case "phone":
-        return "New Phone";
-      case "accessory":
-        return "Accessory";
-      default:
-        return "Order";
-    }
-  };
-
   const renderOrderCard = (order) => {
+    const orderNumberDisplay =
+      order.order_number ||
+      t("orderNumberFallback", { id: order.id || "" });
+    const createdAtDisplay = order.created_at
+      ? new Date(order.created_at).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : notAvailableLabel;
+    const productLabel = getProductLabel(order.orderType);
     // Compute badge props outside of JSX
     const statusLower = (order.status || "").toLowerCase();
-    const statusDisplay = order.status_display || order.status || "Unknown";
+    const statusDisplay =
+      order.status_display || order.status || orderTypeLabels.default;
     let statusBadgeProps = { variant: "outline" };
     let statusIcon = null;
 
@@ -295,7 +332,9 @@ function OrdersContent() {
 
     const paymentStatusLower = (order.payment_status || "").toLowerCase();
     const paymentStatusDisplay =
-      order.payment_status_display || order.payment_status || "Unknown";
+      order.payment_status_display ||
+      order.payment_status ||
+      orderTypeLabels.default;
     let paymentBadgeProps = {
       className:
         "bg-yellow-500/10 text-yellow-500 border-yellow-500 flex items-center",
@@ -342,19 +381,11 @@ function OrdersContent() {
               <div className="flex-1">
                 <h3 className="text-base font-semibold text-secondary flex items-center gap-1.5 mb-0.5">
                   <Package size={16} />
-                  {order.order_number || `Order #${order.id}`}
+                    {orderNumberDisplay}
                 </h3>
                 <p className="text-xs text-accent/60 flex items-center gap-1.5">
                   <Calendar size={12} />
-                  {order.created_at
-                    ? new Date(order.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : "N/A"}
+                    {createdAtDisplay}
                 </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
@@ -373,42 +404,43 @@ function OrdersContent() {
             <div className="grid grid-cols-4 items-center  gap-y-1 text-sm">
               <div className="flex items-center gap-1.5">
                 <Phone size={12} className="text-accent/60 flex-shrink-0" />
-                <span className="text-xs text-accent/60">
-                  {order.orderType === "accessory"
-                    ? "Product"
-                    : order.orderType === "repair"
-                    ? "Repair Service"
-                    : "Phone Model"}
-                  :
-                </span>
+                <span className="text-xs text-accent/60">{productLabel}:</span>
                 <span className="font-medium text-accent">
                   {order.productName}
                 </span>
               </div>
-              {order.brandName && order.brandName !== "N/A" && (
+              {order.brandName && order.brandName !== notAvailableLabel && (
                 <div className="flex items-center gap-1.5">
                   <User size={12} className="text-accent/60 flex-shrink-0" />
-                  <span className="text-xs text-accent/60">Brand:</span>
+                  <span className="text-xs text-accent/60">
+                    {t("labels.brand")}:
+                  </span>
                   <span className="font-medium text-accent">
                     {order.brandName}
                   </span>
                 </div>
               )}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-accent/60">Customer:</span>
+                <span className="text-xs text-accent/60">
+                  {t("labels.customer")}:
+                </span>
                 <span className="font-medium text-accent">
-                  {order.customer_name || "N/A"}
+                  {order.customer_name || notAvailableLabel}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-accent/60">Phone:</span>
+                <span className="text-xs text-accent/60">
+                  {t("labels.phone")}:
+                </span>
                 <span className="font-medium text-accent">
-                  {order.customer_phone || "N/A"}
+                  {order.customer_phone || notAvailableLabel}
                 </span>
               </div>
               {order.quantity > 1 && (
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-accent/60">Qty:</span>
+                  <span className="text-xs text-accent/60">
+                    {t("labels.quantity")}:
+                  </span>
                   <span className="font-medium text-accent">
                     {order.quantity}
                   </span>
@@ -429,15 +461,15 @@ function OrdersContent() {
 
                 if (scheduleInfo.isPast) {
                   badgeStyle = "bg-red-500/10 border-red-500 text-red-500";
-                  statusText = "Past";
+                  statusText = scheduleStatusLabels.past;
                 } else if (scheduleInfo.isToday) {
                   badgeStyle =
                     "bg-orange-500/10 border-orange-500 text-orange-500";
-                  statusText = "Today";
+                  statusText = scheduleStatusLabels.today;
                 } else {
                   badgeStyle =
                     "bg-blue-500/10 border-blue-500 text-blue-500";
-                  statusText = "Upcoming";
+                  statusText = scheduleStatusLabels.upcoming;
                 }
 
                 return (
@@ -467,14 +499,18 @@ function OrdersContent() {
             {/* Amount Section */}
             <div className="pt-2 border-t border-accent/10 flex items-center justify-between">
               <div>
-                <span className="text-xs text-accent/60">Total Amount</span>
+                <span className="text-xs text-accent/60">
+                  {t("labels.totalAmount")}
+                </span>
                 {order.quantity > 1 && (
                   <p className="text-xs text-accent/60 mt-0.5">
-                    {order.quantity} ×{" "}
-                    {(
-                      (parseFloat(order.total_amount) || 0) / order.quantity
-                    ).toFixed(2)}{" "}
-                    {order.currency || "EUR"}
+                    {t("labels.perItem", {
+                      count: order.quantity,
+                      amount: (
+                        (parseFloat(order.total_amount) || 0) / order.quantity
+                      ).toFixed(2),
+                      currency: order.currency || "EUR",
+                    })}
                   </p>
                 )}
               </div>
@@ -496,7 +532,7 @@ function OrdersContent() {
               className="bg-accent text-white hover:bg-accent/90 w-full lg:w-auto whitespace-nowrap flex items-center justify-center gap-1.5 text-sm py-2 px-3"
             >
               <MessageSquare size={14} />
-              Add Review
+              {t("buttons.addReview")}
             </CustomButton>
           </div>
         </div>
@@ -529,11 +565,11 @@ function OrdersContent() {
           <div className="container mx-auto px-4 py-8">
             <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl shadow-lg border border-accent/20 p-8">
               <h2 className="text-2xl font-bold text-secondary mb-4">
-                Please log in to view your orders
+                {t("loginRequiredTitle")}
               </h2>
               <Link href="/login">
                 <CustomButton className="bg-secondary text-primary hover:bg-secondary/90 px-8 py-3">
-                  Go to Login
+                  {t("loginButton")}
                 </CustomButton>
               </Link>
             </div>
@@ -551,7 +587,9 @@ function OrdersContent() {
             <div className="flex flex-col flex-1 min-h-0 rounded-xl">
               {/* Fixed Header */}
               <div className="flex-shrink-0 flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-secondary">My Orders</h2>
+                <h2 className="text-xl font-bold text-secondary">
+                  {t("title")}
+                </h2>
               </div>
 
               {/* Fixed Tabs */}
@@ -565,7 +603,7 @@ function OrdersContent() {
                   }`}
                 >
                   <Package size={16} />
-                  All Orders
+                  {t("tabs.all")}
                   {!isLoading && (
                     <Badge
                       variant="outline"
@@ -588,7 +626,7 @@ function OrdersContent() {
                   }`}
                 >
                   <Wrench size={16} />
-                  Repair Services
+                  {t("tabs.repair")}
                   {!isLoading && normalizedRepairOrders.length > 0 && (
                     <Badge
                       variant="outline"
@@ -611,7 +649,7 @@ function OrdersContent() {
                   }`}
                 >
                   <Smartphone size={16} />
-                  New Phones
+                  {t("tabs.phone")}
                   {!isLoading && normalizedPhoneOrders.length > 0 && (
                     <Badge
                       variant="outline"
@@ -634,7 +672,7 @@ function OrdersContent() {
                   }`}
                 >
                   <ShoppingBag size={16} />
-                  Accessories
+                  {t("tabs.accessory")}
                   {!isLoading && normalizedAccessoryOrders.length > 0 && (
                     <Badge
                       variant="outline"
@@ -671,25 +709,17 @@ function OrdersContent() {
                   <Package size={48} className="mx-auto text-accent/40 mb-4" />
                   <p className="text-accent/80 text-lg">
                     {activeTab === "all"
-                      ? "No orders found."
-                      : `No ${
-                          activeTab === "repair"
-                            ? "repair service"
-                            : activeTab === "phone"
-                            ? "phone"
-                            : "accessory"
-                        } orders found.`}
+                      ? t("empty.allTitle")
+                      : t("empty.filteredTitle", {
+                          type: getOrderTypeSentence(activeTab),
+                        })}
                   </p>
                   <p className="text-accent/60 text-sm mt-2">
                     {activeTab === "all"
-                      ? "Your orders will appear here once you place an order."
-                      : `Try switching to a different tab or place a ${
-                          activeTab === "repair"
-                            ? "repair service"
-                            : activeTab === "phone"
-                            ? "phone"
-                            : "accessory"
-                        } order.`}
+                      ? t("empty.allDescription")
+                      : t("empty.filteredDescription", {
+                          type: getOrderTypeSentence(activeTab),
+                        })}
                   </p>
                 </div>
                 ) : (
@@ -706,13 +736,10 @@ function OrdersContent() {
                               </div>
                               <div>
                                 <h3 className="text-base font-semibold text-secondary">
-                                  Repair Services
+                                  {t("sectionHeaders.repair")}
                                 </h3>
                                 <p className="text-xs text-accent/60">
-                                  {normalizedRepairOrders.length}{" "}
-                                  {normalizedRepairOrders.length === 1
-                                    ? "order"
-                                    : "orders"}
+                                  {getCountsLabel(normalizedRepairOrders.length)}
                                 </p>
                               </div>
                             </div>
@@ -734,13 +761,10 @@ function OrdersContent() {
                               </div>
                               <div>
                                 <h3 className="text-base font-semibold text-secondary">
-                                  New Phones
+                                  {t("sectionHeaders.phone")}
                                 </h3>
                                 <p className="text-xs text-accent/60">
-                                  {normalizedPhoneOrders.length}{" "}
-                                  {normalizedPhoneOrders.length === 1
-                                    ? "order"
-                                    : "orders"}
+                                  {getCountsLabel(normalizedPhoneOrders.length)}
                                 </p>
                               </div>
                             </div>
@@ -762,13 +786,12 @@ function OrdersContent() {
                               </div>
                               <div>
                                 <h3 className="text-base font-semibold text-secondary">
-                                  Accessories
+                                  {t("sectionHeaders.accessory")}
                                 </h3>
                                 <p className="text-xs text-accent/60">
-                                  {normalizedAccessoryOrders.length}{" "}
-                                  {normalizedAccessoryOrders.length === 1
-                                    ? "order"
-                                    : "orders"}
+                                  {getCountsLabel(
+                                    normalizedAccessoryOrders.length
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -793,7 +816,7 @@ function OrdersContent() {
                     onClick={() => setVisibleCount((prev) => prev + 10)}
                     className="bg-accent text-white hover:bg-accent/90 px-6 py-2"
                   >
-                    Show More ({filteredOrders.length - visibleCount} remaining)
+                    {getShowMoreLabel(filteredOrders.length - visibleCount)}
                   </CustomButton>
                 </div>
               )}
@@ -806,23 +829,25 @@ function OrdersContent() {
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
         <DialogContent className="bg-primary border-accent/20 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-secondary">Add Review</DialogTitle>
+            <DialogTitle className="text-secondary">
+              {t("reviewDialog.title")}
+            </DialogTitle>
             <DialogDescription className="text-accent/80">
               {selectedOrder && (
-                <>
-                  Review for{" "}
-                  {selectedOrder.productName ||
+                t("reviewDialog.description", {
+                  product:
+                    selectedOrder.productName ||
                     selectedOrder.phone_model_name ||
                     selectedOrder.product_title ||
-                    "this product"}
-                </>
+                    notAvailableLabel,
+                })
               )}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
               <label className="block text-sm font-medium text-accent mb-2">
-                Rating
+                {t("reviewDialog.ratingLabel")}
               </label>
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((rating) => (
@@ -848,7 +873,7 @@ function OrdersContent() {
 
             <div>
               <label className="block text-sm font-medium text-accent mb-2">
-                Your Review
+                {t("reviewDialog.commentLabel")}
               </label>
               <textarea
                 value={reviewForm.comment}
@@ -861,7 +886,7 @@ function OrdersContent() {
                 required
                 rows={4}
                 className="w-full px-4 py-2 bg-white/5 border border-accent/20 rounded-lg text-accent focus:outline-none focus:border-secondary resize-none"
-                placeholder="Share your experience with this product..."
+                placeholder={t("reviewDialog.commentPlaceholder")}
               />
             </div>
 
@@ -869,12 +894,14 @@ function OrdersContent() {
               <CustomButton
                 onClick={async () => {
                   if (!reviewForm.comment.trim()) {
-                    toast.error("Please enter your review");
+                    toast.error(t("reviewDialog.validationError"));
                     return;
                   }
 
                   setIsSubmittingReview(true);
-                  const loadingToast = toast.loading("Submitting review...");
+                  const loadingToast = toast.loading(
+                    t("reviewDialog.loading")
+                  );
 
                   try {
                     // Determine review type and endpoint based on order type
@@ -907,7 +934,7 @@ function OrdersContent() {
                     await apiFetcher.post(endpoint, payload);
 
                     toast.dismiss(loadingToast);
-                    toast.success("Review submitted successfully!");
+                    toast.success(t("reviewDialog.success"));
 
                     setReviewDialogOpen(false);
                     setReviewForm({ rating: 5, comment: "" });
@@ -918,7 +945,7 @@ function OrdersContent() {
                     toast.error(
                       error.response?.data?.message ||
                         error.response?.data.order_id ||
-                        "Failed to submit review. Please try again."
+                        t("reviewDialog.error")
                     );
                   } finally {
                     setIsSubmittingReview(false);
@@ -927,7 +954,9 @@ function OrdersContent() {
                 disabled={isSubmittingReview}
                 className="bg-secondary text-primary hover:bg-secondary/90 flex-1"
               >
-                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                {isSubmittingReview
+                  ? t("buttons.submittingReview")
+                  : t("buttons.submitReview")}
               </CustomButton>
               <CustomButton
                 onClick={() => {
@@ -938,7 +967,7 @@ function OrdersContent() {
                 disabled={isSubmittingReview}
                 className="bg-white/10 text-accent hover:bg-white/20 flex-1"
               >
-                Cancel
+                {t("buttons.cancel")}
               </CustomButton>
             </div>
           </div>

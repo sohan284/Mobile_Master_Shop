@@ -16,8 +16,10 @@ import {
   List,
   Smartphone as PhoneIcon
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function NewPhonesPage() {
+  const t = useTranslations('dashboard.newPhones');
   const router = useRouter();
   const [stats, setStats] = useState({
     totalBrands: 0,
@@ -52,15 +54,15 @@ export default function NewPhonesPage() {
 
   const quickActions = [
     {
-      title: 'Brands',
-      description: 'Manage phone brands',
+      title: t('brands'),
+      description: t('manageBrands'),
       icon: Tag,
       href: '/dashboard/new-phones/brands',
       color: 'bg-blue-500'
     },
     {
-      title: 'Models',
-      description: 'Manage phone models',
+      title: t('models'),
+      description: t('manageModels'),
       icon: PhoneIcon,
       href: '/dashboard/new-phones/models',
       color: 'bg-green-500'
@@ -78,8 +80,8 @@ export default function NewPhonesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">New Phones</h1>
-        <p className="text-gray-600">Manage new phone brands and models</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       {/* Stats Cards */}
@@ -90,7 +92,7 @@ export default function NewPhonesPage() {
               <Tag className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Brands</p>
+              <p className="text-sm font-medium text-gray-600">{t('totalBrands')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalBrands}</p>
             </div>
           </div>
@@ -102,7 +104,7 @@ export default function NewPhonesPage() {
               <PhoneIcon className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Models</p>
+              <p className="text-sm font-medium text-gray-600">{t('totalModels')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.totalModels}</p>
             </div>
           </div>
@@ -114,7 +116,7 @@ export default function NewPhonesPage() {
               <TrendingUp className="h-6 w-6 text-yellow-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+              <p className="text-sm font-medium text-gray-600">{t('totalRevenue')}</p>
               <p className="text-2xl font-bold text-gray-900">${stats.totalRevenue.toLocaleString()}</p>
             </div>
           </div>
@@ -126,7 +128,7 @@ export default function NewPhonesPage() {
               <Smartphone className="h-6 w-6 text-purple-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Active Brands</p>
+              <p className="text-sm font-medium text-gray-600">{t('activeBrands')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats.activeBrands}</p>
             </div>
           </div>
@@ -136,8 +138,8 @@ export default function NewPhonesPage() {
       {/* Quick Actions */}
       <div className="bg-white/10  rounded-lg shadow-sm border">
         <div className="px-6 py-4 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-          <p className="text-sm text-gray-600">Manage different aspects of your new phones</p>
+          <h2 className="text-lg font-semibold text-gray-900">{t('quickActions')}</h2>
+          <p className="text-sm text-gray-600">{t('quickActionsDescription')}</p>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

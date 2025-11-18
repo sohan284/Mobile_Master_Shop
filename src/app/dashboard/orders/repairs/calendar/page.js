@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import PageTransition from "@/components/animations/PageTransition";
 import { useApiGet } from "@/hooks/useApi";
 import { apiFetcher } from "@/lib/api";
@@ -18,9 +18,43 @@ import {
   X,
   Loader2,
   Phone,
+  Plus,
+  Trash2,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+const getInitialCustomOrderForm = () => ({
+  brandId: "",
+  brandSlug: "",
+  modelId: "",
+  problems: [],
+  customerName: "",
+  customerEmail: "",
+  customerPhone: "",
+  customerAddress: "",
+  schedule: "",
+  notes: "",
+  amount: "",
+});
 
 const formatDateKey = (date) => {
   const year = date.getFullYear();
@@ -101,6 +135,28 @@ const getStatusBadge = (status) => {
   return "bg-gray-100 text-gray-700 border-gray-200";
 };
 
+const formatDateTimeLocal = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const formatCurrencyValue = (value, currency = "EUR") => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return null;
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+    }).format(numericValue);
+  } catch {
+    return numericValue.toFixed(2);
+  }
+};
+
 export default function RepairCalendarPage() {
   const t = useTranslations("dashboard.repairCalendar");
   const queryClient = useQueryClient();
@@ -113,11 +169,197 @@ export default function RepairCalendarPage() {
   const [editingSchedule, setEditingSchedule] = useState({});
   const [scheduleValues, setScheduleValues] = useState({});
   const [updatingSchedule, setUpdatingSchedule] = useState({});
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [formState, setFormState] = useState(() => getInitialCustomOrderForm());
+  const [brandOptions, setBrandOptions] = useState([]);
+  const [modelOptions, setModelOptions] = useState([]);
+  const [problemOptions, setProblemOptions] = useState([]);
+  const [isFetchingBrands, setIsFetchingBrands] = useState(false);
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
+  const [isFetchingProblems, setIsFetchingProblems] = useState(false);
+  const [isSubmittingCustomOrder, setIsSubmittingCustomOrder] = useState(false);
+  const [isAmountCustom, setIsAmountCustom] = useState(false);
+  const [editingCustomOrder, setEditingCustomOrder] = useState(null);
+  const [customOrderToDelete, setCustomOrderToDelete] = useState(null);
+  const [isDeletingCustomOrder, setIsDeletingCustomOrder] = useState(false);
+  const resetCustomOrderForm = useCallback(() => {
+    setFormState(getInitialCustomOrderForm());
+    setModelOptions([]);
+    setProblemOptions([]);
+    setIsAmountCustom(false);
+  }, []);
 
+  useEffect(() => {
+    if (!isCreateModalOpen) {
+      resetCustomOrderForm();
+      setEditingCustomOrder(null);
+    }
+  }, [isCreateModalOpen, resetCustomOrderForm]);
+  const getProblemPrice = useCallback(
+    (problemId, partType) => {
+      const problem = problemOptions.find(
+        (item) => String(item.problem_id) === String(problemId)
+      );
+      if (!problem) return 0;
+      if (partType === "original" && problem.original) {
+        return parseFloat(problem.original.final_price || problem.original.base_price || 0) || 0;
+      }
+      if (partType === "duplicate" && problem.duplicate) {
+        return parseFloat(problem.duplicate.final_price || problem.duplicate.base_price || 0) || 0;
+      }
+      const fallback =
+        parseFloat(problem.final_price || problem.base_price || 0) || 0;
+      return fallback;
+    },
+    [problemOptions]
+  );
+  const calculateProblemsTotal = useCallback(
+    (problems) => {
+      return problems.reduce((sum, problem) => {
+        return sum + getProblemPrice(problem.problem_id, problem.part_type);
+      }, 0);
+    },
+    [getProblemPrice]
+  );
+  useEffect(() => {
+    if (!isAmountCustom) {
+      setFormState((prev) => {
+        const total = calculateProblemsTotal(prev.problems);
+        const nextAmount = total ? total.toString() : "";
+        if (nextAmount === prev.amount) {
+          return prev;
+        }
+        return {
+          ...prev,
+          amount: nextAmount,
+        };
+      });
+    }
+  }, [formState.problems, calculateProblemsTotal, isAmountCustom]);
+
+  
+
+ 
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchBrands = async () => {
+      setIsFetchingBrands(true);
+      try {
+        const response = await apiFetcher.get("/api/repair/brands/");
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setBrandOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load brands"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingBrands(false);
+        }
+      }
+    };
+    fetchBrands();
+    return () => {
+      isMounted = false;
+    };
+  }, [t]);
+
+  useEffect(() => {
+    if (!formState.brandId) {
+      setModelOptions([]);
+      return;
+    }
+    let isMounted = true;
+    const fetchModels = async () => {
+      setIsFetchingModels(true);
+      try {
+        const param = formState.brandSlug || formState.brandId;
+        const url = param
+          ? `/api/repair/models/?brand=${encodeURIComponent(param)}`
+          : "/api/repair/models/";
+        const response = await apiFetcher.get(url);
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setModelOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load models"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingModels(false);
+        }
+      }
+    };
+    fetchModels();
+    return () => {
+      isMounted = false;
+    };
+  }, [formState.brandId, formState.brandSlug, t]);
+
+  useEffect(() => {
+    if (!formState.modelId) {
+      setProblemOptions([]);
+      return;
+    }
+    let isMounted = true;
+    const fetchProblems = async () => {
+      setIsFetchingProblems(true);
+      try {
+        const response = await apiFetcher.get(
+          `/api/repair/repair-prices/?phone_model=${formState.modelId}`
+        );
+        const list = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response?.results)
+          ? response.results
+          : Array.isArray(response)
+          ? response
+          : [];
+        if (isMounted) {
+          setProblemOptions(list);
+        }
+      } catch (error) {
+        toast.error(
+          error?.response?.data?.message ||
+            t("customOrderLoadFailed") ||
+            "Failed to load problems"
+        );
+      } finally {
+        if (isMounted) {
+          setIsFetchingProblems(false);
+        }
+      }
+    };
+    fetchProblems();
+    return () => {
+      isMounted = false;
+    };
+  }, [formState.modelId, t]);
   const {
     data: ordersData,
-    isLoading,
-    error,
+    isLoading: isLoadingOrders,
+    error: errorOrders,
     refetch,
     isRefetching,
   } = useApiGet(["repairOrdersCalendar"], () => {
@@ -127,6 +369,285 @@ export default function RepairCalendarPage() {
     params.append("ordering", "schedule");
     return apiFetcher.get(`/api/admin/orders/?${params.toString()}`);
   });
+
+  const {
+    data: customOrdersData,
+    isLoading: isLoadingCustomOrders,
+    error: customOrdersError,
+    refetch: refetchCustomOrders,
+  } = useApiGet(["customRepairOrders"], () =>
+    apiFetcher.get("/api/repair/custom-orders/")
+  );
+  const openCreateModal = useCallback(() => {
+    resetCustomOrderForm();
+    setEditingCustomOrder(null);
+    setIsCreateModalOpen(true);
+  }, [resetCustomOrderForm]);
+
+  const handleBrandSelect = useCallback(
+    (value) => {
+      const brand = brandOptions.find((item) => String(item.id) === value);
+      setFormState((prev) => ({
+        ...prev,
+        brandId: value,
+        brandSlug: brand?.slug || "",
+        modelId: "",
+        problems: [],
+        amount: "",
+      }));
+      setIsAmountCustom(false);
+    },
+    [brandOptions]
+  );
+
+  const handleModelSelect = useCallback((value) => {
+    setFormState((prev) => ({
+      ...prev,
+      modelId: value,
+      problems: [],
+      amount: "",
+    }));
+    setIsAmountCustom(false);
+  }, []);
+
+  const handleProblemToggle = useCallback((problemId, checked, partType = null) => {
+    setFormState((prev) => {
+      let updatedProblems;
+      if (checked) {
+        const filtered = prev.problems.filter(
+          (p) => p.problem_id !== problemId
+        );
+        const newProblem = { problem_id: problemId, part_type: partType };
+        updatedProblems = [...filtered, newProblem];
+      } else {
+        updatedProblems = prev.problems.filter(
+          (p) => !(p.problem_id === problemId && p.part_type === partType)
+        );
+      }
+      const nextState = { ...prev, problems: updatedProblems };
+      if (!isAmountCustom) {
+        const total = calculateProblemsTotal(updatedProblems);
+        nextState.amount = total ? total.toString() : "";
+      }
+      return nextState;
+    });
+  }, [isAmountCustom, calculateProblemsTotal]);
+
+  const isProblemSelected = useCallback((problemId, partType) => {
+    return formState.problems.some(
+      (p) => p.problem_id === problemId && p.part_type === partType
+    );
+  }, [formState.problems]);
+
+  const updateFormField = useCallback((field, value) => {
+    setFormState((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }, []);
+
+  const handleAmountInputChange = useCallback((value) => {
+    setIsAmountCustom(true);
+    setFormState((prev) => ({
+      ...prev,
+      amount: value,
+    }));
+  }, []);
+
+  const handleUseAutoAmount = useCallback(() => {
+    const total = calculateProblemsTotal(formState.problems);
+    setIsAmountCustom(false);
+    setFormState((prev) => ({
+      ...prev,
+      amount: total ? total.toString() : "",
+    }));
+  }, [calculateProblemsTotal, formState.problems]);
+
+  const handleEditCustomOrder = useCallback(
+    (order) => {
+      const brandId =
+        order.brand ||
+        order.brand_id ||
+        order.brandId ||
+        (order.brand_details && order.brand_details.id);
+      const modelId =
+        order.model ||
+        order.model_id ||
+        order.modelId ||
+        (order.model_details && order.model_details.id);
+      const problemsSource =
+        order.rawProblems ||
+        order.problem_details ||
+        order.problems ||
+        [];
+      const mappedProblems = problemsSource
+        .map((problem) => {
+          const id = problem.problem_id || problem.problem || problem.id;
+          if (!id) return null;
+          return {
+            problem_id: String(id),
+            part_type: problem.part_type || null,
+          };
+        })
+        .filter(Boolean);
+      const scheduleValue = order.schedule
+        ? new Date(order.schedule)
+        : null;
+      const scheduleInput =
+        scheduleValue && !Number.isNaN(scheduleValue.getTime())
+          ? formatDateTimeLocal(scheduleValue)
+          : "";
+
+      setFormState({
+        brandId: brandId ? String(brandId) : "",
+        brandSlug: order.brandSlug || order.brand_slug || "",
+        modelId: modelId ? String(modelId) : "",
+        problems: mappedProblems,
+        customerName: order.customerName || order.customer_name || "",
+        customerEmail: order.customerEmail || order.customer_email || "",
+        customerPhone: order.customerPhone || order.customer_phone || "",
+        customerAddress: order.customer_address || "",
+        schedule: scheduleInput,
+        notes: order.notes || "",
+        amount:
+          order.amount !== undefined && order.amount !== null
+            ? String(order.amount)
+            : "",
+      });
+      setIsAmountCustom(true);
+      setEditingCustomOrder(order);
+      setIsCreateModalOpen(true);
+    },
+    []
+  );
+
+  const handleSubmitCustomOrder = useCallback(async () => {
+    if (!formState.brandId) {
+      toast.error(t("customOrderValidationBrand"));
+      return;
+    }
+    if (!formState.modelId) {
+      toast.error(t("customOrderValidationModel"));
+      return;
+    }
+    if (formState.problems.length === 0) {
+      toast.error(t("customOrderValidationProblems"));
+      return;
+    }
+    if (!formState.customerName.trim()) {
+      toast.error(t("customOrderValidationName"));
+      return;
+    }
+    if (!formState.customerPhone.trim()) {
+      toast.error(t("customOrderValidationPhone"));
+      return;
+    }
+    if (!formState.schedule) {
+      toast.error(t("customOrderValidationSchedule"));
+      return;
+    }
+
+    const scheduleDate = new Date(formState.schedule);
+    if (Number.isNaN(scheduleDate.getTime())) {
+      toast.error(t("customOrderValidationSchedule"));
+      return;
+    }
+
+    setIsSubmittingCustomOrder(true);
+    try {
+      // Format problems for API: array of objects with problem_id and part_type
+      const problemPayload = formState.problems.map((p) => {
+        const price = getProblemPrice(p.problem_id, p.part_type);
+        return {
+          problem_id: Number(p.problem_id),
+          part_type: p.part_type,
+          amount: price,
+        };
+      });
+      const derivedAmount = problemPayload.reduce(
+        (acc, problem) => acc + (problem.amount || 0),
+        0
+      );
+      const manualAmount = parseFloat(formState.amount);
+      const finalAmount = Number.isFinite(manualAmount)
+        ? manualAmount
+        : derivedAmount;
+
+      const payload = {
+        brand: Number(formState.brandId),
+        model: Number(formState.modelId),
+        problem: problemPayload,
+        customer_name: formState.customerName.trim(),
+        customer_email: formState.customerEmail.trim() || null,
+        customer_phone: formState.customerPhone.trim(),
+        customer_address: formState.customerAddress.trim(),
+        notes: formState.notes.trim() || undefined,
+        schedule: scheduleDate.toISOString(),
+        amount: finalAmount,
+      };
+
+      if (editingCustomOrder) {
+        const targetId =
+          editingCustomOrder.originalId || editingCustomOrder.id;
+        await apiFetcher.patch(
+          `/api/repair/custom-orders/${targetId}/`,
+          payload
+        );
+        toast.success(t("customOrderUpdated"));
+      } else {
+        await apiFetcher.post("/api/repair/custom-orders/", payload);
+        toast.success(t("customOrderCreated"));
+      }
+      setIsCreateModalOpen(false);
+      resetCustomOrderForm();
+      setEditingCustomOrder(null);
+      refetchCustomOrders();
+      refetch();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          t("customOrderCreateFailed") ||
+          "Failed to create custom order"
+      );
+    } finally {
+      setIsSubmittingCustomOrder(false);
+    }
+  }, [
+    editingCustomOrder,
+    formState,
+    getProblemPrice,
+    refetch,
+    refetchCustomOrders,
+    resetCustomOrderForm,
+    t,
+  ]);
+
+
+
+  const handleRequestDeleteCustomOrder = useCallback((order) => {
+    setCustomOrderToDelete(order);
+  }, []);
+
+  const handleDeleteCustomOrder = useCallback(async () => {
+    if (!customOrderToDelete) return;
+    const targetId =
+      customOrderToDelete.originalId || customOrderToDelete.id;
+    setIsDeletingCustomOrder(true);
+    try {
+      await apiFetcher.delete(`/api/repair/custom-orders/${targetId}/`);
+      toast.success(t("customOrderDeleted"));
+      setCustomOrderToDelete(null);
+      refetchCustomOrders();
+      refetch();
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+          t("customOrderDeleteFailed")
+      );
+    } finally {
+      setIsDeletingCustomOrder(false);
+    }
+  }, [customOrderToDelete, refetch, refetchCustomOrders, t]);
 
   const normalizedOrders = useMemo(() => {
     const source = Array.isArray(ordersData?.data)
@@ -140,6 +661,7 @@ export default function RepairCalendarPage() {
     return source
       .map((order) => ({
         ...order,
+        originalId: order.id,
         orderNumber: order.order_number || `#${order.id}`,
         customerName: order.customer_name || "N/A",
         customerPhone: order.customer_phone || "",
@@ -148,6 +670,21 @@ export default function RepairCalendarPage() {
         status: order.status || "pending",
         paymentStatus: order.payment_status || "unknown",
         schedule: order.schedule || null,
+        amount:
+          order.total_amount !== undefined && order.total_amount !== null
+            ? parseFloat(order.total_amount)
+            : null,
+        currency: order.currency || "EUR",
+        problemsSummary: (
+          Array.isArray(order.repair_items)
+            ? order.repair_items
+            : Array.isArray(order.problems)
+            ? order.problems
+            : []
+        )
+          .map((item) => item.problem || item.problem_name || "")
+          .filter(Boolean)
+          .join(", "),
       }))
       .sort((a, b) => {
         if (!a.schedule && !b.schedule) return 0;
@@ -157,20 +694,105 @@ export default function RepairCalendarPage() {
       });
   }, [ordersData]);
 
+  const normalizedCustomOrders = useMemo(() => {
+    const source = Array.isArray(customOrdersData?.data)
+      ? customOrdersData.data
+      : Array.isArray(customOrdersData?.results)
+      ? customOrdersData.results
+      : Array.isArray(customOrdersData)
+      ? customOrdersData
+      : [];
+
+    return source.map((order) => {
+      const problemList = Array.isArray(order.problems)
+        ? order.problems
+        : Array.isArray(order.problem_details)
+        ? order.problem_details
+        : Array.isArray(order.problems_detail)
+        ? order.problems_detail
+        : Array.isArray(order.problem_names)
+        ? order.problem_names
+        : [];
+      const problemNames = problemList
+        .map((problem) => {
+          if (typeof problem === "string") return problem;
+          return (
+            problem?.name ||
+            problem?.title ||
+            problem?.problem_name ||
+            problem?.label ||
+            ""
+          );
+        })
+        .filter(Boolean);
+
+      return {
+        ...order,
+        id: `custom-${order.id}`,
+        originalId: order.id,
+        orderNumber: order.reference || order.order_number || `CUST-${order.id}`,
+        customerName: order.customer_name || "N/A",
+        customerPhone: order.customer_phone || "",
+        productName:
+          order.model_name ||
+          order.model?.name ||
+          order.phone_model_name ||
+          "Repair Service",
+        brandName: order.brand_name || order.brand?.name || "Custom",
+        status: order.status || "custom",
+        paymentStatus: order.payment_status || "unpaid",
+        schedule: order.schedule || null,
+        problemsSummary: problemNames.join(", "),
+        isCustom: true,
+        rawProblems: problemList,
+        amount:
+          order.amount !== undefined && order.amount !== null
+            ? parseFloat(order.amount)
+            : null,
+        currency: order.currency || "EUR",
+        customerAddress: order.customer_address || "",
+      };
+    });
+  }, [customOrdersData]);
+
+  const allOrders = useMemo(
+    () => [...normalizedOrders, ...normalizedCustomOrders],
+    [normalizedOrders, normalizedCustomOrders]
+  );
+
   const ordersByDate = useMemo(() => {
-    return normalizedOrders.reduce((acc, order) => {
+    return allOrders.reduce((acc, order) => {
       const key = getScheduleDateKey(order.schedule);
       if (!key) return acc;
       if (!acc[key]) acc[key] = [];
       acc[key].push(order);
       return acc;
     }, {});
-  }, [normalizedOrders]);
+  }, [allOrders]);
 
-  const scheduledOrders = normalizedOrders.filter((order) => order.schedule);
+  const scheduledOrders = allOrders.filter((order) => order.schedule);
 
   const selectedDateKey = formatDateKey(selectedDate);
-  const ordersForSelectedDate = ordersByDate[selectedDateKey] || [];
+  const ordersForSelectedDate = useMemo(
+    () => ordersByDate[selectedDateKey] || [],
+    [ordersByDate, selectedDateKey]
+  );
+  const totalAmountForSelectedDate = useMemo(() => {
+    return ordersForSelectedDate.reduce((sum, order) => {
+      const value =
+        order.amount ??
+        order.totalAmount ??
+        order.total_amount ??
+        0;
+      return sum + (Number(value) || 0);
+    }, 0);
+  }, [ordersForSelectedDate]);
+  const selectedDateCurrency =
+    ordersForSelectedDate.find((order) => order.currency)?.currency || "EUR";
+  const totalAmountDisplay =
+    totalAmountForSelectedDate > 0
+      ? formatCurrencyValue(totalAmountForSelectedDate, selectedDateCurrency)
+      : null;
 
   const calendarDays = useMemo(() => {
     const startOfMonth = new Date(
@@ -247,18 +869,26 @@ export default function RepairCalendarPage() {
   };
 
   const handleScheduleUpdate = async (order, isoString) => {
-    const orderId = order.id;
-    if (!orderId) return;
+    const orderKey = order.id;
+    const targetId = order.originalId || order.id;
+    if (!orderKey || !targetId) return;
 
-    setUpdatingSchedule((prev) => ({ ...prev, [orderId]: true }));
+    const endpoint = order.isCustom
+      ? `/api/repair/custom-orders/${targetId}/`
+      : `/api/repair/orders/${targetId}/`;
+
+    setUpdatingSchedule((prev) => ({ ...prev, [orderKey]: true }));
     try {
-      await apiFetcher.patch(`/api/repair/orders/${orderId}/`, {
+      await apiFetcher.patch(endpoint, {
         schedule: isoString,
       });
       queryClient.invalidateQueries({ queryKey: ["repairOrdersCalendar"] });
       queryClient.invalidateQueries({ queryKey: ["repairOrders"] });
+      if (order.isCustom) {
+        refetchCustomOrders();
+      }
       toast.success(t("scheduleUpdated"));
-      cancelEditing(orderId);
+      cancelEditing(orderKey);
     } catch (err) {
       toast.error(
         err?.response?.data?.message || t("scheduleUpdateFailed")
@@ -266,7 +896,7 @@ export default function RepairCalendarPage() {
     } finally {
       setUpdatingSchedule((prev) => {
         const next = { ...prev };
-        delete next[orderId];
+        delete next[orderKey];
         return next;
       });
     }
@@ -367,7 +997,10 @@ export default function RepairCalendarPage() {
     );
   };
 
-  if (isLoading && !ordersData) {
+  const combinedLoading = isLoadingOrders || isLoadingCustomOrders;
+  const error = errorOrders || customOrdersError;
+
+  if (combinedLoading && !ordersData && !customOrdersData) {
     return (
       <PageTransition>
         <div className="flex h-[70vh] items-center justify-center">
@@ -403,6 +1036,13 @@ export default function RepairCalendarPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <button
+              onClick={openCreateModal}
+              className="flex items-center gap-2 text-white border border-gray-200 px-4 py-2 text-sm font-semibold bg-black transition hover:bg-gray-800"
+            >
+              <Plus className="h-4 w-4" />
+              {t("addCustomOrder")}
+            </button>
+            <button
               onClick={handleToday}
               className="flex items-center gap-2 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-500 hover:text-blue-600"
             >
@@ -412,7 +1052,7 @@ export default function RepairCalendarPage() {
             <button
               onClick={() => refetch()}
               disabled={isRefetching}
-              className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+              className="flex items-center gap-2 rounded-xl border border-blue-500 px-4 py-2 text-sm font-semibold text-blue-500 transition disabled:opacity-60"
             >
               {isRefetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -490,7 +1130,7 @@ export default function RepairCalendarPage() {
             </div>
           </section>
 
-          <section className="flex max-h-[640px] flex-col rounded-3xl border border-gray-200 bg-white shadow-sm">
+          <section className="flex max-h-[75vh] flex-col rounded-3xl border border-gray-200 bg-white shadow-sm">
             <div className="border-b border-gray-100 p-6">
               <p className="text-sm font-semibold uppercase text-blue-600 tracking-widest">
                 {t("ordersFor", { date: selectedDateLabel })}
@@ -501,6 +1141,11 @@ export default function RepairCalendarPage() {
               <p className="text-sm text-gray-500">
                 {t("scheduledCount", { count: ordersForSelectedDate.length })}
               </p>
+              {totalAmountDisplay && (
+                <p className="text-sm font-semibold text-gray-700">
+                  {t("amountLabel")}: {totalAmountDisplay}
+                </p>
+              )}
             </div>
             <div className="flex-1 overflow-y-auto p-6">
               {ordersForSelectedDate.length === 0 ? (
@@ -512,31 +1157,84 @@ export default function RepairCalendarPage() {
                   {ordersForSelectedDate.map((order) => {
                     const isEditing = editingSchedule[order.id];
                     const isUpdating = updatingSchedule[order.id];
+                    const orderAmountDisplay = formatCurrencyValue(
+                      order.amount ??
+                        order.totalAmount ??
+                        order.total_amount,
+                      order.currency || "EUR"
+                    );
+                    const address =
+                      order.customerAddress ||
+                      order.customer_address ||
+                      "";
                     return (
                       <article
                         key={order.id}
                         className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
                       >
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div>
                             <p className="text-sm font-semibold text-gray-500">
                               {order.orderNumber}
                             </p>
-                            <h3 className="text-lg font-bold text-gray-900">
-                              {order.customerName}
-                            </h3>
-                            {/* <p className="text-sm text-gray-500">
-                              {order.brandName && `${order.brandName} · ` }
-                              {order.productName}
-                            </p> */}
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm font-bold text-gray-900">
+                                {order.customerName}
+                              </h3>
+                              
+                            </div>
+                            {(order.brandName || order.productName) && (
+                              <p className="text-sm text-gray-500">
+                                {[order.brandName, order.productName]
+                                  .filter(Boolean)
+                                  .join(" · ")}
+                              </p>
+                            )}
+                            {order.problemsSummary && (
+                              <p className="text-xs text-gray-500">
+                                {order.problemsSummary}
+                              </p>
+                            )}
+                            {address && (
+                              <p className="mt-1 text-xs text-gray-500">
+                                {address}
+                              </p>
+                            )}
+                            {orderAmountDisplay && (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {t("amountLabel")}: {orderAmountDisplay}
+                              </p>
+                            )}
                           </div>
-                          <span
-                            className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
-                              order.status
-                            )}`}
-                          >
-                            {order.status}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadge(
+                                order.status
+                              )}`}
+                            >
+                              {order.status}
+                            </span>
+                            {order.isCustom && (
+                              <>
+                                <button
+                                  onClick={() => handleEditCustomOrder(order)}
+                                  className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:border-blue-500 hover:text-blue-600"
+                                  title={t("editCustomOrderAction")}
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleRequestDeleteCustomOrder(order)
+                                  }
+                                  className="rounded-full border border-gray-200 p-2 text-gray-600 transition hover:border-red-500 hover:text-red-600"
+                                  title={t("deleteOrderLabel")}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
 
                         <div className="mt-4 space-y-3">
@@ -564,6 +1262,344 @@ export default function RepairCalendarPage() {
           </section>
         </div>
       </div>
+      <Dialog className="w-[75vw]" open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent style={{ width: '75vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[75vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200">
+          <DialogHeader>
+            <DialogTitle>
+              {editingCustomOrder
+                ? t("editCustomOrderTitle")
+                : t("customOrderModalTitle")}
+            </DialogTitle>
+            <DialogDescription>
+              {editingCustomOrder
+                ? t("editCustomOrderDescription")
+                : t("customOrderModalDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-brand">{t("brandLabel")}</Label>
+                <Select
+                  value={formState.brandId}
+                  onValueChange={handleBrandSelect}
+                  disabled={isFetchingBrands || isSubmittingCustomOrder}
+                >
+                  <SelectTrigger id="custom-brand">
+                    <SelectValue placeholder={t("selectBrand")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {brandOptions.map((brand) => (
+                      <SelectItem key={brand.id} value={String(brand.id)}>
+                        {brand.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-model">{t("modelLabel")}</Label>
+                <Select
+                  value={formState.modelId}
+                  onValueChange={handleModelSelect}
+                  disabled={
+                    !formState.brandId ||
+                    isFetchingModels ||
+                    isSubmittingCustomOrder
+                  }
+                >
+                  <SelectTrigger id="custom-model">
+                    <SelectValue placeholder={t("selectModel")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {modelOptions.map((model) => (
+                      <SelectItem key={model.id} value={String(model.id)}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>{t("problemsLabel")}</Label>
+              <div className="rounded-xl border border-dashed border-gray-200 p-3 max-h-96 overflow-y-auto">
+                {isFetchingProblems ? (
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("loadingLabel")}
+                  </div>
+                ) : problemOptions.length === 0 ? (
+                  <p className="text-sm text-gray-500">
+                    {t("noProblemsLabel")}
+                  </p>
+                ) : (
+                  <div className="space-y-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {problemOptions.map((problem) => {
+                      const problemId = String(problem.problem_id);
+                      const hasOriginal = problem.original !== null;
+                      const hasDuplicate = problem.duplicate !== null;
+                      const originalSelected = isProblemSelected(problemId, "original");
+                      const duplicateSelected = isProblemSelected(problemId, "duplicate");
+                      const anySelected = originalSelected || duplicateSelected;
+
+                      return (
+                        <div
+                          key={problem.problem_id}
+                          className={`rounded-lg border p-3 h-full ${
+                            anySelected
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-white"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                              {problem.problem_name}
+                            </span>
+                          </div>
+                          {problem.problem_description && (
+                            <p className="text-xs text-gray-500 mb-2">
+                              {problem.problem_description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {hasOriginal && (
+                              <label
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleProblemToggle(problemId, !originalSelected, "original");
+                                }}
+                                className={`flex cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-xs w-full ${
+                                  originalSelected
+                                    ? "border-green-600 bg-green-50 text-green-700"
+                                    : "border-gray-300 bg-white text-gray-700"
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={originalSelected}
+                                  onCheckedChange={(value) =>
+                                    handleProblemToggle(problemId, Boolean(value), "original")
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="flex-1">Original</span>
+                                {problem.original && (
+                                  <span className="text-xs font-semibold">
+                                    ${parseFloat(problem.original.final_price || 0).toFixed(2)}
+                                  </span>
+                                )}
+                              </label>
+                            )}
+                            {hasDuplicate && (
+                              <label
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleProblemToggle(problemId, !duplicateSelected, "duplicate");
+                                }}
+                                className={`flex cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-xs w-full ${
+                                  duplicateSelected
+                                    ? "border-orange-600 bg-orange-50 text-orange-700"
+                                    : "border-gray-300 bg-white text-gray-700"
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={duplicateSelected}
+                                  onCheckedChange={(value) =>
+                                    handleProblemToggle(problemId, Boolean(value), "duplicate")
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="flex-1">Duplicate</span>
+                                {problem.duplicate && (
+                                  <span className="text-xs font-semibold">
+                                    ${parseFloat(problem.duplicate.final_price || 0).toFixed(2)}
+                                  </span>
+                                )}
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-amount">{t("amountLabel")}</Label>
+              <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                <Input
+                  id="custom-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={formState.amount}
+                  onChange={(event) => handleAmountInputChange(event.target.value)}
+                  placeholder={t("amountPlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                  className="md:flex-1"
+                />
+                <button
+                  type="button"
+                  onClick={handleUseAutoAmount}
+                  disabled={isSubmittingCustomOrder || formState.problems.length === 0}
+                  className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-60"
+                >
+                  {t("amountAuto")}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500">{t("amountAutoHint")}</p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-name">{t("customerNameLabel")}</Label>
+                <Input
+                  id="custom-name"
+                  value={formState.customerName}
+                  onChange={(event) =>
+                    updateFormField("customerName", event.target.value)
+                  }
+                  placeholder={t("customerNamePlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-email">{t("customerEmailLabel")}</Label>
+                <Input
+                  id="custom-email"
+                  type="email"
+                  value={formState.customerEmail}
+                  onChange={(event) =>
+                    updateFormField("customerEmail", event.target.value)
+                  }
+                  placeholder={t("customerEmailPlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="custom-phone">{t("customerPhoneLabel")}</Label>
+                <Input
+                  id="custom-phone"
+                  value={formState.customerPhone}
+                  onChange={(event) =>
+                    updateFormField("customerPhone", event.target.value)
+                  }
+                  placeholder={t("customerPhonePlaceholder")}
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="custom-schedule">{t("scheduleLabel")}</Label>
+                <Input
+                  id="custom-schedule"
+                  type="datetime-local"
+                  value={formState.schedule}
+                  onChange={(event) =>
+                    updateFormField("schedule", event.target.value)
+                  }
+                  disabled={isSubmittingCustomOrder}
+                />
+              </div>
+            </div>
+           
+            <div className="space-y-2">
+              <Label htmlFor="custom-address">{t("customerAddressLabel")}</Label>
+              <Textarea
+                id="custom-address"
+                value={formState.customerAddress}
+                onChange={(event) =>
+                  updateFormField("customerAddress", event.target.value)
+                }
+                placeholder={t("customerAddressPlaceholder")}
+                disabled={isSubmittingCustomOrder}
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-notes">{t("notesLabel")}</Label>
+              <Textarea
+                id="custom-notes"
+                value={formState.notes}
+                onChange={(event) =>
+                  updateFormField("notes", event.target.value)
+                }
+                placeholder={t("notesPlaceholder")}
+                disabled={isSubmittingCustomOrder}
+                rows={2}
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              disabled={isSubmittingCustomOrder}
+            >
+              {t("cancelLabel")}
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmitCustomOrder}
+              className="flex items-center gap-2 text-white border border-gray-200 px-4 py-2 text-sm font-semibold bg-black transition hover:bg-gray-800 disabled:opacity-60"
+              disabled={isSubmittingCustomOrder}
+            >
+              {isSubmittingCustomOrder && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {editingCustomOrder
+                ? t("updateOrderLabel")
+                : t("createOrderLabel")}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(customOrderToDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCustomOrderToDelete(null);
+          }
+        }}
+      >
+        <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("customOrderDelete")}</DialogTitle>
+            <DialogDescription>
+              {t("customOrderDeleteConfirm", {
+                order: customOrderToDelete?.orderNumber || "",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-gray-600">
+              {t("customOrderDeleteWarning")}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCustomOrderToDelete(null)}
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50"
+              >
+                {t("cancelLabel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteCustomOrder}
+                disabled={isDeletingCustomOrder}
+                className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+              >
+                {isDeletingCustomOrder && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                {t("deleteOrderLabel")}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }

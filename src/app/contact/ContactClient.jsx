@@ -82,7 +82,7 @@ export default function ContactClient() {
     {
       icon: MapPin,
       title: t('address'),
-      content: 'MLKPHONE\n11 Avenue of Marshal de Lattre de Tassigny\n88000 Épinal',
+      content: 'MLKPHONE\n11 avenue DU maréchal de Lattre de Tassigny\n88000 Épinal',
       color: 'from-blue-500/20 to-blue-600/20',
       iconBg: 'bg-blue-500/10',
       iconColor: 'text-blue-400',

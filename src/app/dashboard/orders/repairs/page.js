@@ -16,9 +16,13 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { useTranslations } from "next-intl";
 
 export default function RepairOrdersPage() {
   const router = useRouter();
+  const t = useTranslations("dashboard.orders.repairPage");
+  const tOrders = useTranslations("dashboard.orders.common");
+  const tCommon = useTranslations("dashboard.common");
   const [selectedStatus, setSelectedStatus] = useState("all"); // 'all', 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'
   const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
   const [updatingStatus, setUpdatingStatus] = useState({}); // Track which order is being updated
@@ -50,7 +54,7 @@ export default function RepairOrdersPage() {
         delete newState[variables.orderId];
         return newState;
       });
-      toast.success("Order status updated successfully");
+      toast.success(tOrders("statusUpdated"));
     },
     onError: (error, variables) => {
       setUpdatingStatus((prev) => {
@@ -59,7 +63,7 @@ export default function RepairOrdersPage() {
         return newState;
       });
       toast.error(
-        error.response?.data?.message || "Failed to update order status"
+        error.response?.data?.message || tOrders("statusUpdateFailed")
       );
     },
   });
@@ -76,7 +80,7 @@ export default function RepairOrdersPage() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/api/repair/orders/${selectedOrder.id}/`);
-      toast.success("Order deleted successfully");
+      toast.success(tOrders("deleteSuccess"));
       queryClient.invalidateQueries({
         queryKey: ["repairOrders", selectedStatus, currentPage],
       });
@@ -86,7 +90,7 @@ export default function RepairOrdersPage() {
       toast.error(
         error.response?.data?.message ||
           error.message ||
-          "Failed to delete order"
+          tOrders("deleteFailed")
       );
     } finally {
       setIsDeleting(false);
@@ -110,6 +114,7 @@ export default function RepairOrdersPage() {
       });
       queryClient.invalidateQueries({ queryKey: ['dashboardStatistics'] });
     } catch (error) {
+      toast.error(tOrders("markReadFailed"));
       console.error("Failed to mark order as read:", error);
     }
     router.push(`/dashboard/orders/repairs/${order.id}`);
@@ -119,7 +124,7 @@ export default function RepairOrdersPage() {
   const handleScheduleUpdate = async (order, newSchedule) => {
     const orderId = order.id;
     if (!orderId) {
-      toast.error("Order ID not found");
+      toast.error(tOrders("orderIdMissing"));
       return;
     }
 
@@ -147,10 +152,10 @@ export default function RepairOrdersPage() {
         return newState;
       });
 
-      toast.success("Schedule updated successfully");
+      toast.success(t("scheduleUpdated"));
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to update schedule"
+        error.response?.data?.message || t("scheduleUpdateFailed")
       );
     } finally {
       setUpdatingSchedule((prev) => {
@@ -204,7 +209,7 @@ export default function RepairOrdersPage() {
     const dateTimeValue = scheduleValues[orderId];
     
     if (!dateTimeValue) {
-      toast.error("Please select a date and time");
+      toast.error(t("scheduleSelectPlaceholder"));
       return;
     }
 
@@ -223,7 +228,7 @@ export default function RepairOrdersPage() {
     // Ensure we have the order ID
     const orderId = order.id;
     if (!orderId) {
-      toast.error("Order ID not found");
+      toast.error(tOrders("orderIdMissing"));
       return;
     }
 
@@ -277,20 +282,25 @@ export default function RepairOrdersPage() {
         ...order,
         orderType: orderType,
         // Normalize common fields
-        productName: order.phone_model_name || order.product_title || "N/A",
-        brandName: order.brand_name || order.phone_model_brand || "N/A",
+        productName:
+          order.phone_model_name || order.product_title || tCommon("noData"),
+        brandName:
+          order.brand_name || order.phone_model_brand || tCommon("noData"),
         productImage: order.phone_image || order.product_image || null,
         quantity: order.quantity || order.items_count || 1,
         orderNumber: order.order_number || `#${order.id}`,
-        customerName: order.customer_name || "N/A",
-        customerPhone: order.customer_phone || "N/A",
+        customerName: order.customer_name || tCommon("noData"),
+        customerPhone: order.customer_phone || tCommon("noData"),
         totalAmount: parseFloat(order.total_amount) || 0,
         currency: order.currency || "EUR",
         status: order.status || "unknown",
-        statusDisplay: order.status_display || order.status || "Unknown",
+        statusDisplay:
+          order.status_display || order.status || tCommon("unknown"),
         paymentStatus: order.payment_status || "unknown",
         paymentStatusDisplay:
-          order.payment_status_display || order.payment_status || "Unknown",
+          order.payment_status_display ||
+          order.payment_status ||
+          tCommon("unknown"),
         createdAt: order.created_at || null,
         schedule: order.schedule || null,
         colorName: order.color_name || order.color?.name || order.color || null,
@@ -316,7 +326,7 @@ export default function RepairOrdersPage() {
       .sort((a, b) => {
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       });
-  }, [ordersData]);
+  }, [ordersData, tCommon]);
 
   // Extract pagination info from API response
   const pagination = ordersData?.pagination || {};
@@ -418,26 +428,32 @@ export default function RepairOrdersPage() {
   };
 
   // Status options for dropdown
-  const statusOptions = [
-    { value: "pending", label: "Pending" },
-    { value: "confirmed", label: "Confirmed" },
-    { value: "processing", label: "Processing" },
-    { value: "shipped", label: "Shipped" },
-    { value: "delivered", label: "Delivered" },
-    { value: "cancelled", label: "Cancelled" },
-    { value: "refunded", label: "Refunded" },
-  ];
+  const statusOptions = useMemo(
+    () => [
+      { value: "pending", label: tCommon("pending") },
+      { value: "confirmed", label: tCommon("confirmed") },
+      { value: "processing", label: tCommon("processing") },
+      { value: "shipped", label: tCommon("shipped") },
+      { value: "delivered", label: tCommon("delivered") },
+      { value: "cancelled", label: tCommon("cancelled") },
+      { value: "refunded", label: tCommon("refunded") },
+    ],
+    [tCommon]
+  );
 
   // Status options for filter dropdown (with 'all')
-  const filterStatusOptions = [
-    { value: "all", label: "All Statuses" },
-    ...statusOptions,
-  ];
+  const filterStatusOptions = useMemo(
+    () => [
+      { value: "all", label: tOrders("allStatuses") },
+      ...statusOptions,
+    ],
+    [statusOptions, tOrders]
+  );
 
   // Define columns for DataTable - simplified
   const columns = [
     {
-      header: "Order Number",
+      header: tOrders("orderNumber"),
       accessor: "orderNumber",
       sortable: true,
       render: (order) => (
@@ -450,7 +466,7 @@ export default function RepairOrdersPage() {
       ),
     },
     {
-      header: "Amount",
+      header: tOrders("amount"),
       accessor: "totalAmount",
       sortable: true,
       render: (order) => (
@@ -460,7 +476,7 @@ export default function RepairOrdersPage() {
       ),
     },
     {
-      header: "Status",
+      header: tOrders("status"),
       accessor: "status",
       sortable: true,
       render: (order) => {
@@ -479,7 +495,7 @@ export default function RepairOrdersPage() {
             >
               <SelectValue>
                 {isUpdating ? (
-                  <span className="text-xs">Updating...</span>
+                  <span className="text-xs">{tOrders("updating")}</span>
                 ) : (
                   <span className="text-xs font-semibold capitalize">
                     {statusOptions.find((opt) => opt.value === currentStatus)
@@ -500,7 +516,7 @@ export default function RepairOrdersPage() {
       },
     },
     {
-      header: "Payment",
+      header: tOrders("payment"),
       accessor: "paymentStatus",
       sortable: true,
       render: (order) => (
@@ -514,7 +530,7 @@ export default function RepairOrdersPage() {
       ),
     },
     {
-      header: "Schedule",
+      header: t("scheduleColumn"),
       accessor: "schedule",
       sortable: true,
       render: (order) => {
@@ -543,7 +559,7 @@ export default function RepairOrdersPage() {
                 onClick={() => saveSchedule(order)}
                 disabled={isUpdating}
                 className="p-1.5 bg-green-500 cursor-pointer text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Save schedule"
+                title={t("scheduleSaveTooltip")}
               >
                 <Check size={16} />
               </button>
@@ -551,7 +567,7 @@ export default function RepairOrdersPage() {
                 onClick={() => cancelEditingSchedule(orderId)}
                 disabled={isUpdating}
                 className="p-1.5 bg-red-500 cursor-pointer text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Cancel"
+                title={t("scheduleCancelTooltip")}
               >
                 <X size={16} />
               </button>
@@ -563,12 +579,14 @@ export default function RepairOrdersPage() {
         if (!scheduleInfo) {
           return (
             <div className="flex items-center gap-2 max-w-[300px]">
-              <span className="text-gray-400 italic text-xs">Not scheduled</span>
+              <span className="text-gray-400 italic text-xs">
+                {t("scheduleNotSet")}
+              </span>
               <button
                 onClick={() => startEditingSchedule(order)}
                 disabled={isUpdating}
                 className="p-1.5 text-blue-600 cursor-pointer hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Add schedule"
+                title={t("scheduleAddTooltip")}
               >
                 <Edit2 size={14} />
               </button>
@@ -590,11 +608,11 @@ export default function RepairOrdersPage() {
         // Determine status text
         let statusText = "";
         if (scheduleInfo.isPast) {
-          statusText = "Past";
+          statusText = t("schedulePast");
         } else if (scheduleInfo.isToday) {
-          statusText = "Today";
+          statusText = t("scheduleToday");
         } else if (scheduleInfo.isUpcoming) {
-          statusText = "Upcoming";
+          statusText = t("scheduleUpcoming");
         }
 
         return (
@@ -621,7 +639,7 @@ export default function RepairOrdersPage() {
               onClick={() => startEditingSchedule(order)}
               disabled={isUpdating}
               className="p-1.5 text-blue-600 cursor-pointer hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
-              title="Edit schedule"
+                title={t("scheduleEditTooltip")}
             >
               {isUpdating ? (
                 <Clock size={14} className="animate-spin" />
@@ -634,7 +652,7 @@ export default function RepairOrdersPage() {
       },
     },
     {
-      header: "Date",
+        header: tOrders("date"),
       accessor: "createdAt",
       sortable: true,
       render: (order) =>
@@ -650,7 +668,7 @@ export default function RepairOrdersPage() {
             </span>
           </div>
         ) : (
-          "N/A"
+          tCommon("noData")
         ),
     },
   ];
@@ -663,22 +681,24 @@ export default function RepairOrdersPage() {
       >
         {/* Scrollable Orders Table Section */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Repair Orders</h1>
-          <p className="text-gray-600">Manage repair service orders</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t("title")}</h1>
+          <p className="text-gray-600">{t("subtitle")}</p>
         </div>
         <div className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 flex flex-col ">
             {error ? (
               <div className="p-6 text-center bg-white rounded-lg shadow-sm border border-gray-200">
                 <p className="text-red-600">
-                  Error loading orders: {error.message || "Unknown error"}
+                  {tOrders("loadError", {
+                    message: error.message || tOrders("unknownError"),
+                  })}
                 </p>
               </div>
             ) : (
               <DataTable
                 data={filteredOrders}
                 columns={columns}
-                title="Repair Orders"
+                title={t("tableTitle")}
                 searchable={true}
                 pagination={true}
                 itemsPerPage={pageSize}
@@ -701,7 +721,7 @@ export default function RepairOrdersPage() {
                     onValueChange={setSelectedStatus}
                   >
                     <SelectTrigger className="w-[180px] h-10">
-                      <SelectValue placeholder="Filter by status" />
+                      <SelectValue placeholder={tOrders("filterByStatus")} />
                     </SelectTrigger>
                     <SelectContent>
                       {filterStatusOptions.map((option) => (
@@ -723,12 +743,12 @@ export default function RepairOrdersPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Order"
-        message={`Are you sure you want to delete order "${
-          selectedOrder?.orderNumber || selectedOrder?.id
-        }"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={tOrders("deleteOrder")}
+        message={tOrders("deleteConfirm", {
+          order: selectedOrder?.orderNumber || selectedOrder?.id || "",
+        })}
+        confirmText={tOrders("yesDelete")}
+        cancelText={tCommon("cancel")}
         type="danger"
         isLoading={isDeleting}
       />

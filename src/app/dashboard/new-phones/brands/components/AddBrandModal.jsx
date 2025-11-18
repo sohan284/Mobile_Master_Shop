@@ -16,8 +16,11 @@ import {
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
+  const t = useTranslations('dashboard.newPhones.brandsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -39,13 +42,13 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('pleaseSelectImageFile'));
         return;
       }
 
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size should be less than 5MB');
+        toast.error(t('imageSizeLimit'));
         return;
       }
 
@@ -69,12 +72,12 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter brand name');
+      toast.error(t('pleaseEnterBrandName'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating brand...');
+    const loadingToast = toast.loading(t('creatingBrand'));
 
     try {
       // Create FormData for file upload
@@ -94,7 +97,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Brand created successfully!');
+      toast.success(t('createdSuccessfully'));
       
       // Reset form
       setFormData({
@@ -110,7 +113,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create brand');
+      toast.error(error.response?.data?.message || error.message || t('failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -132,20 +135,20 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Brand</DialogTitle>
+          <DialogTitle>{t('addNewBrand')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Brand Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Brand Name *</Label>
+            <Label htmlFor="name">{t('brandNameLabel')} *</Label>
             <Input
               id="name"
               name="name"
               type="text"
               value={formData.name}
               onChange={handleNameChange}
-              placeholder="Enter brand name"
+              placeholder={t('brandNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -153,13 +156,13 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('descriptionLabel')}</Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Enter brand description"
+              placeholder={t('descriptionPlaceholder')}
               disabled={isSubmitting}
               rows={3}
             />
@@ -167,7 +170,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
 
           {/* Icon Upload */}
           <div className="space-y-2">
-            <Label htmlFor="icon">Brand Icon</Label>
+            <Label htmlFor="icon">{t('brandIcon')}</Label>
             
             {/* Icon Preview */}
             {formData.iconPreview && (
@@ -175,7 +178,7 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
                 <div className="relative w-16 h-16">
                   <Image
                     src={formData.iconPreview}
-                    alt="Icon preview"
+                    alt={t('iconPreview')}
                     fill
                     className="object-contain rounded"
                   />
@@ -223,8 +226,8 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
                     <Upload className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Upload icon</p>
-                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                    <p className="text-sm font-medium text-gray-900">{t('uploadIcon')}</p>
+                    <p className="text-xs text-gray-500">{t('imageFormat')}</p>
                   </div>
                 </label>
               </div>
@@ -240,14 +243,14 @@ export default function AddBrandModal({ isOpen, onClose, onSuccess }) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting || !formData.name.trim()}
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Brand'}
+              {isSubmitting ? t('creating') : t('createBrand')}
             </Button>
           </DialogFooter>
         </form>

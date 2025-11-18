@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Dynamically import RichTextEditor with no SSR
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
@@ -32,6 +33,8 @@ const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
 });
 
 export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colors }) {
+  const t = useTranslations('dashboard.newPhones.modelsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -120,11 +123,11 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('pleaseSelectImageFile'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+      toast.error(t('imageSizeLimit'));
       return;
     }
 
@@ -197,43 +200,43 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter model name');
+      toast.error(t('pleaseEnterModelName'));
       return;
     }
   
     if (!formData.brand) {
-      toast.error('Please select a brand');
+      toast.error(t('pleaseSelectBrand'));
       return;
     }
   
     if (!formData.main_amount) {
-      toast.error('Please enter main amount');
+      toast.error(t('pleaseEnterMainAmount'));
       return;
     }
   
     if (!formData.ram) {
-      toast.error('Please select RAM');
+      toast.error(t('pleaseSelectRAM'));
       return;
     }
   
     if (!formData.memory) {
-      toast.error('Please select memory');
+      toast.error(t('pleaseSelectMemory'));
       return;
     }
   
     if (formData.stock_management.length === 0) {
-      toast.error('Please add at least one color variant');
+      toast.error(t('pleaseAddColorVariant'));
       return;
     }
   
     const status = getCompletionStatus();
     if (status.complete !== status.total) {
-      toast.error('Please complete all color variants (add image and quantity)');
+      toast.error(t('pleaseCompleteColorVariants'));
       return;
     }
   
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Creating model...');
+    const loadingToast = toast.loading(t('creatingModel'));
   
     try {
       // Calculate discounted amount
@@ -287,7 +290,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
         }
       });
 
-      toast.loading('Uploading color images...', { id: loadingToast });
+      toast.loading(t('uploadingColorImages'), { id: loadingToast });
 
       await Promise.all(
         formData.stock_management.map(async (variant, index) => {
@@ -310,7 +313,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       );
   
       toast.dismiss(loadingToast);
-      toast.success('Model created successfully!');
+      toast.success(t('createdSuccessfully'));
       
       // Reset form
       setFormData({
@@ -333,7 +336,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
       toast.dismiss(loadingToast);
       console.error('Error creating model:', error);
       console.error('Error response:', error.response?.data);
-      toast.error(error.response?.data?.message || error.message || 'Failed to create model');
+      toast.error(error.response?.data?.message || error.message || t('failedToCreate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -363,7 +366,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Model</DialogTitle>
+          <DialogTitle>{t('addNewModel')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -371,10 +374,10 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Brand Selection */}
             <div className="space-y-2">
-              <Label htmlFor="brand">Brand *</Label>
+              <Label htmlFor="brand">{t('brandLabel')} *</Label>
               <Select value={formData.brand} onValueChange={(value) => setFormData(prev => ({ ...prev, brand: value }))}>
                 <SelectTrigger disabled={isSubmitting}>
-                  <SelectValue placeholder="Select a brand" />
+                  <SelectValue placeholder={t('selectBrand')} />
                 </SelectTrigger>
                 <SelectContent>
                   {brands.map((brand) => (
@@ -399,14 +402,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
             {/* Model Name */}
             <div className="space-y-2">
-              <Label htmlFor="name">Model Name *</Label>
+              <Label htmlFor="name">{t('modelNameLabel')} *</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Enter model name"
+                placeholder={t('modelNamePlaceholder')}
                 disabled={isSubmitting}
                 required
               />
@@ -417,7 +420,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* RAM */}
             <div className="space-y-2">
-              <Label htmlFor="ram">RAM *</Label>
+              <Label htmlFor="ram">{t('ramLabel')} *</Label>
               <div className="flex flex-wrap gap-2">
                 {ramOptions.map((opt) => (
                   <button
@@ -439,7 +442,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
             {/* Memory */}
             <div className="space-y-2">
-              <Label htmlFor="memory">Memory *</Label>
+              <Label htmlFor="memory">{t('memoryLabel')} *</Label>
               <div className="flex flex-wrap gap-2">
                 {memoryOptions.map((opt) => (
                   <button
@@ -464,14 +467,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Main Amount */}
             <div className="space-y-2">
-              <Label htmlFor="main_amount">Main Amount *</Label>
+              <Label htmlFor="main_amount">{t('mainAmountLabel')} *</Label>
               <Input
                 id="main_amount"
                 name="main_amount"
                 type="number"
                 value={formData.main_amount}
                 onChange={handleInputChange}
-                placeholder="Enter main amount"
+                placeholder={t('mainAmountPlaceholder')}
                 disabled={isSubmitting}
                 min="0"
                 step="0.01"
@@ -481,14 +484,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
 
             {/* Discount Type */}
             <div className="space-y-2">
-              <Label htmlFor="discount_type">Discount Type</Label>
+              <Label htmlFor="discount_type">{t('discountTypeLabel')}</Label>
               <Select value={formData.discount_type} onValueChange={(value) => setFormData(prev => ({ ...prev, discount_type: value }))}>
                 <SelectTrigger disabled={isSubmitting}>
-                  <SelectValue placeholder="Select discount type" />
+                  <SelectValue placeholder={t('selectDiscountType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="amount">Fixed Amount</SelectItem>
-                  <SelectItem value="percentage">Percentage</SelectItem>
+                  <SelectItem value="amount">{t('fixedAmount')}</SelectItem>
+                  <SelectItem value="percentage">{t('percentage')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -496,7 +499,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             {/* Discount Value */}
             <div className="space-y-2">
               <Label htmlFor="discount_value">
-                Discount {formData.discount_type === 'percentage' ? 'Percentage' : 'Amount'}
+                {t('discountValueLabel')} {formData.discount_type === 'percentage' ? t('percentage') : t('fixedAmount')}
               </Label>
               <Input
                 id="discount_value"
@@ -506,15 +509,15 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                 onChange={handleInputChange}
                 placeholder={
                   formData.discount_type === 'percentage' 
-                    ? 'Enter discount percentage (e.g., 10)' 
-                    : 'Enter discount amount'
+                    ? t('discountPercentagePlaceholder')
+                    : t('discountAmountPlaceholder')
                 }
                 disabled={isSubmitting}
                 min="0"
                 step={formData.discount_type === 'percentage' ? '1' : '0.01'}
               />
               {formData.discount_type === 'percentage' && (
-                <p className="text-xs text-gray-500">Enter percentage value (e.g., 10 for 10%)</p>
+                <p className="text-xs text-gray-500">{t('discountPercentageHint')}</p>
               )}
             </div>
           </div>
@@ -524,7 +527,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Palette className="h-5 w-5 text-gray-700" />
-                <Label className="text-base font-semibold">Color Variants *</Label>
+                <Label className="text-base font-semibold">{t('colorVariantsLabel')} *</Label>
               </div>
               {formData.stock_management.length > 0 && (
                 <div className="flex items-center space-x-2">
@@ -533,7 +536,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                       ? 'bg-green-100 text-green-700 border border-green-200' 
                       : 'bg-amber-100 text-amber-700 border border-amber-200'
                   }`}>
-                    {status.complete}/{status.total} Complete
+                    {t('completeStatus', { complete: status.complete, total: status.total })}
                   </div>
                   {status.complete !== status.total && (
                     <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -548,7 +551,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             </div>
 
             <p className="text-xs text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-2">
-              💡 <strong>Tip:</strong> Click on a color card to select it, then expand to add product image and stock quantity.
+              {t('colorVariantsTip')}
             </p>
 
             {/* All Colors as Collapsible Items */}
@@ -612,9 +615,9 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                             }`}>
                               {isSelected 
                                 ? isComplete
-                                  ? `✓ Complete - ${variant.quantity} units in stock`
-                                  : '⚠️ Add image and quantity'
-                                : 'Click to select this color'
+                                  ? t('completeWithStock', { quantity: variant.quantity })
+                                  : t('addImageAndQuantity')
+                                : t('clickToSelectColor')
                               }
                             </p>
                           </div>
@@ -634,7 +637,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                                 onClick={(e) => handleColorDeselect(color.id, e)}
                                 className="p-1.5 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
                                 disabled={isSubmitting}
-                                title="Remove color"
+                                title={t('removeColor')}
                               >
                                 <X className="h-4 w-4 text-red-500" />
                               </button>
@@ -665,7 +668,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                               <div className="space-y-2">
                                 <Label className="text-sm font-semibold flex items-center space-x-2 text-gray-700">
                                   <ImageIcon className="h-4 w-4 text-blue-600" />
-                                  <span>Product Image *</span>
+                                  <span>{t('productImageLabel')} *</span>
                                 </Label>
                                 
                                 {variant.imagePreview ? (
@@ -680,7 +683,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                                       onClick={() => handleRemoveVariantImage(variant.color_id)}
                                       className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                                       disabled={isSubmitting}
-                                      title="Remove image"
+                                      title={t('removeColor')}
                                     >
                                       <X className="h-4 w-4" />
                                     </button>
@@ -709,8 +712,8 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                                         <Upload className="h-8 w-8 text-blue-600" />
                                       </div>
                                       <div className="text-center">
-                                        <p className="text-sm font-semibold text-gray-900">Click to upload image</p>
-                                        <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                                        <p className="text-sm font-semibold text-gray-900">{t('uploadImage')}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{t('imageFormat')}</p>
                                       </div>
                                     </label>
                                   </div>
@@ -720,7 +723,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                               {/* Quantity Input */}
                               <div className="space-y-2">
                                 <Label htmlFor={`quantity-${variant.color_id}`} className="text-sm font-semibold text-gray-700">
-                                  Stock Quantity *
+                                  {t('stockQuantityLabel')} *
                                 </Label>
                                 <Input
                                   id={`quantity-${variant.color_id}`}
@@ -728,13 +731,13 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
                                   min="0"
                                   value={variant.quantity}
                                   onChange={(e) => handleQuantityChange(variant.color_id, e.target.value)}
-                                  placeholder="Enter stock quantity"
+                                  placeholder={t('stockQuantityPlaceholder')}
                                   className="text-lg font-semibold border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                                   disabled={isSubmitting}
                                 />
                                 <p className="text-xs text-gray-500 flex items-center space-x-1">
                                   <span>📦</span>
-                                  <span>Available units in stock</span>
+                                  <span>{t('availableUnitsInStock')}</span>
                                 </p>
                               </div>
                             </div>
@@ -748,14 +751,14 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
             ) : (
               <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-lg">
                 <Palette className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No colors available. Please add colors first.</p>
+                <p className="text-sm">{t('noColorsAvailable')}</p>
               </div>
             )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('descriptionLabel')}</Label>
             <RichTextEditor
               content={formData.description}
               onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
@@ -771,7 +774,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
@@ -787,7 +790,7 @@ export default function AddModelModal({ isOpen, onClose, onSuccess, brands, colo
               }
               className="text-secondary cursor-pointer"
             >
-              {isSubmitting ? 'Creating...' : 'Create Model'}
+              {isSubmitting ? t('creating') : t('createModel')}
             </Button>
           </DialogFooter>
         </form>

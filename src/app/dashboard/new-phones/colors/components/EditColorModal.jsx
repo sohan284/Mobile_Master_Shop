@@ -13,8 +13,11 @@ import {
 } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
 import { apiFetcher } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 
 export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
+  const t = useTranslations('dashboard.newPhones.colorsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     code: '#000000'
@@ -43,24 +46,24 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('Please enter color name');
+      toast.error(t('pleaseEnterColorName'));
       return;
     }
 
     if (!formData.code.trim()) {
-      toast.error('Please enter color code');
+      toast.error(t('pleaseEnterColorCode'));
       return;
     }
 
     // Validate hex color code
     const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
     if (!hexColorRegex.test(formData.code)) {
-      toast.error('Please enter a valid hex color code (e.g., #FF0000)');
+      toast.error(t('pleaseEnterValidHexCode'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Updating color...');
+    const loadingToast = toast.loading(t('updatingColor'));
 
     try {
       await apiFetcher.put(`/api/brandnew/color/${color.id}/`, {
@@ -69,7 +72,7 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
       });
 
       toast.dismiss(loadingToast);
-      toast.success('Color updated successfully!');
+      toast.success(t('updatedSuccessfully'));
       
       // Close modal and refresh data
       onClose();
@@ -77,7 +80,7 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to update color');
+      toast.error(error.response?.data?.message || error.message || t('failedToUpdate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -97,18 +100,18 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Color</DialogTitle>
+          <DialogTitle>{t('editColor')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Color Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Color Name</Label>
+            <Label htmlFor="name">{t('colorNameLabel')}</Label>
             <Input
               id="name"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter color name (e.g., Midnight Black)"
+              placeholder={t('colorNamePlaceholder')}
               disabled={isSubmitting}
               required
             />
@@ -116,7 +119,7 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
 
           {/* Color Code */}
           <div className="space-y-2">
-            <Label htmlFor="code">Color Code</Label>
+            <Label htmlFor="code">{t('colorCodeLabel')}</Label>
             <div className="flex items-center space-x-3">
               <input
                 id="code"
@@ -127,12 +130,12 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
                 disabled={isSubmitting}
                 required
                 className="w-16 h-10 rounded border border-gray-300 cursor-pointer"
-                title="Select color"
+                title={t('selectColor')}
               />
               <Input
                 value={formData.code}
                 onChange={handleInputChange}
-                placeholder="#000000"
+                placeholder={t('colorCodePlaceholder')}
                 disabled={isSubmitting}
                 required
                 className="flex-1"
@@ -140,25 +143,25 @@ export default function EditColorModal({ isOpen, onClose, onSuccess, color }) {
               <div 
                 className="w-12 h-10 rounded border border-gray-300"
                 style={{ backgroundColor: formData.code }}
-                title="Color preview"
+                title={t('colorPreview')}
               />
             </div>
             <p className="text-xs text-gray-500">
-              Use the color picker or enter a hex color code (e.g., #FF0000 for red)
+              {t('colorCodeHint')}
             </p>
           </div>
 
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-              Cancel
+            <Button type="button" className='bg-white hover:bg-white/60 cursor-pointer' variant="outline" onClick={handleClose} disabled={isSubmitting}>
+              {tCommon('cancel')}
             </Button>
             <Button 
               type="submit" 
               disabled={isSubmitting || !formData.name.trim() || !formData.code.trim()}
-              className="bg-primary text-white hover:bg-primary/90"
+              className="bg-black text-white hover:bg-black/90 cursor-pointer"
             >
-              {isSubmitting ? 'Updating...' : 'Update Color'}
+              {isSubmitting ? t('updating') : t('updateColor')}
             </Button>
           </DialogFooter>
         </form>

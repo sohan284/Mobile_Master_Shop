@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import Image from 'next/image';
 import { apiFetcher } from '@/lib/api';
 import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 
 // Dynamically import RichTextEditor with no SSR
 const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
@@ -34,6 +35,8 @@ const ramOptions = ['2', '4', '6', '8', '12', '16'];
 const memoryOptions = ['16', '32', '64', '128', '256', '512', '1024'];
 
 export default function EditModelModal({ isOpen, onClose, onSuccess, model, brands, colors }) {
+  const t = useTranslations('dashboard.newPhones.modelsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -103,10 +106,10 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       try {
         setVariantLoadingId(colorId);
         await apiFetcher.delete(`/api/brandnew/stock-management/${variant.stock_id}/`);
-        toast.success('Color variant removed');
+        toast.success(t('colorVariantRemoved'));
       } catch (error) {
         console.error('Failed to delete color variant:', error);
-        toast.error(error.response?.data?.message || 'Failed to delete color variant');
+        toast.error(error.response?.data?.message || t('failedToDeleteColorVariant'));
         setVariantLoadingId(null);
         return;
       }
@@ -129,11 +132,11 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('pleaseSelectImageFile'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size should be less than 5MB');
+      toast.error(t('imageSizeLimit'));
       return;
     }
 
@@ -264,22 +267,22 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      toast.error('Please enter model name');
+      toast.error(t('pleaseEnterModelName'));
       return;
     }
 
     if (!formData.brand) {
-      toast.error('Please select a brand');
+      toast.error(t('pleaseSelectBrand'));
       return;
     }
 
     if (!formData.main_amount) {
-      toast.error('Please enter main amount');
+      toast.error(t('pleaseEnterMainAmount'));
       return;
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Updating model...');
+    const loadingToast = toast.loading(t('updatingModel'));
 
     try {
       // Calculate discounted amount based on type
@@ -343,7 +346,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
         );
       }
 
-      toast.loading('Saving color variants...', { id: loadingToast });
+      toast.loading(t('savingColorVariants'), { id: loadingToast });
 
       await Promise.all(
         formData.stock_management.map(async (variant) => {
@@ -367,7 +370,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       );
 
       toast.dismiss(loadingToast);
-      toast.success('Model updated successfully!');
+      toast.success(t('updatedSuccessfully'));
       
       // Close modal and refresh data
       onClose();
@@ -375,7 +378,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
       
     } catch (error) {
       toast.dismiss(loadingToast);
-      toast.error(error.response?.data?.message || error.message || 'Failed to update model');
+      toast.error(error.response?.data?.message || error.message || t('failedToUpdate'));
     } finally {
       setIsSubmitting(false);
     }
@@ -405,7 +408,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
     <Dialog open={isOpen} onOpenChange={handleClose}>
     <DialogContent style={{ width: '95vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[95vw] sm:max-w-xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
     <DialogHeader>
-          <DialogTitle>Edit Model</DialogTitle>
+          <DialogTitle>{t('editModel')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -413,10 +416,10 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Brand Selection */}
             <div className="space-y-2">
-              <Label htmlFor="brand">Brand *</Label>
+              <Label htmlFor="brand">{t('brandLabel')} *</Label>
               <Select value={formData.brand} onValueChange={(value) => setFormData(prev => ({ ...prev, brand: value }))}>
                 <SelectTrigger disabled={isSubmitting}>
-                  <SelectValue placeholder="Select a brand" />
+                  <SelectValue placeholder={t('selectBrand')} />
                 </SelectTrigger>
                 <SelectContent>
                   {brands.map((brand) => (
@@ -441,14 +444,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
 
             {/* Model Name */}
             <div className="space-y-2">
-              <Label htmlFor="name">Model Name *</Label>
+              <Label htmlFor="name">{t('modelNameLabel')} *</Label>
               <Input
                 id="name"
                 name="name"
                 type="text"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Enter model name"
+                placeholder={t('modelNamePlaceholder')}
                 disabled={isSubmitting}
                 required
               />
@@ -459,7 +462,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* RAM */}
             <div className="space-y-2">
-              <Label htmlFor="ram">RAM</Label>
+              <Label htmlFor="ram">{t('ramLabel')}</Label>
               <div className="flex flex-wrap gap-2">
                 {ramOptions.map((opt) => (
                   <button
@@ -481,7 +484,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
 
             {/* Memory */}
             <div className="space-y-2">
-              <Label htmlFor="memory">Memory</Label>
+              <Label htmlFor="memory">{t('memoryLabel')}</Label>
               <div className="flex flex-wrap gap-2">
                 {memoryOptions.map((opt) => (
                   <button
@@ -506,14 +509,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Main Amount */}
             <div className="space-y-2">
-              <Label htmlFor="main_amount">Main Amount *</Label>
+              <Label htmlFor="main_amount">{t('mainAmountLabel')} *</Label>
               <Input
                 id="main_amount"
                 name="main_amount"
                 type="number"
                 value={formData.main_amount}
                 onChange={handleInputChange}
-                placeholder="Enter main amount"
+                placeholder={t('mainAmountPlaceholder')}
                 disabled={isSubmitting}
                 min="0"
                 step="0.01"
@@ -523,14 +526,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
 
             {/* Discount Type */}
             <div className="space-y-2">
-              <Label htmlFor="discount_type">Discount Type</Label>
+              <Label htmlFor="discount_type">{t('discountTypeLabel')}</Label>
               <Select value={formData.discount_type} onValueChange={(value) => setFormData(prev => ({ ...prev, discount_type: value }))}>
                 <SelectTrigger disabled={isSubmitting}>
-                  <SelectValue placeholder="Select discount type" />
+                  <SelectValue placeholder={t('selectDiscountType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="amount">Fixed Amount</SelectItem>
-                  <SelectItem value="percentage">Percentage</SelectItem>
+                  <SelectItem value="amount">{t('fixedAmount')}</SelectItem>
+                  <SelectItem value="percentage">{t('percentage')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -538,7 +541,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             {/* Discount Value */}
             <div className="space-y-2">
               <Label htmlFor="discount_value">
-                Discount {formData.discount_type === 'percentage' ? 'Percentage' : 'Amount'}
+                {t('discountValueLabel')} {formData.discount_type === 'percentage' ? t('percentage') : t('fixedAmount')}
               </Label>
               <Input
                 id="discount_value"
@@ -548,15 +551,15 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                 onChange={handleInputChange}
                 placeholder={
                   formData.discount_type === 'percentage' 
-                    ? 'Enter discount percentage (e.g., 10)' 
-                    : 'Enter discount amount'
+                    ? t('discountPercentagePlaceholder')
+                    : t('discountAmountPlaceholder')
                 }
                 disabled={isSubmitting}
                 min="0"
                 step={formData.discount_type === 'percentage' ? '1' : '0.01'}
               />
               {formData.discount_type === 'percentage' && (
-                <p className="text-xs text-gray-500">Enter percentage value (e.g., 10 for 10%)</p>
+                <p className="text-xs text-gray-500">{t('discountPercentageHint')}</p>
               )}
             </div>
           </div>
@@ -566,7 +569,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Palette className="h-5 w-5 text-gray-700" />
-                <Label className="text-base font-semibold">Color Variants *</Label>
+                <Label className="text-base font-semibold">{t('colorVariantsLabel')} *</Label>
               </div>
               {formData.stock_management.length > 0 && (
                 <div className="flex items-center space-x-2">
@@ -575,7 +578,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                       ? 'bg-green-100 text-green-700 border border-green-200' 
                       : 'bg-amber-100 text-amber-700 border border-amber-200'
                   }`}>
-                    {status.complete}/{status.total} Complete
+                    {t('completeStatus', { complete: status.complete, total: status.total })}
                   </div>
                   {status.complete !== status.total && (
                     <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -590,7 +593,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             </div>
 
             <p className="text-xs text-gray-600 bg-blue-50 border border-blue-100 rounded-lg p-2">
-              💡 <strong>Tip:</strong> Click on a color card to select it, then expand to add product image and stock quantity.
+              {t('colorVariantsTip')}
             </p>
 
             {/* All Colors as Collapsible Items */}
@@ -654,9 +657,9 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                             }`}>
                               {isSelected 
                                 ? isComplete
-                                  ? `✓ Complete - ${variant.quantity} units in stock`
-                                  : '⚠️ Add image and quantity'
-                                : 'Click to select this color'
+                                  ? t('completeWithStock', { quantity: variant.quantity })
+                                  : t('addImageAndQuantity')
+                                : t('clickToSelectColor')
                               }
                             </p>
                           </div>
@@ -676,7 +679,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                                 onClick={(e) => handleColorDeselect(color.id, e)}
                                 className="p-1.5 hover:bg-red-50 rounded-full transition-all duration-200 hover:scale-110"
                                 disabled={isSubmitting || variantLoadingId === color.id}
-                                title="Remove color"
+                                title={t('removeColor')}
                               >
                                 <X className="h-4 w-4 text-red-500" />
                               </button>
@@ -707,7 +710,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                               <div className="space-y-2">
                                 <Label className="text-sm font-semibold flex items-center space-x-2 text-gray-700">
                                   <ImageIcon className="h-4 w-4 text-blue-600" />
-                                  <span>Product Image *</span>
+                                  <span>{t('productImageLabel')} *</span>
                                 </Label>
                                 
                                 {variant.imagePreview ? (
@@ -722,12 +725,12 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                                       onClick={() => handleRemoveVariantImage(variant.color_id)}
                                       className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                                       disabled={isSubmitting}
-                                      title="Remove image"
+                                      title={t('removeColor')}
                                     >
                                       <X className="h-4 w-4" />
                                     </button>
                                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent text-white text-xs p-3">
-                                      <p className="font-medium truncate">{variant.image?.name || 'Current image'}</p>
+                                      <p className="font-medium truncate">{variant.image?.name || t('currentImage')}</p>
                                       {variant.image && (
                                         <p className="text-xs opacity-90">
                                           {(variant.image.size / 1024).toFixed(1)} KB
@@ -753,8 +756,8 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                                         <Upload className="h-8 w-8 text-blue-600" />
                                       </div>
                                       <div className="text-center">
-                                        <p className="text-sm font-semibold text-gray-900">Click to upload image</p>
-                                        <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                                        <p className="text-sm font-semibold text-gray-900">{t('uploadImage')}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{t('imageFormat')}</p>
                                       </div>
                         </label>
                       </div>
@@ -764,7 +767,7 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                               {/* Quantity Input */}
                               <div className="space-y-2">
                                 <Label htmlFor={`quantity-${variant.color_id}`} className="text-sm font-semibold text-gray-700">
-                                  Stock Quantity *
+                                  {t('stockQuantityLabel')} *
                                 </Label>
                                 <Input
                                   id={`quantity-${variant.color_id}`}
@@ -772,13 +775,13 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                                   min="0"
                                   value={variant.quantity}
                                   onChange={(e) => handleQuantityChange(variant.color_id, e.target.value)}
-                                  placeholder="Enter stock quantity"
+                                  placeholder={t('stockQuantityPlaceholder')}
                                   className="text-lg font-semibold border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                                   disabled={isSubmitting}
                                 />
                                 <p className="text-xs text-gray-500 flex items-center space-x-1">
                                   <span>📦</span>
-                                  <span>Available units in stock</span>
+                                  <span>{t('availableUnitsInStock')}</span>
                                 </p>
                               </div>
                             </div>
@@ -792,14 +795,14 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
             ) : (
               <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-lg">
                 <Palette className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No colors available. Please add colors first.</p>
+                <p className="text-sm">{t('noColorsAvailable')}</p>
               </div>
             )}
           </div>
 
           {/* Description - Full Width */}
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('descriptionLabel')}</Label>
             <RichTextEditor
               content={formData.description}
               onChange={(html) => setFormData(prev => ({ ...prev, description: html }))}
@@ -811,11 +814,12 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
           <DialogFooter>
             <Button
               type="button"
+              className='bg-white hover:bg-white/60 cursor-pointer'
               variant="outline"
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {tCommon('cancel')}
             </Button>
             <Button
               type="submit"
@@ -825,9 +829,9 @@ export default function EditModelModal({ isOpen, onClose, onSuccess, model, bran
                 !formData.brand || 
                 !formData.main_amount 
               }
-              className="text-secondary cursor-pointer"
+              className="bg-black text-white hover:bg-black/90 cursor-pointer"
             >
-              {isSubmitting ? 'Updating...' : 'Update Model'}
+              {isSubmitting ? t('updating') : t('updateModel')}
             </Button>
           </DialogFooter>
         </form>

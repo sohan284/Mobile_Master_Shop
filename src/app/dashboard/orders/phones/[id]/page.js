@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet, useApiPatch } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
@@ -21,6 +22,10 @@ export default function PhoneOrderDetailPage() {
   const orderId = params.id;
   const queryClient = useQueryClient();
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const tDetail = useTranslations('dashboard.orders.detailCommon');
+  const tPage = useTranslations('dashboard.orders.phoneDetail');
+  const tOrdersCommon = useTranslations('dashboard.orders.common');
+  const tGlobal = useTranslations('dashboard.common');
 
   // Fetch order details
   const { data: orderData, isLoading, error, refetch } = useApiGet(
@@ -35,11 +40,13 @@ export default function PhoneOrderDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['phoneOrder', orderId] });
       setUpdatingStatus(false);
-      toast.success('Order status updated successfully');
+      toast.success(tOrdersCommon('statusUpdated'));
     },
     onError: (error) => {
       setUpdatingStatus(false);
-      toast.error(error.response?.data?.message || 'Failed to update order status');
+      toast.error(
+        error.response?.data?.message || tOrdersCommon('statusUpdateFailed')
+      );
     }
   });
 
@@ -69,15 +76,32 @@ export default function PhoneOrderDetailPage() {
     return 'bg-gray-100 text-gray-800';
   };
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' },
+  const translateStatus = (value) => {
+    if (!value) {
+      return tDetail('notAvailable');
+    }
+    const normalized = value.toLowerCase();
+    try {
+      return tGlobal(normalized);
+    } catch {
+      return value;
+    }
+  };
+
+  const statusValues = [
+    'pending',
+    'confirmed',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+    'refunded',
   ];
+
+  const statusOptions = statusValues.map((value) => ({
+    value,
+    label: translateStatus(value),
+  }));
 
   if (isLoading) {
     return (
@@ -95,14 +119,19 @@ export default function PhoneOrderDetailPage() {
       <PageTransition>
         <div className="min-h-[60vh]">
           <ApiErrorMessage
-            error={error || { message: 'Order not found' }}
-            title="Error Loading Order"
+            error={error || { message: tDetail('orderNotFound') }}
+            title={tDetail('errorTitle')}
             onRetry={() => refetch()}
-            retryLabel="Retry"
+            retryLabel={tDetail('retry')}
             showReload={false}
             showGoBack={true}
           />
-
+          <div className="flex justify-center mt-4">
+            <Button onClick={() => router.back()} className="cursor-pointer">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {tDetail('goBack')}
+            </Button>
+          </div>
         </div>
       </PageTransition>
     );
@@ -114,15 +143,21 @@ export default function PhoneOrderDetailPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="outline" onClick={() => router.back()} className="cursor-pointer">
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="cursor-pointer"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {tDetail('back')}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Order {order.order_number || `#${order.id}`}
+                {tDetail('orderHeading', {
+                  number: order.order_number || `#${order.id}`,
+                })}
               </h1>
-              <p className="text-sm text-gray-600">New Phone Order Details</p>
+              <p className="text-sm text-gray-600">{tPage('subtitle')}</p>
             </div>
           </div>
         </div>
@@ -134,15 +169,17 @@ export default function PhoneOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Order Information
+                {tDetail('orderInformation')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Order Number</p>
-                  <p className="font-medium">{order.order_number || `#${order.id}`}</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderNumber')}</p>
+                  <p className="font-medium">
+                    {order.order_number || `#${order.id}`}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Order Date</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderDate')}</p>
                   <p className="font-medium">
                     {order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -150,11 +187,11 @@ export default function PhoneOrderDetailPage() {
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    }) : 'N/A'}
+                    }) : tDetail('notAvailable')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Order Status</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderStatus')}</p>
                   <Select
                     value={order.status?.toLowerCase() || 'pending'}
                     onValueChange={handleStatusChange}
@@ -162,7 +199,9 @@ export default function PhoneOrderDetailPage() {
                   >
                     <SelectTrigger className={`w-full mt-1 ${getStatusBadge(order.status)}`}>
                       <SelectValue>
-                        {updatingStatus ? 'Updating...' : order.status_display || order.status}
+                        {updatingStatus
+                          ? tOrdersCommon('updating')
+                          : order.status_display || translateStatus(order.status)}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -175,24 +214,27 @@ export default function PhoneOrderDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Payment Status</p>
+                  <p className="text-sm text-gray-600">{tDetail('paymentStatus')}</p>
                   <Badge className={`mt-1 ${getStatusBadge(order.payment_status)}`}>
-                    {order.payment_status_display || order.payment_status || 'Unknown'}
+                    {order.payment_status_display ||
+                      translateStatus(order.payment_status)}
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Quantity</p>
-                  <p className="font-medium">{order.quantity || 1}</p>
+                  <p className="text-sm text-gray-600">{tDetail('quantity')}</p>
+                  <p className="font-medium">
+                    {Number.isFinite(order.quantity) ? order.quantity : 1}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Last Updated</p>
+                  <p className="text-sm text-gray-600">{tDetail('lastUpdated')}</p>
                   <p className="font-medium text-sm">
                     {order.updated_at ? new Date(order.updated_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    }) : 'N/A'}
+                    }) : tDetail('notAvailable')}
                   </p>
                 </div>
               </div>
@@ -200,23 +242,31 @@ export default function PhoneOrderDetailPage() {
               {/* Status Timestamps */}
               {(order.confirmed_at || order.shipped_at || order.delivered_at) && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Status History</p>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    {tDetail('statusHistory')}
+                  </p>
                   <div className="space-y-2">
                     {order.confirmed_at && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="w-24 text-gray-600">Confirmed:</span>
+                        <span className="w-24 text-gray-600">
+                          {tDetail('statusConfirmed')}:
+                        </span>
                         <span className="font-medium">{new Date(order.confirmed_at).toLocaleString()}</span>
                       </div>
                     )}
                     {order.shipped_at && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="w-24 text-gray-600">Shipped:</span>
+                        <span className="w-24 text-gray-600">
+                          {tDetail('statusShipped')}:
+                        </span>
                         <span className="font-medium">{new Date(order.shipped_at).toLocaleString()}</span>
                       </div>
                     )}
                     {order.delivered_at && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="w-24 text-gray-600">Delivered:</span>
+                        <span className="w-24 text-gray-600">
+                          {tDetail('statusDelivered')}:
+                        </span>
                         <span className="font-medium">{new Date(order.delivered_at).toLocaleString()}</span>
                       </div>
                     )}
@@ -227,7 +277,9 @@ export default function PhoneOrderDetailPage() {
 
             {/* Product Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Information</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                {tDetail('productInformation')}
+              </h2>
               <div className="flex gap-4">
                 {order.phone_model_image && (
                   <div className="flex-shrink-0">
@@ -241,26 +293,30 @@ export default function PhoneOrderDetailPage() {
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg text-gray-900">{order.phone_model_name || 'N/A'}</h3>
+                  <h3 className="font-semibold text-lg text-gray-900">
+                    {order.phone_model_name || tDetail('notAvailable')}
+                  </h3>
                   {order.phone_model_brand && (
-                    <p className="text-gray-600 mt-1">Brand: <span className="font-medium">{order.phone_model_brand}</span></p>
+                    <p className="text-gray-600 mt-1">
+                      {tDetail('brand')}: <span className="font-medium">{order.phone_model_brand}</span>
+                    </p>
                   )}
                   <div className="mt-3 space-y-2">
                     {order.phone_ram && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">RAM:</span>
+                        <span className="text-sm text-gray-600">{tDetail('ram')}:</span>
                         <span className="font-medium text-sm">{order.phone_ram} GB</span>
                       </div>
                     )}
                     {order.phone_memory && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Storage:</span>
+                        <span className="text-sm text-gray-600">{tDetail('storage')}:</span>
                         <span className="font-medium text-sm">{order.phone_memory} GB</span>
                       </div>
                     )}
                     {order.selected_color && (
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Color:</span>
+                        <span className="text-sm text-gray-600">{tDetail('color')}:</span>
                         <span className="font-medium text-sm">{order.selected_color}</span>
                       </div>
                     )}
@@ -273,21 +329,23 @@ export default function PhoneOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Customer Information
+                {tDetail('customerInformation')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Name
+                    {tDetail('name')}
                   </p>
-                  <p className="font-medium">{order.customer_name || 'N/A'}</p>
+                  <p className="font-medium">
+                    {order.customer_name || tDetail('notAvailable')}
+                  </p>
                 </div>
                 {order.customer_phone && (
                   <div>
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Phone
+                      {tDetail('phone')}
                     </p>
                     <p className="font-medium">{order.customer_phone}</p>
                   </div>
@@ -296,7 +354,7 @@ export default function PhoneOrderDetailPage() {
                   <div className="col-span-2">
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      Email
+                      {tDetail('email')}
                     </p>
                     <p className="font-medium">{order.customer_email}</p>
                   </div>
@@ -308,12 +366,12 @@ export default function PhoneOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <MapPin className="h-5 w-5" />
-                Shipping Information
+                {tDetail('shippingInformation')}
               </h2>
               <div className="space-y-2">
                 {order.shipping_address && (
                   <div>
-                    <p className="text-sm text-gray-600">Address</p>
+                    <p className="text-sm text-gray-600">{tDetail('address')}</p>
                     <p className="font-medium">{order.shipping_address}</p>
                   </div>
                 )}
@@ -330,21 +388,21 @@ export default function PhoneOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Payment Summary
+                {tDetail('paymentSummary')}
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Unit Price</span>
+                  <span className="text-gray-600">{tDetail('unitPrice')}</span>
                   <span className="font-medium">
                     €{parseFloat(order.unit_price || 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Quantity</span>
+                  <span className="text-gray-600">{tDetail('quantity')}</span>
                   <span className="font-medium">{order.quantity || 1}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600">{tDetail('subtotal')}</span>
                   <span className="font-medium">
                     €{parseFloat(order.subtotal || 0).toFixed(2)}
                   </span>
@@ -352,7 +410,11 @@ export default function PhoneOrderDetailPage() {
                 
                 {parseFloat(order.website_discount_amount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Discount ({order.website_discount_percentage}%)</span>
+                    <span>
+                      {tDetail('discountWithPercentage', {
+                        percentage: order.website_discount_percentage || 0,
+                      })}
+                    </span>
                     <span className="font-medium">
                       -€{parseFloat(order.website_discount_amount).toFixed(2)}
                     </span>
@@ -361,7 +423,7 @@ export default function PhoneOrderDetailPage() {
                 
                 {parseFloat(order.shipping_cost || 0) > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
+                    <span className="text-gray-600">{tDetail('shipping')}</span>
                     <span className="font-medium">
                       €{parseFloat(order.shipping_cost).toFixed(2)}
                     </span>
@@ -370,7 +432,7 @@ export default function PhoneOrderDetailPage() {
 
                 {parseFloat(order.total_discount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Total Discount</span>
+                    <span>{tDetail('totalDiscount')}</span>
                     <span className="font-medium">
                       -€{parseFloat(order.total_discount).toFixed(2)}
                     </span>
@@ -378,7 +440,9 @@ export default function PhoneOrderDetailPage() {
                 )}
                 
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="font-semibold text-gray-900">Total Amount</span>
+                  <span className="font-semibold text-gray-900">
+                    {tDetail('totalAmount')}
+                  </span>
                   <span className="font-bold text-lg text-gray-900">
                     €{parseFloat(order.total_amount || 0).toFixed(2)}
                   </span>

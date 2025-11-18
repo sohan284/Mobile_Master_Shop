@@ -12,8 +12,11 @@ import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 function ModelsPageContent() {
+  const t = useTranslations('dashboard.repairServices.modelsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,7 +79,7 @@ function ModelsPageContent() {
       ),
     },
     {
-      header: 'Image',
+      header: t('image'),
       accessor: 'image',
       render: (item) => (
         <div className="flex items-center">
@@ -91,12 +94,12 @@ function ModelsPageContent() {
       ),
     },
     {
-      header: 'Model Name',
+      header: t('modelName'),
       accessor: 'name',
       sortable: true,
     },
     {
-      header: 'Brand',
+      header: t('brand'),
       accessor: 'brand',
       render: (item) => (
         <div className="flex items-center">
@@ -132,12 +135,12 @@ function ModelsPageContent() {
     setIsDeleting(true);
     try {
       await deleteModel(selectedModel.id);
-      toast.success(`${selectedModel.name} deleted successfully`);
+      toast.success(t('deletedSuccessfully', { name: selectedModel.name }));
       refetch();
       setIsDeleteDialogOpen(false);
       setSelectedModel(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete model');
+      toast.error(error.response?.data?.message || error.message || t('failedToDelete'));
     } finally {
       setIsDeleting(false);
     }
@@ -161,7 +164,7 @@ function ModelsPageContent() {
 
     // Use existing rank fields from the models
     if (draggedModel.rank === undefined || targetModel.rank === undefined) {
-      toast.error('Rank information is missing');
+      toast.error(t('rankMissing'));
       return;
     }
 
@@ -178,10 +181,10 @@ function ModelsPageContent() {
         // apiFetcher.patch(`/api/repair/models/${targetModel.id}/`, { rank: draggedRank })
       ]);
       
-      toast.success('Models reordered successfully');
+      toast.success(t('reorderedSuccessfully'));
       refetch();
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to reorder models');
+      toast.error(error.response?.data?.message || error.message || t('failedToReorder'));
     } finally {
       setMovingItems({});
     }
@@ -203,8 +206,8 @@ function ModelsPageContent() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-2xl font-bold text-gray-900">Models Management</p>
-        <p className="text-gray-600">Manage phone models and their information</p>
+        <p className="text-2xl font-bold text-gray-900">{t('title')}</p>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       {/* Brand Tabs */}
@@ -254,7 +257,7 @@ function ModelsPageContent() {
       <DataTable
         data={modelsList}
         columns={columns}
-        title="Phone Models"
+        title={t('tableTitle')}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -292,10 +295,10 @@ function ModelsPageContent() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Model"
-        message={`Are you sure you want to delete "${selectedModel?.name}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={t('deleteModel')}
+        message={t('deleteConfirm', { name: selectedModel?.name || '' })}
+        confirmText={t('yesDelete')}
+        cancelText={tCommon('cancel')}
         type="danger"
         isLoading={isDeleting}
       />

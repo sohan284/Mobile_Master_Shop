@@ -11,8 +11,11 @@ import Image from 'next/image';
 import AddBrandModal from './components/AddBrandModal';
 import EditBrandModal from './components/EditBrandModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 export default function NewPhoneBrandsPage() {
+  const t = useTranslations('dashboard.newPhones.brandsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -26,7 +29,7 @@ export default function NewPhoneBrandsPage() {
 
   const columns = [
     {
-      header: 'Icon',
+      header: t('icon'),
       accessor: 'icon',
       render: (item) => (
         <div className="flex items-center">
@@ -40,35 +43,35 @@ export default function NewPhoneBrandsPage() {
             />
           ) : (
             <div className="h-8 w-8 bg-gray-200 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-500">No Icon</span>
+              <span className="text-xs text-gray-500">{t('noIcon')}</span>
             </div>
           )}
         </div>
       )
     },
     {
-      header: 'Brand Name',
+      header: t('brandName'),
       accessor: 'name',
       sortable: true
     },
   
     {
-      header: 'Description',
+      header: t('description'),
       accessor: 'description',
       render: (item) => (
         <div className="max-w-xs truncate" title={item.description}>
-          {item.description || 'No description'}
+          {item.description || t('noDescription')}
         </div>
       )
     },
  
     {
-      header: 'Models Count',
+      header: t('modelsCount'),
       accessor: 'models_count',
       sortable: true
     },
     {
-      header: 'Created At',
+      header: t('createdAt'),
       accessor: 'created_at',
       render: (item) => (
         <div className="text-sm text-gray-500">
@@ -116,12 +119,12 @@ export default function NewPhoneBrandsPage() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/api/brandnew/brands/${selectedBrand.slug}/`);
-      toast.success(`${selectedBrand.name} deleted successfully`);
+      toast.success(t('deletedSuccessfully', { name: selectedBrand.name }));
       refetch(); // Refresh the data after successful deletion
       setIsDeleteDialogOpen(false);
       setSelectedBrand(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to delete brand');  
+      toast.error(error.response?.data?.message || error.message || t('failedToDelete'));  
     } finally {
       setIsDeleting(false);
     } 
@@ -136,14 +139,14 @@ export default function NewPhoneBrandsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">New Phone Brands</h1>
-        <p className="text-gray-600">Manage new phone brands and their information</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       <DataTable
         data={brands}
         columns={columns}
-        title="Brands"
+        title={t('tableTitle')}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -173,10 +176,10 @@ export default function NewPhoneBrandsPage() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Brand"
-        message={`Are you sure you want to delete "${selectedBrand?.name}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={t('deleteBrand')}
+        message={t('deleteConfirm', { name: selectedBrand?.name || '' })}
+        confirmText={t('yesDelete')}
+        cancelText={tCommon('cancel')}
         type="danger"
         isLoading={isDeleting}
       />

@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import PageTransition from '@/components/animations/PageTransition';
 import { useApiGet, useApiPatch } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
@@ -21,6 +22,10 @@ export default function RepairOrderDetailPage() {
   const orderId = params.id;
   const queryClient = useQueryClient();
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const tDetail = useTranslations('dashboard.orders.detailCommon');
+  const tPage = useTranslations('dashboard.orders.repairDetail');
+  const tOrdersCommon = useTranslations('dashboard.orders.common');
+  const tGlobal = useTranslations('dashboard.common');
 
   // Fetch order details
   const { data: orderData, isLoading, error, refetch } = useApiGet(
@@ -35,11 +40,13 @@ export default function RepairOrderDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repairOrder', orderId] });
       setUpdatingStatus(false);
-      toast.success('Order status updated successfully');
+      toast.success(tOrdersCommon('statusUpdated'));
     },
     onError: (error) => {
       setUpdatingStatus(false);
-      toast.error(error.response?.data?.message || 'Failed to update order status');
+      toast.error(
+        error.response?.data?.message || tOrdersCommon('statusUpdateFailed')
+      );
     }
   });
 
@@ -69,14 +76,31 @@ export default function RepairOrderDetailPage() {
     return 'bg-gray-100 text-gray-800';
   };
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'confirmed', label: 'Confirmed' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' },
+  const translateStatus = (value) => {
+    if (!value) {
+      return tDetail('notAvailable');
+    }
+    const normalized = value.toLowerCase();
+    try {
+      return tGlobal(normalized);
+    } catch {
+      return value;
+    }
+  };
+
+  const statusValues = [
+    'pending',
+    'confirmed',
+    'processing',
+    'completed',
+    'cancelled',
+    'refunded',
   ];
+
+  const statusOptions = statusValues.map((value) => ({
+    value,
+    label: translateStatus(value),
+  }));
 
   if (isLoading) {
     return (
@@ -94,13 +118,19 @@ export default function RepairOrderDetailPage() {
       <PageTransition>
         <div className="min-h-[60vh]">
           <ApiErrorMessage
-            error={error || { message: 'Order not found' }}
-            title="Error Loading Order"
+            error={error || { message: tDetail('orderNotFound') }}
+            title={tDetail('errorTitle')}
             onRetry={() => refetch()}
-            retryLabel="Retry"
+            retryLabel={tDetail('retry')}
             showReload={false}
             showGoBack={true}
           />
+          <div className="flex justify-center mt-4">
+            <Button onClick={() => router.back()} className="cursor-pointer">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {tDetail('goBack')}
+            </Button>
+          </div>
         </div>
       </PageTransition>
     );
@@ -114,13 +144,15 @@ export default function RepairOrderDetailPage() {
           <div className="flex items-center gap-4">
             <Button variant="outline" onClick={() => router.back()} className="cursor-pointer">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {tDetail('back')}
             </Button>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Order {order.order_number || `#${order.id}`}
+                {tDetail('orderHeading', {
+                  number: order.order_number || `#${order.id}`,
+                })}
               </h1>
-              <p className="text-sm text-gray-600">Repair Order Details</p>
+              <p className="text-sm text-gray-600">{tPage('subtitle')}</p>
             </div>
           </div>
         </div>
@@ -132,15 +164,15 @@ export default function RepairOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Order Information
+                {tDetail('orderInformation')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Order Number</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderNumber')}</p>
                   <p className="font-medium">{order.order_number || `#${order.id}`}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Order Date</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderDate')}</p>
                   <p className="font-medium">
                     {order.created_at ? new Date(order.created_at).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -148,11 +180,11 @@ export default function RepairOrderDetailPage() {
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    }) : 'N/A'}
+                    }) : tDetail('notAvailable')}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Order Status</p>
+                  <p className="text-sm text-gray-600">{tDetail('orderStatus')}</p>
                   <Select
                     value={order.status?.toLowerCase() || 'pending'}
                     onValueChange={handleStatusChange}
@@ -160,7 +192,9 @@ export default function RepairOrderDetailPage() {
                   >
                     <SelectTrigger className={`w-full mt-1 ${getStatusBadge(order.status)}`}>
                       <SelectValue>
-                        {updatingStatus ? 'Updating...' : order.status_display || order.status}
+                        {updatingStatus
+                          ? tOrdersCommon('updating')
+                          : order.status_display || translateStatus(order.status)}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -173,29 +207,30 @@ export default function RepairOrderDetailPage() {
                   </Select>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Payment Status</p>
+                  <p className="text-sm text-gray-600">{tDetail('paymentStatus')}</p>
                   <Badge className={`mt-1 ${getStatusBadge(order.payment_status)}`}>
-                    {order.payment_status_display || order.payment_status || 'Unknown'}
+                    {order.payment_status_display ||
+                      translateStatus(order.payment_status)}
                   </Badge>
                 </div>
                 {order.schedule && (
                   <div className="col-span-2">
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
-                      Scheduled Date/Time
+                      {tDetail('schedule')}
                     </p>
                     <p className="font-medium">{order.schedule}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm text-gray-600">Last Updated</p>
+                  <p className="text-sm text-gray-600">{tDetail('lastUpdated')}</p>
                   <p className="font-medium text-sm">
                     {order.updated_at ? new Date(order.updated_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    }) : 'N/A'}
+                    }) : tDetail('notAvailable')}
                   </p>
                 </div>
               </div>
@@ -203,17 +238,23 @@ export default function RepairOrderDetailPage() {
               {/* Status Timestamps */}
               {(order.confirmed_at || order.completed_at) && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Status History</p>
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    {tDetail('statusHistory')}
+                  </p>
                   <div className="space-y-2">
                     {order.confirmed_at && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="w-24 text-gray-600">Confirmed:</span>
+                        <span className="w-24 text-gray-600">
+                          {tDetail('statusConfirmed')}:
+                        </span>
                         <span className="font-medium">{new Date(order.confirmed_at).toLocaleString()}</span>
                       </div>
                     )}
                     {order.completed_at && (
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="w-24 text-gray-600">Completed:</span>
+                        <span className="w-24 text-gray-600">
+                          {tDetail('statusCompleted')}:
+                        </span>
                         <span className="font-medium">{new Date(order.completed_at).toLocaleString()}</span>
                       </div>
                     )}
@@ -226,16 +267,18 @@ export default function RepairOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Phone className="h-5 w-5" />
-                Device Information
+                {tDetail('deviceInformation')}
               </h2>
               <div className="space-y-2">
                 <div>
-                  <p className="text-sm text-gray-600">Device Model</p>
-                  <p className="font-semibold text-lg">{order.phone_model_name || 'N/A'}</p>
+                  <p className="text-sm text-gray-600">{tDetail('deviceModel')}</p>
+                  <p className="font-semibold text-lg">
+                    {order.phone_model_name || tDetail('notAvailable')}
+                  </p>
                 </div>
                 {order.brand_name && (
                   <div>
-                    <p className="text-sm text-gray-600">Brand</p>
+                    <p className="text-sm text-gray-600">{tDetail('brand')}</p>
                     <p className="font-medium">{order.brand_name}</p>
                   </div>
                 )}
@@ -243,69 +286,82 @@ export default function RepairOrderDetailPage() {
             </div>
 
             {/* Repair Services */}
-            {order.order_items && Array.isArray(order.order_items) && order.order_items.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Wrench className="h-5 w-5" />
-                  Repair Services
-                </h2>
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Wrench className="h-5 w-5" />
+                {tDetail('repairServices')}
+              </h2>
+              {order.order_items && Array.isArray(order.order_items) && order.order_items.length > 0 ? (
                 <div className="space-y-4">
                   {order.order_items.map((item, index) => (
                     <div key={item.id || index} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{item.problem_name || 'Service'}</h3>
+                          <h3 className="font-semibold text-gray-900">
+                            {item.problem_name || tDetail('notAvailable')}
+                          </h3>
                           {item.part_type && (
                             <p className="text-sm text-gray-600 mt-1">
-                              Part Type: <span className="font-medium capitalize">{item.part_type}</span>
+                              {tDetail('partType')}: <span className="font-medium capitalize">{item.part_type}</span>
                             </p>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900">€{parseFloat(item.final_price || 0).toFixed(2)}</p>
+                          <p className="font-semibold text-gray-900">
+                            €{parseFloat(item.final_price || 0).toFixed(2)}
+                          </p>
                           {parseFloat(item.discount_amount || 0) > 0 && (
-                            <p className="text-xs text-green-600 line-through">€{parseFloat(item.base_price || 0).toFixed(2)}</p>
+                            <p className="text-xs text-green-600 line-through">
+                              €{parseFloat(item.base_price || 0).toFixed(2)}
+                            </p>
                           )}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <p className="text-gray-600">Base Price</p>
-                          <p className="font-medium">€{parseFloat(item.base_price || 0).toFixed(2)}</p>
+                          <p className="text-gray-600">{tDetail('basePrice')}</p>
+                          <p className="font-medium">
+                            €{parseFloat(item.base_price || 0).toFixed(2)}
+                          </p>
                         </div>
                         {parseFloat(item.item_discount || 0) > 0 && (
                           <div>
-                            <p className="text-gray-600">Item Discount</p>
-                            <p className="font-medium text-green-600">-€{parseFloat(item.item_discount || 0).toFixed(2)}</p>
+                            <p className="text-gray-600">{tDetail('itemDiscount')}</p>
+                            <p className="font-medium text-green-600">
+                              -€{parseFloat(item.item_discount || 0).toFixed(2)}
+                            </p>
                           </div>
                         )}
                         {parseFloat(item.discount_percentage || 0) > 0 && (
                           <div>
-                            <p className="text-gray-600">Discount</p>
-                            <p className="font-medium text-green-600">{item.discount_percentage}% (-€{parseFloat(item.discount_amount || 0).toFixed(2)})</p>
+                            <p className="text-gray-600">{tDetail('discount')}</p>
+                            <p className="font-medium text-green-600">
+                              {item.discount_percentage}% (-€{parseFloat(item.discount_amount || 0).toFixed(2)})
+                            </p>
                           </div>
                         )}
                         {item.warranty_days > 0 && (
                           <div className="col-span-2">
                             <p className="text-gray-600 flex items-center gap-1">
                               <Shield className="h-4 w-4" />
-                              Warranty
+                              {tDetail('warranty')}
                             </p>
-                            <p className="font-medium">{item.warranty_days} days</p>
+                            <p className="font-medium">
+                              {tDetail('warrantyDuration', { count: item.warranty_days })}
+                            </p>
                             {item.warranty_expires_at && (
                               <p className="text-xs text-gray-500">
-                                Expires: {new Date(item.warranty_expires_at).toLocaleDateString()}
+                                {tDetail('warrantyExpires')}: {new Date(item.warranty_expires_at).toLocaleDateString()}
                               </p>
                             )}
                           </div>
                         )}
                       </div>
 
-                      
-
                       <p className="text-xs text-gray-500 mt-3">
-                        Added: {new Date(item.created_at).toLocaleDateString('en-US', {
+                        {tDetail('added')}:{' '}
+                        {new Date(item.created_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
@@ -316,28 +372,32 @@ export default function RepairOrderDetailPage() {
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-sm text-gray-500">{tPage('servicesEmpty')}</p>
+              )}
+            </div>
 
             {/* Customer Information */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <User className="h-5 w-5" />
-                Customer Information
+                {tDetail('customerInformation')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600 flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    Name
+                    {tDetail('name')}
                   </p>
-                  <p className="font-medium">{order.customer_name || 'N/A'}</p>
+                  <p className="font-medium">
+                    {order.customer_name || tDetail('notAvailable')}
+                  </p>
                 </div>
                 {order.customer_phone && (
                   <div>
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Phone
+                      {tDetail('phone')}
                     </p>
                     <p className="font-medium">{order.customer_phone}</p>
                   </div>
@@ -346,7 +406,7 @@ export default function RepairOrderDetailPage() {
                   <div className="col-span-2">
                     <p className="text-sm text-gray-600 flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      Email
+                      {tDetail('email')}
                     </p>
                     <p className="font-medium">{order.customer_email}</p>
                   </div>
@@ -363,11 +423,11 @@ export default function RepairOrderDetailPage() {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Payment Summary
+                {tDetail('paymentSummary')}
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
+                  <span className="text-gray-600">{tDetail('subtotal')}</span>
                   <span className="font-medium">
                     €{parseFloat(order.subtotal || 0).toFixed(2)}
                   </span>
@@ -375,7 +435,7 @@ export default function RepairOrderDetailPage() {
 
                 {parseFloat(order.item_discount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Item Discount</span>
+                    <span>{tDetail('itemDiscount')}</span>
                     <span className="font-medium">
                       -€{parseFloat(order.item_discount).toFixed(2)}
                     </span>
@@ -384,7 +444,11 @@ export default function RepairOrderDetailPage() {
 
                 {parseFloat(order.website_discount_amount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Website Discount ({order.website_discount_percentage}%)</span>
+                    <span>
+                      {tDetail('websiteDiscount', {
+                        percentage: order.website_discount_percentage || 0,
+                      })}
+                    </span>
                     <span className="font-medium">
                       -€{parseFloat(order.website_discount_amount).toFixed(2)}
                     </span>
@@ -393,7 +457,7 @@ export default function RepairOrderDetailPage() {
 
                 {parseFloat(order.total_discount || 0) > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Total Discount</span>
+                    <span>{tDetail('totalDiscount')}</span>
                     <span className="font-medium">
                       -€{parseFloat(order.total_discount).toFixed(2)}
                     </span>
@@ -401,7 +465,9 @@ export default function RepairOrderDetailPage() {
                 )}
                 
                 <div className="border-t pt-3 flex justify-between">
-                  <span className="font-semibold text-gray-900">Total Amount</span>
+                  <span className="font-semibold text-gray-900">
+                    {tDetail('totalAmount')}
+                  </span>
                   <span className="font-bold text-lg text-gray-900">
                     €{parseFloat(order.total_amount || 0).toFixed(2)}
                   </span>
@@ -411,24 +477,26 @@ export default function RepairOrderDetailPage() {
 
             {/* Quick Stats */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                {tDetail('orderSummary')}
+              </h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Services</span>
+                  <span className="text-sm text-gray-600">{tDetail('totalServices')}</span>
                   <Badge variant="text-gray-600">
                     {order.order_items?.length || 0}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Order Status</span>
+                  <span className="text-sm text-gray-600">{tDetail('orderStatusLabel')}</span>
                   <Badge className={getStatusBadge(order.status)}>
-                    {order.status_display || order.status}
+                    {order.status_display || translateStatus(order.status)}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Payment Status</span>
+                  <span className="text-sm text-gray-600">{tDetail('paymentStatusLabel')}</span>
                   <Badge className={getStatusBadge(order.payment_status)}>
-                    {order.payment_status_display || order.payment_status}
+                    {order.payment_status_display || translateStatus(order.payment_status)}
                   </Badge>
                 </div>
               </div>

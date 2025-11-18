@@ -188,7 +188,7 @@ export default function Refurbished() {
                           <Image
                             width={400}
                             height={400}
-                            src={model.icon}
+                            src={model.icon || model.stock_management[0]?.icon_color_based || '/Apple.png'}
                             alt={model.name}
                             className="w-full h-full object-contain rounded-md group-hover:scale-110 transition-transform duration-500"
                           />
