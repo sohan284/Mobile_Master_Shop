@@ -55,7 +55,7 @@ export default function AccessoriesPage() {
       accessor: 'main_amount',
       render: (item) => (
         <div className="font-medium text-green-600">
-          ${item.main_amount || '0.00'}
+          €{item.main_amount || '0.00'}
         </div>
       ),
       sortable: true

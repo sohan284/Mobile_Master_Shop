@@ -252,7 +252,7 @@ export default function RepairCalendarPage() {
       setIsFetchingProblems(true);
       try {
         const response = await apiFetcher.get(
-          `/api/repair/problems/?model=${formState.modelId}`
+          `/api/repair/repair-prices/?phone_model=${formState.modelId}`
         );
         const list = Array.isArray(response?.data)
           ? response.data
@@ -325,18 +325,31 @@ export default function RepairCalendarPage() {
     }));
   }, []);
 
-  const handleProblemToggle = useCallback((problemId, checked) => {
+  const handleProblemToggle = useCallback((problemId, checked, partType = null) => {
     setFormState((prev) => {
-      const exists = prev.problems.includes(problemId);
-      let updated = prev.problems;
-      if (checked && !exists) {
-        updated = [...prev.problems, problemId];
-      } else if (!checked && exists) {
-        updated = prev.problems.filter((id) => id !== problemId);
+      if (checked) {
+        // Remove any existing selection for this problem (original or duplicate)
+        // Then add the new selection
+        const filtered = prev.problems.filter(
+          (p) => p.problem_id !== problemId
+        );
+        const newProblem = { problem_id: problemId, part_type: partType };
+        return { ...prev, problems: [...filtered, newProblem] };
+      } else {
+        // Remove problem
+        const updated = prev.problems.filter(
+          (p) => !(p.problem_id === problemId && p.part_type === partType)
+        );
+        return { ...prev, problems: updated };
       }
-      return { ...prev, problems: updated };
     });
   }, []);
+
+  const isProblemSelected = useCallback((problemId, partType) => {
+    return formState.problems.some(
+      (p) => p.problem_id === problemId && p.part_type === partType
+    );
+  }, [formState.problems]);
 
   const updateFormField = useCallback((field, value) => {
     setFormState((prev) => ({
@@ -379,11 +392,16 @@ export default function RepairCalendarPage() {
 
     setIsSubmittingCustomOrder(true);
     try {
-      const problemIds = formState.problems.map((id) => Number(id));
+      // Format problems for API: array of objects with problem_id and part_type
+      const problemPayload = formState.problems.map((p) => ({
+        problem_id: Number(p.problem_id),
+        part_type: p.part_type,
+      }));
+      
       const payload = {
         brand: Number(formState.brandId),
         model: Number(formState.modelId),
-        problem: problemIds,
+        problem: problemPayload,
         customer_name: formState.customerName.trim(),
         customer_email: formState.customerEmail.trim() || null,
         customer_phone: formState.customerPhone.trim(),
@@ -944,8 +962,8 @@ export default function RepairCalendarPage() {
           </section>
         </div>
       </div>
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl border border-gray-200">
+      <Dialog className="w-[75vw]" open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent style={{ width: '75vw', maxHeight: '90vh', overflowY: 'auto' }} className="w-[75vw] sm:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto   border border-gray-200">
           <DialogHeader>
             <DialogTitle>{t("customOrderModalTitle")}</DialogTitle>
             <DialogDescription>
@@ -999,7 +1017,7 @@ export default function RepairCalendarPage() {
             </div>
             <div className="space-y-2">
               <Label>{t("problemsLabel")}</Label>
-              <div className="rounded-xl border border-dashed border-gray-200 p-3 max-h-56 overflow-y-auto">
+              <div className="rounded-xl border border-dashed border-gray-200 p-3 max-h-96 overflow-y-auto">
                 {isFetchingProblems ? (
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1010,27 +1028,91 @@ export default function RepairCalendarPage() {
                     {t("noProblemsLabel")}
                   </p>
                 ) : (
-                  <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="space-y-3 grid grid-cols-1 md:grid-cols-2 gap-2">
                     {problemOptions.map((problem) => {
-                      const problemId = String(problem.id);
-                      const checked = formState.problems.includes(problemId);
+                      const problemId = String(problem.problem_id);
+                      const hasOriginal = problem.original !== null;
+                      const hasDuplicate = problem.duplicate !== null;
+                      const originalSelected = isProblemSelected(problemId, "original");
+                      const duplicateSelected = isProblemSelected(problemId, "duplicate");
+                      const anySelected = originalSelected || duplicateSelected;
+
                       return (
-                        <label
-                          key={problem.id}
-                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm ${
-                            checked
+                        <div
+                          key={problem.problem_id}
+                          className={`rounded-lg border p-3 h-full ${
+                            anySelected
                               ? "border-blue-500 bg-blue-50"
                               : "border-gray-200 bg-white"
                           }`}
                         >
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(value) =>
-                              handleProblemToggle(problemId, Boolean(value))
-                            }
-                          />
-                          <span className="text-gray-700">{problem.name}</span>
-                        </label>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                              {problem.problem_name}
+                            </span>
+                          </div>
+                          {problem.problem_description && (
+                            <p className="text-xs text-gray-500 mb-2">
+                              {problem.problem_description}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {hasOriginal && (
+                              <label
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleProblemToggle(problemId, !originalSelected, "original");
+                                }}
+                                className={`flex cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-xs w-full ${
+                                  originalSelected
+                                    ? "border-green-600 bg-green-50 text-green-700"
+                                    : "border-gray-300 bg-white text-gray-700"
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={originalSelected}
+                                  onCheckedChange={(value) =>
+                                    handleProblemToggle(problemId, Boolean(value), "original")
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="flex-1">Original</span>
+                                {problem.original && (
+                                  <span className="text-xs font-semibold">
+                                    ${parseFloat(problem.original.final_price || 0).toFixed(2)}
+                                  </span>
+                                )}
+                              </label>
+                            )}
+                            {hasDuplicate && (
+                              <label
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleProblemToggle(problemId, !duplicateSelected, "duplicate");
+                                }}
+                                className={`flex cursor-pointer items-center gap-2 rounded-md border px-2 py-1 text-xs w-full ${
+                                  duplicateSelected
+                                    ? "border-orange-600 bg-orange-50 text-orange-700"
+                                    : "border-gray-300 bg-white text-gray-700"
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={duplicateSelected}
+                                  onCheckedChange={(value) =>
+                                    handleProblemToggle(problemId, Boolean(value), "duplicate")
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className="flex-1">Duplicate</span>
+                                {problem.duplicate && (
+                                  <span className="text-xs font-semibold">
+                                    ${parseFloat(problem.duplicate.final_price || 0).toFixed(2)}
+                                  </span>
+                                )}
+                              </label>
+                            )}
+                          </div>
+                        </div>
                       );
                     })}
                   </div>

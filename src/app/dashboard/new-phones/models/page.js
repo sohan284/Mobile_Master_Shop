@@ -12,8 +12,11 @@ import Image from 'next/image';
 import AddModelModal from './components/AddModelModal';
 import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useTranslations } from 'next-intl';
 
 function NewPhoneModelsContent() {
+  const t = useTranslations('dashboard.newPhones.modelsManagement');
+  const tCommon = useTranslations('dashboard.common');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -92,7 +95,7 @@ function NewPhoneModelsContent() {
       ),
     },
     {
-      header: 'Icon',
+      header: t('icon'),
       accessor: 'icon',
       render: (item) => (
         <div className="flex items-center">
@@ -106,48 +109,48 @@ function NewPhoneModelsContent() {
             />
           ) : (
             <div className="h-12 w-12 bg-gray-200 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-500">No Icon</span>
+              <span className="text-xs text-gray-500">{t('noIcon')}</span>
             </div>
           )}
         </div>
       )
     },
     {
-      header: 'Model Name',
+      header: t('modelName'),
       accessor: 'name',
       sortable: true
     },
     {
-      header: 'Brand',
+      header: t('brand'),
       accessor: 'brand_name',
       render: (item) => (
         <div className="flex items-center space-x-2">
-          <span>{item.brand_name || 'Unknown Brand'}</span>
+          <span>{item.brand_name || t('unknownBrand')}</span>
         </div>
       ),
       sortable: true
     },
     {
-      header: 'Price',
+      header: t('price'),
       accessor: 'main_amount',
       render: (item) => (
         <div className="font-medium">
-          {item.main_amount ? `$${parseFloat(item.main_amount).toLocaleString()}` : 'N/A'}
+          {item.main_amount ? `€${parseFloat(item.main_amount).toLocaleString()}` : 'N/A'}
         </div>
       ),
       sortable: true
     }, 
     {
-      header: 'Discounted Price',
+      header: t('discountedPrice'),
       accessor: 'discounted_amount',
       render: (item) => (
         <div className="font-medium">
-          {item.discounted_amount ? `$${parseFloat(item.discounted_amount).toLocaleString()}` : 'N/A'}
+          {item.discounted_amount ? `€${parseFloat(item.discounted_amount).toLocaleString()}` : 'N/A'}
         </div>
       ),
     }, 
     {
-      header: 'RAM',
+      header: t('ram'),
       accessor: 'ram',
       render: (item) => (
         <div className="text-sm">
@@ -157,7 +160,7 @@ function NewPhoneModelsContent() {
       sortable: true
     },
     {
-      header: 'Memory',
+      header: t('memory'),
       accessor: 'memory',
       render: (item) => (
         <div className="text-sm">
@@ -167,7 +170,7 @@ function NewPhoneModelsContent() {
       sortable: true
     },
     {
-      header: 'Stock',
+      header: t('stock'),
       accessor: 'stock_management',
       render: (item) => (
         <div className="text-sm">
@@ -176,7 +179,7 @@ function NewPhoneModelsContent() {
       ),
     },
     {
-      header: 'Created At',
+      header: t('createdAt'),
       accessor: 'created_at',
       render: (item) => (
         <div className="text-sm text-gray-500">
@@ -226,11 +229,12 @@ function NewPhoneModelsContent() {
     setIsDeleting(true);
     try {
       await apiFetcher.delete(`/api/brandnew/models/${selectedModel.id}/`);
+      toast.success(t('deletedSuccessfully'));
       setIsDeleteDialogOpen(false);
       setSelectedModel(null);
       refetch();
     } catch (error) {
-      toast.error('Failed to delete model');
+      toast.error(t('failedToDelete'));
     } finally {
       setIsDeleting(false);
     }
@@ -250,7 +254,7 @@ function NewPhoneModelsContent() {
 
     // Use existing rank fields from the models
     if (draggedModel.rank === undefined || targetModel.rank === undefined) {
-      toast.error('Rank information is missing');
+      toast.error(t('rankMissing'));
       return;
     }
 
@@ -267,10 +271,10 @@ function NewPhoneModelsContent() {
         // apiFetcher.patch(`/api/brandnew/models/${targetModel.id}/`, { rank: draggedRank })
       ]);
       
-      toast.success('Models reordered successfully');
+      toast.success(t('reorderedSuccessfully'));
       refetch();
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message || 'Failed to reorder models');
+      toast.error(error.response?.data?.message || error.message || t('failedToReorder'));
     } finally {
       setMovingModels({});
     }
@@ -292,8 +296,8 @@ function NewPhoneModelsContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">New Phone Models</h1>
-        <p className="text-gray-600">Manage new phone models and their information</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600">{t('subtitle')}</p>
       </div>
 
       {/* Brand Tabs */}
@@ -343,7 +347,7 @@ function NewPhoneModelsContent() {
       <DataTable
         data={modelsList}
         columns={columns}
-        title="Models"
+        title={t('tableTitle')}
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -381,10 +385,10 @@ function NewPhoneModelsContent() {
         isOpen={isDeleteDialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Delete Model"
-        message={`Are you sure you want to delete "${selectedModel?.name}"? This action cannot be undone.`}
-        confirmText="Yes, delete it!"
-        cancelText="Cancel"
+        title={t('deleteModel')}
+        message={t('deleteConfirm', { name: selectedModel?.name || '' })}
+        confirmText={t('yesDelete')}
+        cancelText={tCommon('cancel')}
         type="danger"
         isLoading={isDeleting}
       />
