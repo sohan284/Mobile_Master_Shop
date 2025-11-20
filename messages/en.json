@@ -625,7 +625,8 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday",
-    "sunday": "Sunday"
+      "sunday": "Sunday",
+    "sendUsAMessage": "Send us a Message"
   },
   "profile": {
     "pleaseLogin": "Please log in to view your profile",
