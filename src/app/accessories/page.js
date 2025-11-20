@@ -35,6 +35,8 @@ export default async function AccessoriesPage() {
     console.error('Error fetching accessories:', err);
     error = err;
   }
+  const activeAccessories =
+    accessories?.filter((accessory) => Boolean(accessory?.is_active)) || [];
 
-  return <AccessoriesClient initialAccessories={accessories} isLoading={false} error={error} />;
+  return <AccessoriesClient initialAccessories={activeAccessories} isLoading={false} error={error} />;
 }

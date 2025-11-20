@@ -60,7 +60,10 @@ export default function Refurbished() {
     () => apiFetcher.get('/api/brandnew/models/')
   );
   const models = modelsResponse?.data || [];
-
+  const featuredModels = useMemo(
+    () => (models || []).filter((model) => Boolean(model?.is_featured) && Boolean(model?.is_active)),
+    [models]
+  );
 
   const features = useMemo(() => [
     {
@@ -173,7 +176,7 @@ export default function Refurbished() {
             }}
             className="relative overflow-visible"
           >
-            {models.map((model) => (
+            {featuredModels.map((model) => (
               <SwiperSlide key={model.id}>
                 <Link className='cursor-pointer' href={`/phones/${model.brand}/${model.id}`}>
                   <Card className="group cursor-pointer bg-gray-200 /10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-500 border border-white/20 hover:border-secondary/50 h-full overflow-hidden">
