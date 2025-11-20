@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 export default function ContactClient() {
   const t = useTranslations('contact');
+  const tFooter = useTranslations('footer');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -152,7 +153,7 @@ export default function ContactClient() {
                 <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
                   <Send className="w-5 h-5 text-secondary" />
                 </div>
-                <h2 className="text-2xl font-bold text-secondary">Send us a Message</h2>
+                <h2 className="text-2xl font-bold text-secondary">{t('sendUsAMessage')}</h2>
               </div>
 
               <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
@@ -273,9 +274,14 @@ export default function ContactClient() {
                               <div className="text-secondary/90 text-sm leading-relaxed">
                                 {info.content === "day" ? (
                                   <div className="space-y-1">
-                                    <p className="text-secondary/90">{t('monday')}: <span className="text-secondary">2-7 pm</span></p>
-                                    <p className="text-secondary/90">{t('tuesday')} to {t('saturday')}: <span className="text-secondary">10 am-1 pm and 2-7 pm</span></p>
-                                    <p className="text-secondary/90">{t('sunday')}: <span className="text-secondary">10 am-1 pm</span></p>
+                              <p className="text-secondary/80 text-xs sm:text-sm leading-relaxed  transition-colors duration-300">
+                      
+                        <span className="text-secondary/70">{tFooter('mondayHours')}</span>
+                        <br />
+                        <span className="text-secondary/70">{tFooter('tuesdayToSaturdayHours')}</span>
+                        <br />
+                        <span className="text-secondary/70">{tFooter('sundayHours')}</span>
+                    </p>
                                   </div>
                                 ) : (
                                   <p className="whitespace-pre-line text-secondary/90">{info.content}</p>

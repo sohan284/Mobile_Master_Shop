@@ -9,6 +9,7 @@ import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
 import { apiFetcher } from '@/lib/api';
 import Image from 'next/image';
+import { Switch } from '@/components/ui/switch';
 import AddModelModal from './components/AddModelModal';
 import EditModelModal from './components/EditModelModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -28,6 +29,7 @@ function NewPhoneModelsContent() {
   // Get brand from URL params, default to 'apple' if not present
   const [selectedBrandSlug, setSelectedBrandSlug] = useState('apple');
   const [movingModels, setMovingModels] = useState({}); // Track which models are being moved
+  const [updatingModelFlags, setUpdatingModelFlags] = useState({}); // Track toggle updates
   
   // Fetch brands for the dropdown
   const { data: brandsResponse, isLoading: brandsLoading } = useApiGet(
@@ -179,6 +181,45 @@ function NewPhoneModelsContent() {
       ),
     },
     {
+      header: t('activeColumn'),
+      accessor: 'is_active',
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={Boolean(item.is_active)}
+            onCheckedChange={(checked) =>
+              handleToggleModelFlag(item, 'is_active', checked)
+            }
+            disabled={Boolean(updatingModelFlags[item.id])}
+            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 data-[state=unchecked]:bg-red-500 data-[state=unchecked]:border-red-500"
+          />
+          <span className="text-xs font-medium text-gray-600">
+            {item.is_active ? t('switchOn') : t('switchOff')}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: t('featuredColumn'),
+      accessor: 'is_featured',
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={Boolean(item.is_featured)}
+            onCheckedChange={(checked) =>
+              handleToggleModelFlag(item, 'is_featured', checked)
+            }
+            disabled={Boolean(updatingModelFlags[item.id])}
+            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 data-[state=unchecked]:bg-red-500 data-[state=unchecked]:border-red-500"
+          />
+          <span className="text-xs font-medium text-gray-600">
+            {item.is_featured ? t('switchOn') : t('switchOff')}
+          </span>
+        </div>
+      ),
+    },
+   
+    {
       header: t('createdAt'),
       accessor: 'created_at',
       render: (item) => (
@@ -244,6 +285,41 @@ function NewPhoneModelsContent() {
     setIsDeleteDialogOpen(false);
     setSelectedModel(null);
     setIsDeleting(false);
+  };
+
+  const handleToggleModelFlag = async (model, field, value) => {
+    if (!model?.id || (field !== 'is_active' && field !== 'is_featured')) return;
+
+    const previousValue = Boolean(model[field]);
+    setUpdatingModelFlags((prev) => ({ ...prev, [model.id]: true }));
+    setModelsList((prev) =>
+      prev.map((item) =>
+        item.id === model.id ? { ...item, [field]: value } : item
+      )
+    );
+
+    try {
+      await apiFetcher.patch(`/api/brandnew/models/${model.id}/`, {
+        [field]: value,
+      });
+      toast.success('Model updated');
+      refetch();
+    } catch (error) {
+      setModelsList((prev) =>
+        prev.map((item) =>
+          item.id === model.id ? { ...item, [field]: previousValue } : item
+        )
+      );
+      toast.error(
+        error?.response?.data?.message || error?.message || 'Failed to update model'
+      );
+    } finally {
+      setUpdatingModelFlags((prev) => {
+        const next = { ...prev };
+        delete next[model.id];
+        return next;
+      });
+    }
   };
 
   // Drag and drop handler - swap any two items

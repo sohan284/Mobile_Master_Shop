@@ -625,7 +625,8 @@
     "thursday": "Jeudi",
     "friday": "Vendredi",
     "saturday": "Samedi",
-    "sunday": "Dimanche"
+    "sunday": "Dimanche",
+    "sendUsAMessage": "Envoyer-nous un message"
   },
   "profile": {
     "pleaseLogin": "Veuillez vous connecter pour voir votre profil",
@@ -917,6 +918,11 @@
       "name": "Nom",
       "price": "Prix",
       "stock": "Stock",
+      "activeStatus": "Actif",
+      "activeLabel": "Actif",
+      "inactiveLabel": "Inactif",
+      "switchOn": "Oui",
+      "switchOff": "Non",
       "inStock": "en stock",
       "createdAt": "Créé le",
       "addNewAccessory": "Ajouter un Accessoire",
@@ -1073,6 +1079,10 @@
         "ram": "RAM",
         "memory": "Mémoire",
         "stock": "Stock",
+        "activeColumn": "Actif",
+        "featuredColumn": "Mis en avant",
+        "switchOn": "Oui",
+        "switchOff": "Non",
         "createdAt": "Créé le",
         "noIcon": "Aucune Icône",
         "unknownBrand": "Marque Inconnue",

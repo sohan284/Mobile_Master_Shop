@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DataTable from '@/components/ui/DataTable';
-import { Badge } from '@/components/ui/badge';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useApiGet } from '@/hooks/useApi';
@@ -13,6 +12,7 @@ import EditAccessoryModal from './components/EditAccessoryModal';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import PageTransition from '@/components/animations/PageTransition';
 import { useTranslations } from 'next-intl';
+import { Switch } from '@/components/ui/switch';
 
 export default function AccessoriesPage() {
   const t = useTranslations('dashboard.accessories');
@@ -26,7 +26,51 @@ export default function AccessoriesPage() {
     ['accessories'],
     () => apiFetcher.get('/api/accessories/products/')
   );
-  const accessories = accessoriesResponse?.data || accessoriesResponse || [];
+  const accessories = useMemo(() => {
+    return accessoriesResponse?.data || accessoriesResponse || [];
+  }, [accessoriesResponse]);
+  const [accessoriesList, setAccessoriesList] = useState([]);
+  const [updatingActiveStatus, setUpdatingActiveStatus] = useState({});
+
+  useEffect(() => {
+    setAccessoriesList(accessories);
+  }, [accessories]);
+
+  const handleToggleActive = async (accessory, nextValue) => {
+    if (!accessory?.id) return;
+    const accessoryId = accessory.id;
+    const previousValue = Boolean(accessory.is_active);
+
+    setUpdatingActiveStatus((prev) => ({ ...prev, [accessoryId]: true }));
+    setAccessoriesList((prev) =>
+      prev.map((item) =>
+        item.id === accessoryId ? { ...item, is_active: nextValue } : item
+      )
+    );
+
+    try {
+      await apiFetcher.patch(`/api/accessories/products/${accessoryId}/`, {
+        is_active: nextValue,
+      });
+      toast.success(t('updatedSuccessfully'));
+      refetch();
+    } catch (error) {
+      setAccessoriesList((prev) =>
+        prev.map((item) =>
+          item.id === accessoryId ? { ...item, is_active: previousValue } : item
+        )
+      );
+      toast.error(
+        error?.response?.data?.message || error?.message || t('failedToUpdate')
+      );
+    } finally {
+      setUpdatingActiveStatus((prev) => {
+        const next = { ...prev };
+        delete next[accessoryId];
+        return next;
+      });
+    }
+  };
 
   const columns = [
     {
@@ -59,6 +103,29 @@ export default function AccessoriesPage() {
         </div>
       ),
       sortable: true
+    },
+    {
+      header: t('activeStatus'),
+      accessor: 'is_active',
+      render: (item) => {
+        const isActive = Boolean(item?.is_active);
+        return (
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={isActive}
+              onCheckedChange={(checked) =>
+                handleToggleActive(item, Boolean(checked))
+              }
+              disabled={Boolean(updatingActiveStatus[item.id])}
+              className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 data-[state=unchecked]:bg-red-500 data-[state=unchecked]:border-red-500"
+            />
+            <span className="text-xs font-medium text-gray-600">
+              {isActive ? t('switchOn') : t('switchOff')}
+            </span>
+          </div>
+        );
+      },
+      sortable: true,
     },
     {
       header: t('stock'),
@@ -145,7 +212,7 @@ export default function AccessoriesPage() {
         </div>
 
         <DataTable
-          data={accessories}
+          data={accessoriesList}
           columns={columns}
           title={t('tableTitle')}
           onAdd={handleAdd}

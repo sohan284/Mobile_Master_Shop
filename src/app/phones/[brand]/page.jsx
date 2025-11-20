@@ -39,10 +39,10 @@ export default async function BrandPage({ params }) {
     console.error('Error fetching brand phones:', err);
     error = err;
   }
-
+const activePhones = phones?.filter((phone) => Boolean(phone?.is_active)) || [];
   return (
     <BrandPhonesClient 
-      initialPhones={phones} 
+      initialPhones={activePhones} 
       brand={brandLower}
                   isLoading={false}
       error={error} 
