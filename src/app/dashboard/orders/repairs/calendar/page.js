@@ -144,6 +144,20 @@ const formatDateTimeLocal = (date) => {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
 
+// Convert datetime-local string to ISO string without timezone conversion
+// Treats the local time as UTC to avoid timezone offset issues
+const datetimeLocalToISO = (datetimeLocalString) => {
+  if (!datetimeLocalString) return null;
+  // datetime-local format: "YYYY-MM-DDTHH:mm"
+  const parts = datetimeLocalString.split("T");
+  if (parts.length !== 2) return null;
+  const [datePart, timePart] = parts;
+  if (!datePart || !timePart) return null;
+  
+  // Return as ISO string with Z (UTC) - treating local time as UTC
+  return `${datePart}T${timePart}:00.000Z`;
+};
+
 const formatCurrencyValue = (value, currency = "EUR") => {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) return null;
@@ -547,8 +561,8 @@ export default function RepairCalendarPage() {
       return;
     }
 
-    const scheduleDate = new Date(formState.schedule);
-    if (Number.isNaN(scheduleDate.getTime())) {
+    const scheduleISO = datetimeLocalToISO(formState.schedule);
+    if (!scheduleISO) {
       toast.error(t("customOrderValidationSchedule"));
       return;
     }
@@ -582,7 +596,7 @@ export default function RepairCalendarPage() {
         customer_phone: formState.customerPhone.trim(),
         customer_address: formState.customerAddress.trim(),
         notes: formState.notes.trim() || undefined,
-        schedule: scheduleDate.toISOString(),
+        schedule: scheduleISO,
         amount: finalAmount,
       };
 
@@ -909,8 +923,11 @@ export default function RepairCalendarPage() {
       toast.error(t("schedulePlaceholder"));
       return;
     }
-    const localDate = new Date(value);
-    const isoString = localDate.toISOString();
+    const isoString = datetimeLocalToISO(value);
+    if (!isoString) {
+      toast.error(t("schedulePlaceholder"));
+      return;
+    }
     handleScheduleUpdate(order, isoString);
   };
 
